@@ -16,6 +16,4 @@ export class AlumnoController extends CommonController(AlumnoService){
     async editOne(@Param('id', ParseIntPipe) id:number, @Body() alumno:AlumnoEdit){
         return await this.alumnoService.editOne(id, alumno)    
     }
-
-
 }
