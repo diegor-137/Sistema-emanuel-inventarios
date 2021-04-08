@@ -9,6 +9,8 @@ import {  DATABASE_HOST,
           DATABASE_PASSWORD,  
           DATABASE_NAME } from './config/constants';
 import { AlmacenModule } from './almacen/almacen.module';
+import { RecursosHumanosModule } from './recursos-humanos/recursos-humanos.module';
+import { ComprasModule } from './compras/compras.module';
 
 @Module({
   imports: [
@@ -37,7 +39,9 @@ import { AlmacenModule } from './almacen/almacen.module';
       //Para indicar donde esta el archivo .ENV
       envFilePath:'.env'
     }),
-    AlmacenModule
+    AlmacenModule,
+    RecursosHumanosModule,
+    ComprasModule
   ],
   controllers: [AppController],
   providers: [AppService],
