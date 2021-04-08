@@ -8,9 +8,7 @@ import {  DATABASE_HOST,
           DATABASE_USERNAME, 
           DATABASE_PASSWORD,  
           DATABASE_NAME } from './config/constants';
-
-
-import { AlumnoModule } from './alumno/alumno.module';
+import { AlmacenModule } from './almacen/almacen.module';
 
 @Module({
   imports: [
@@ -39,7 +37,7 @@ import { AlumnoModule } from './alumno/alumno.module';
       //Para indicar donde esta el archivo .ENV
       envFilePath:'.env'
     }),
-    AlumnoModule
+    AlmacenModule
   ],
   controllers: [AppController],
   providers: [AppService],

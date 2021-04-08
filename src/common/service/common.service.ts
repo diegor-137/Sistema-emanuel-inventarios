@@ -20,9 +20,9 @@ export interface IDataService<T> {
     async findAll(){
         return await this.repository.find();
     }
-    async findById(id:number, msg?: string){
+    async findById(id:number){
         const data = await this.repository.findOne(id);
-        if(!data) throw new NotFoundException(`El registro(${msg}) no fue encontrado`);
+        if(!data) throw new NotFoundException(`El registro no fue encontrado`);
         return data;
     }
     async deleteById(id:number){
