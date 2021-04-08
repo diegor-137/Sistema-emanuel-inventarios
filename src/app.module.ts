@@ -11,6 +11,8 @@ import {  DATABASE_HOST,
 
 
 import { AlumnoModule } from './alumno/alumno.module';
+import { RecursosHumanosModule } from './recursos-humanos/recursos-humanos.module';
+import { ComprasModule } from './compras/compras.module';
 
 @Module({
   imports: [
@@ -39,7 +41,9 @@ import { AlumnoModule } from './alumno/alumno.module';
       //Para indicar donde esta el archivo .ENV
       envFilePath:'.env'
     }),
-    AlumnoModule
+    AlumnoModule,
+    RecursosHumanosModule,
+    ComprasModule
   ],
   controllers: [AppController],
   providers: [AppService],

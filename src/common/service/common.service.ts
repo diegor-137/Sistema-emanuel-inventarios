@@ -1,6 +1,6 @@
 import { NotFoundException, Type } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { EntitySchema, Repository, Entity } from 'typeorm';
+import { EntitySchema, Repository, Entity, ILike } from 'typeorm';
 
 
 export interface IDataService<T> {
@@ -8,7 +8,9 @@ export interface IDataService<T> {
     findAll:()=> Promise<T[]>
     findById:(id:number,msg?: string)=> Promise<T>
     deleteById:(id:number)=> Promise<any>
-}
+    findByNameR:(nombre:string, relacion:string)=> Promise<any>
+    findByName:(nombre:string)=> Promise<any>
+  }
   
   type Constructor<I> = new (...args: any[]) => I // Main Point
   
@@ -29,7 +31,26 @@ export interface IDataService<T> {
         const data = await this.findById(id)
         return await this.repository.remove(data);
     }
-        
+
+    async findByNameR(nombre:string, relacion:string){
+      return await this.repository.find({
+        relations:[`${relacion}`],
+         where: {
+          nombre: ILike(`%${nombre}%`),
+          estado: true
+        } 
+      });
+    }
+
+    async findByName(nombre:string){
+      return await this.repository.find({
+         where: {
+          nombre: ILike(`%${nombre}%`),
+          estado: true
+        } 
+      });
+    }
+      
     }
     return DataServiceHost;
   }
