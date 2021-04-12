@@ -1,6 +1,8 @@
+import { Compra } from '../../compra/entity/compra.entity';
 import { Column, 
         CreateDateColumn, 
         Entity, 
+        OneToMany, 
         PrimaryGeneratedColumn} 
 from 'typeorm';
 
@@ -28,5 +30,11 @@ export class Proveedor{
     estado:boolean
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
-    createdAt: Date;
+    createdAt: Date
+
+    @OneToMany(
+        type => Compra,
+        compra => compra.proveedor,
+        )
+        compra: Compra;
 }

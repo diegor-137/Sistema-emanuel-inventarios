@@ -27,4 +27,4 @@ export class Puesto {
         empleado => empleado.puesto,
         )
         empleado: Empleado;
-}
+    }

@@ -1,3 +1,4 @@
+import { DetalleCompra } from "src/compras/compra/entity/detalle-compra.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Marca } from '../../marca/entities/marca.entity';
@@ -21,14 +22,26 @@ export class Producto {
     @Column({ type: 'bool', default: true })
     estado: boolean
 
+    //Tablas Padre
     @ManyToOne(() => Categoria, categoria => categoria.productos)
     categoria: Categoria;
     
     @ManyToOne(() => Marca, marca => marca.productos)
     marca: Marca;
 
+
+    //Tablas Hijas
     @OneToMany(()=> Foto, foto => foto.producto, {
         cascade: true
     })
     fotos : Foto[];
+
+    @OneToMany(
+        ()=> DetalleCompra, 
+        detalle_compra => detalle_compra.producto, 
+        {
+            cascade: true})
+    detalle_compra : DetalleCompra
+        
+
 }

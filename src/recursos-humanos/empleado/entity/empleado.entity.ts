@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Puesto } from '../../puesto/entity/puesto.entity';
+import { Compra } from '../../../compras/compra/entity/compra.entity';
 
 @Entity('empleado')
 export class Empleado{
@@ -21,9 +22,17 @@ export class Empleado{
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
 
+    //Tablas Padre
     @ManyToOne(
         type => Puesto,
         puesto => puesto.empleado,
         )
     puesto: Puesto;
+    
+    //Tablas Hijas
+    @OneToMany(
+        type => Compra,
+        compra => compra.empleado,
+        )
+        compra: Compra;
 }
