@@ -21,5 +21,6 @@ export class CreateCompraDto {
     @IsOptional()
     empleado:Empleado
 
-    detalle_compra:CreateDetalleCompraDto[]
+    @IsOptional()
+    detalle_compra:DetalleCompra[]
 }

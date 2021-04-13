@@ -1,14 +1,16 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { CommonController } from 'src/common/controller/common.controller';
+
+import { CompraService } from './compra.service';
 import { CreateCompraDto } from './dto/create-compra.dto';
-import { CreateDetalleCompraDto } from './dto/create-detalle-compra.dto';
 
 @Controller('compra')
-export class CompraController {
-
+export class CompraController extends CommonController(CompraService) {
+    constructor(private readonly compraService: CompraService) {super()}
     @Post()
-    createOne(
+    async createOne(
         @Body() dto:CreateCompraDto
     ){
-        return [dto]
+        return await this.compraService.createOne(dto)
     }
 }
