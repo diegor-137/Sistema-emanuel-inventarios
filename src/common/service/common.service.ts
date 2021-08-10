@@ -1,6 +1,6 @@
 import { NotFoundException, Type } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { EntitySchema, Repository, Entity, ILike } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 
 
 export interface IDataService<T> {

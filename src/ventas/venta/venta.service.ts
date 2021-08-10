@@ -1,25 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { DataService } from '../../common/service/common.service';
-import { Compra } from './entity/compra.entity';
-import { CreateCompraDto } from './dto/create-compra.dto';
+import { CreateVentaDto } from './dto/create-venta.dto';
 import { getConnection } from 'typeorm';
+import { DataService } from '../../common/service/common.service';
+import { Venta } from './entity/venta.entity';
 
 
 @Injectable()
-export class CompraService extends DataService(Compra) {
+export class VentaService extends DataService(Venta){
 
-
-    async createOne(dto:CreateCompraDto){
+    async CreateOne(dto:CreateVentaDto){
         const connection = getConnection()
         const queryRunner = connection.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
-            const compra = this.repository.create(dto)
-            const saved =  await queryRunner.manager.save(compra)
+            const venta = this.repository.create(dto)
+            const saved =  await queryRunner.manager.save(venta)
             await queryRunner.commitTransaction()
             await queryRunner.release()
             return saved
+            
         } catch (err) {
             await queryRunner.rollbackTransaction()
             await queryRunner.release()
@@ -28,23 +28,23 @@ export class CompraService extends DataService(Compra) {
             await queryRunner.release()   
         }
     }
-
-    async FindOne_Compra(id:number){
+    async FindOne_Venta(id:number){
         return await this.repository.find({
             where:[{id}],
             relations:[
-                "detalle_compra",
-                "detalle_compra.producto"
+                "detalle_venta",
+                "detalle_venta.producto"
             ]
         })
     }
 
-    async FindMany_Compra(){
+    async FindMany_Venta(){
         return await this.repository.find({
             relations:[
-                "detalle_compra",
-                "detalle_compra.producto"
+                "detalle_venta",
+                "detalle_venta.producto"
             ]
         })
     }
+
 }

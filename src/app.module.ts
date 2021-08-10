@@ -11,6 +11,8 @@ import {  DATABASE_HOST,
 import { AlmacenModule } from './almacen/almacen.module';
 import { RecursosHumanosModule } from './recursos-humanos/recursos-humanos.module';
 import { ComprasModule } from './compras/compras.module';
+import { VentasModule } from './ventas/ventas.module';
+import { SucursalModule } from './sucursal/sucursal.module';
 
 @Module({
   imports: [
@@ -41,7 +43,9 @@ import { ComprasModule } from './compras/compras.module';
     }),
     AlmacenModule,
     RecursosHumanosModule,
-    ComprasModule
+    ComprasModule,
+    VentasModule,
+    SucursalModule
   ],
   controllers: [AppController],
   providers: [AppService],

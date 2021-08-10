@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, On
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { Proveedor } from '../../proveedor/entity/proveedor.entity';
 import { DetalleCompra } from './detalle-compra.entity';
+import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
 
 
 @Entity('compra')
@@ -22,7 +23,7 @@ export class Compra{
     createdAt: Date
 
 
-    //Tablas Padre
+    //-----Tablas Padre--------
     @ManyToOne(
         type => Proveedor,
         proveedor => proveedor.compra,
@@ -35,11 +36,17 @@ export class Compra{
         )
     empleado: Empleado;
 
-    //Tablas Hijas
+    @ManyToOne(
+        type => Sucursal,
+        sucursal => sucursal.compra,
+        )
+    sucursal: Sucursal;
+
+    //------Tablas Hijas---------
     @OneToMany(
         type => DetalleCompra,
         detalle_compra => detalle_compra.compra,
-        {cascade:true}
-        )
+        {cascade:["insert","update","remove"]
+    })
         detalle_compra: DetalleCompra[];
 }
