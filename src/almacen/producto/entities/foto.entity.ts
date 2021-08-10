@@ -6,13 +6,13 @@ import { Producto } from './producto.entity';
 @Entity('fotos')
 export class Foto {
     
-    @PrimaryGeneratedColumn({name: 'id_producto'})
+    @PrimaryGeneratedColumn({name: 'id_foto'})
     id:number
 
     @Column()
     nombre:string
 
     @ManyToOne(()=> Producto, producto => producto.fotos)
-    producto?: Producto;
+    producto: Producto;
 
 }
