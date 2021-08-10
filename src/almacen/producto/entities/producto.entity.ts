@@ -3,6 +3,7 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "ty
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Marca } from '../../marca/entities/marca.entity';
 import { Foto } from './foto.entity';
+import { Precio } from './precio.entity';
 
 
 @Entity('productos')
@@ -15,9 +16,6 @@ export class Producto {
 
     @Column({name: 'codigo_barras',type: 'int', default: 0, nullable: true })
     codigoBarras: number
-
-    @Column({ type: 'varchar', length: 255, default: '', nullable: true })
-    foto : string
 
     @Column({ type: 'bool', default: true })
     estado: boolean
@@ -34,6 +32,7 @@ export class Producto {
     @OneToMany(()=> Foto, foto => foto.producto, {
         cascade: true
     })
+<<<<<<< HEAD
     fotos : Foto[];
 
     @OneToMany(
@@ -44,4 +43,12 @@ export class Producto {
     detalle_compra : DetalleCompra
         
 
+=======
+    fotos: Foto[];
+
+    @OneToMany(()=> Precio, precio=>precio.producto, {
+        cascade: true
+    })
+    precios: Precio[];
+>>>>>>> diego
 }

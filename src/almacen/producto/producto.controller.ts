@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, UseInterceptors, ParseIntPipe, Res, UploadedFiles, HttpException, HttpStatus, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, UseInterceptors, ParseIntPipe, Res, UploadedFiles, HttpException, HttpStatus, Request, ParseArrayPipe } from '@nestjs/common';
 import { ProductoService } from './producto.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
@@ -6,15 +6,22 @@ import { CommonController } from '../../common/controller/common.controller';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FotoDto } from './dto/foto.dto';
 import { storage } from './const/product-constant';
+import { Precio } from './entities/precio.entity';
 
 
 @Controller('producto')
 export class ProductoController extends CommonController(ProductoService){
   constructor(private readonly productoService: ProductoService) {super()}
 
+  @Get('productos')
+  async products(){
+    return this.productoService.products();
+  }
+
   @Post()
   @UseInterceptors(FilesInterceptor('files', 5, storage))
-  async uploadFiles( @UploadedFiles() files: Express.Multer.File[], @Body() producto: CreateProductoDto) {
+  async uploadFiles( @UploadedFiles() files: Express.Multer.File[], @Body() producto: CreateProductoDto, ) {
+
     return await this.productoService.uploads(files, producto);
   }
 
@@ -23,8 +30,6 @@ export class ProductoController extends CommonController(ProductoService){
   async update(@UploadedFiles() files: Express.Multer.File,@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto) {
     return this.productoService.update(+id, updateProductoDto);
   }
-
-
 
   @Get('images/:id')
   async productImage(@Param('id', ParseIntPipe) idProduc: number, @Body() foto:FotoDto, @Res() res:any){  

@@ -1,9 +1,12 @@
-import { TransformPlainToClass, Type } from "class-transformer";
-import { IsEnum, IsInstance, IsNumber, IsOptional, IsString, IsNotEmpty, IsArray } from 'class-validator';
+import { Type } from "class-transformer";
+import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Categoria } from "src/almacen/categoria/entity/categoria.entity";
-import { Marca } from "src/almacen/marca/entities/marca.entity";
 import { Foto } from '../entities/foto.entity';
-
+import { PrecioDto } from './precio.dto';
+import { MarcaDto } from '../../marca/dto/marca.dto';
+import { CategoriaDto } from '../../categoria/dtos/categoria.dto';
+import { Marca } from '../../marca/entities/marca.entity';
+import { Precio } from '../entities/precio.entity';
 
 
 export class CreateProductoDto {
@@ -15,17 +18,21 @@ export class CreateProductoDto {
     @IsOptional()
     codigoBarras: number
 
-    @IsString()
-    @IsOptional()
-    foto : string
-
-    @IsOptional()  
-    categoria: Categoria;
+    @Type(()=> CategoriaDto)
+    @ValidateNested()  
+    categoria: CategoriaDto;
+       
+    @Type(()=> MarcaDto)
+    @ValidateNested()
+    marca: MarcaDto;
     
     @IsOptional()
-    marca: Marca;
-    
     fotos : Foto[];
+
+    @Type(()=> PrecioDto)
+    @ValidateNested({each: true})
+    precios: Precio[];
+
 
 }
 
