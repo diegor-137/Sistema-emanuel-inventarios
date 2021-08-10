@@ -10,22 +10,24 @@ import  fs  from "fs";
 @Injectable()
 export class ProductoService extends DataService(Producto) {
 
+  async products(){
+    return await this.repository.find({relations: ['categoria', 'marca', 'precios', 'precios.tipoPrecio']});
+  }
+
   async findProductImages(id:number){
     return await this.repository.findOne(id, {relations: ['fotos']});      
   }
 
   async update(id: number, updateProductoDto: UpdateProductoDto) { 
-    const product = await this.findById(id);
-    const editedProducto = Object.assign(product, updateProductoDto);
   }
   async uploads(files: Express.Multer.File[], producto: CreateProductoDto){
-    const list=[];  
+    /* const list=[];  
     files.forEach(a=>{ 
         const images = {nombre:''}
         images.nombre = a.filename
         list.push(images);
       });
-      producto.fotos = list;        
+      producto.fotos = list; */        
       return await this.repository.save(producto);
   }
 
