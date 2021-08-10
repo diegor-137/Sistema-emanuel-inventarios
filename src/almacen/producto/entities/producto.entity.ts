@@ -32,7 +32,6 @@ export class Producto {
     @OneToMany(()=> Foto, foto => foto.producto, {
         cascade: true
     })
-<<<<<<< HEAD
     fotos : Foto[];
 
     @OneToMany(
@@ -43,12 +42,4 @@ export class Producto {
     detalle_compra : DetalleCompra
         
 
-=======
-    fotos: Foto[];
-
-    @OneToMany(()=> Precio, precio=>precio.producto, {
-        cascade: true
-    })
-    precios: Precio[];
->>>>>>> diego
 }
