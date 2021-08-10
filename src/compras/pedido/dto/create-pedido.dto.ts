@@ -1,15 +1,14 @@
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { DetalleCompra } from '../entity/detalle-compra.entity';
 import { Proveedor } from '../../proveedor/entity/proveedor.entity';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
+import { DetallePedido } from '../entity/detalle-pedido.entity';
 
-
-export class CreateCompraDto {
+export class CreatePedidoDto {
+    @IsOptional()
     @IsString()
     documento:string
 
     @IsOptional()
-    @IsString()
     observacion:string
 
     @IsBoolean()
@@ -22,5 +21,5 @@ export class CreateCompraDto {
     empleado:Empleado
 
     @IsOptional()
-    detalle_compra:DetalleCompra[]
+    detalle_pedido:DetallePedido[]
 }

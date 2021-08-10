@@ -1,10 +1,12 @@
 import { Producto } from 'src/almacen/producto/entities/producto.entity';
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Compra } from './compra.entity';
+import { Column, 
+    Entity, 
+    PrimaryGeneratedColumn, 
+    ManyToOne } from 'typeorm';
+import { Pedido } from './pedido-entity';
 
-
-@Entity('detalle_compra')
-export class DetalleCompra{
+@Entity('detalle_pedido')
+export class DetallePedido{
     @PrimaryGeneratedColumn()
     id:number
 
@@ -15,16 +17,16 @@ export class DetalleCompra{
     precio:number
 
     @ManyToOne(
-        type => Compra,
-        compra => compra.detalle_compra,
+        type => Pedido,
+        pedido => pedido.detalle_pedido,
         {onDelete:'CASCADE',
         orphanedRowAction:"delete"}
         )
-    compra: Compra;
+    pedido: Pedido;
 
     @ManyToOne(
         type => Producto,
-        producto => producto.detalle_compra,
+        producto => producto.detalle_pedido,
         )
     producto: Producto;
 }

@@ -1,9 +1,12 @@
 import { DetalleCompra } from "src/compras/compra/entity/detalle-compra.entity";
+import { DetallePedido } from "src/compras/pedido/entity/detalle-pedido.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Marca } from '../../marca/entities/marca.entity';
 import { Foto } from './foto.entity';
 import { Precio } from './precio.entity';
+import { DetalleVenta } from '../../../ventas/venta/entity/detalle-venta.entity';
+import { DetalleCotizacion } from '../../../ventas/cotizacion/entity/detalle-cotizacion.entity';
 
 
 @Entity('productos')
@@ -34,12 +37,35 @@ export class Producto {
     })
     fotos : Foto[];
 
+
+    //---------Compras-------------
     @OneToMany(
         ()=> DetalleCompra, 
         detalle_compra => detalle_compra.producto, 
         {
             cascade: true})
     detalle_compra : DetalleCompra
-        
+
+    @OneToMany(
+        ()=> DetallePedido, 
+        detalle_pedido => detalle_pedido.producto, 
+        {
+            cascade: true})
+    detalle_pedido : DetallePedido
+
+    ///---------Ventas------------
+    @OneToMany(
+        ()=> DetalleVenta, 
+        detalle_venta => detalle_venta.producto, 
+        {
+            cascade: true})
+    detalle_venta : DetalleVenta
+
+    @OneToMany(
+        ()=> DetalleCotizacion, 
+        detalle_cotizacion => detalle_cotizacion.producto, 
+        {
+            cascade: true})
+    detalle_cotizacion : DetalleCotizacion
 
 }

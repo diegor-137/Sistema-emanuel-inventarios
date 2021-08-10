@@ -1,4 +1,5 @@
 import { Compra } from '../../compra/entity/compra.entity';
+import { Pedido } from '../../pedido/entity/pedido-entity';
 import { Column, 
         CreateDateColumn, 
         Entity, 
@@ -37,4 +38,10 @@ export class Proveedor{
         compra => compra.proveedor,
         )
         compra: Compra;
+
+        @OneToMany(
+        type => Pedido,
+        pedido => pedido.proveedor,
+        )
+        pedido: Pedido;
 }

@@ -28,16 +28,17 @@ type Constructor<I> = new (...args: any[]) => I // Main Point
     @Get('buscar/:nombre')
     async findByName(
       @Param('nombre') nombre:string
-  ){
+    ){
       return await this.repository.findByName(nombre)
-  }
+    }
+    
     @Get('buscar/:nombre/:relacion')
     async findByNameR(
       @Param('nombre') nombre:string,
       @Param('relacion') relacion:string
-  ){
+    ){
       return await this.repository.findByNameR(nombre,relacion)
-  }
+    }
 
     }
     return DataControllerHost;
