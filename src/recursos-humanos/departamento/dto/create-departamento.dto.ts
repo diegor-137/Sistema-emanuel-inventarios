@@ -1,4 +1,4 @@
-import {IsBoolean,IsString} from 'class-validator';
+import {IsBoolean,isEmpty,isNotEmpty,IsString} from 'class-validator';
 
 export class CreateDepartamentoDto{
     @IsString()

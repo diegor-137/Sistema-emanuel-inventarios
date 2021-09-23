@@ -7,6 +7,7 @@ import { Foto } from './foto.entity';
 import { Precio } from './precio.entity';
 import { DetalleVenta } from '../../../ventas/venta/entity/detalle-venta.entity';
 import { DetalleCotizacion } from '../../../ventas/cotizacion/entity/detalle-cotizacion.entity';
+import { Inventario } from './inventario.entity';
 
 
 @Entity('productos')
@@ -23,6 +24,15 @@ export class Producto {
     @Column({ type: 'bool', default: true })
     estado: boolean
 
+    @Column({type: 'decimal', default: 0, precision:6,scale:2})
+    costo_prom:number
+
+    @Column({type: 'decimal', default: 0, precision:6,scale:2})
+    costo_prom_old:number
+
+    @Column({type: 'decimal', default: 0, precision:6,scale:2})
+    ultimo_precio:number
+
     //Tablas Padre
     @ManyToOne(() => Categoria, categoria => categoria.productos)
     categoria: Categoria;
@@ -37,6 +47,17 @@ export class Producto {
     })
     fotos : Foto[];
 
+    @OneToMany(()=> Precio, precio => precio.producto, {
+        cascade: true
+    })
+    precio : Precio;
+
+    @OneToMany(
+        type=> Inventario, 
+        inventario => inventario.producto,
+        {cascade:["insert","update","remove"]
+        })
+    inventario : Inventario;
 
     //---------Compras-------------
     @OneToMany(

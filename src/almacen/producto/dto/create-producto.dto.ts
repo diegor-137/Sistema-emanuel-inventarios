@@ -7,6 +7,9 @@ import { MarcaDto } from '../../marca/dto/marca.dto';
 import { CategoriaDto } from '../../categoria/dtos/categoria.dto';
 import { Marca } from '../../marca/entities/marca.entity';
 import { Precio } from '../entities/precio.entity';
+import { Inventario } from '../entities/inventario.entity';
+import { InventarioDto } from "./inventario.dto";
+import { Optional } from "@nestjs/common";
 
 
 export class CreateProductoDto {
@@ -31,9 +34,10 @@ export class CreateProductoDto {
 
     @Type(()=> PrecioDto)
     @ValidateNested({each: true})
-    precios: Precio[];
+    precio: Precio;
 
-
+    @Optional()
+    Inventario:Inventario[]
 }
 
 

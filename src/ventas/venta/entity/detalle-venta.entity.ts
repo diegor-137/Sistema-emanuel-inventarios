@@ -11,7 +11,10 @@ export class DetalleVenta{
     cantidad:number
     
     @Column({type:"decimal",precision:6,scale:2})
-    precio:number
+    precio_compra:number
+
+    @Column({type:"decimal",precision:6,scale:2})
+    precio_venta:number
 
     @ManyToOne(
         type => Venta,

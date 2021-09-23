@@ -2,6 +2,7 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { DetalleCompra } from '../entity/detalle-compra.entity';
 import { Proveedor } from '../../proveedor/entity/proveedor.entity';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
+import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
 
 
 export class CreateCompraDto {
@@ -23,4 +24,7 @@ export class CreateCompraDto {
 
     @IsOptional()
     detalle_compra:DetalleCompra[]
+
+    @IsOptional()
+    sucursal:Sucursal
 }

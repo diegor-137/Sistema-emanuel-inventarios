@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { DataService } from '../../common/service/common.service';
 import { Compra } from './entity/compra.entity';
 import { CreateCompraDto } from './dto/create-compra.dto';
-import { getConnection } from 'typeorm';
+import { getConnection,getRepository } from 'typeorm';
+import { InventarioService } from '../../almacen/producto/inventario.service';
+import { PrecioService } from '../../almacen/producto/precio.service';
 
 
 @Injectable()
 export class CompraService extends DataService(Compra) {
+    constructor(private readonly inventarioService: InventarioService) {super()}
 
 
     async createOne(dto:CreateCompraDto){
@@ -17,6 +20,7 @@ export class CompraService extends DataService(Compra) {
         try {
             const compra = this.repository.create(dto)
             const saved =  await queryRunner.manager.save(compra)
+            await this.inventarioService.Ingreso(saved)
             await queryRunner.commitTransaction()
             await queryRunner.release()
             return saved

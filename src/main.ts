@@ -13,6 +13,7 @@ async function bootstrap() {
       whitelist:true
     })
   )
+  app.enableCors();
   await app.listen(port);
   logger.log(`Servidor funcionando en puerto ${await app.getUrl()}`)
   //console.log(`Servidor corriendo en puerto: ${port}`);

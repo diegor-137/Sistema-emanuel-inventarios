@@ -13,6 +13,7 @@ import { RecursosHumanosModule } from './recursos-humanos/recursos-humanos.modul
 import { ComprasModule } from './compras/compras.module';
 import { VentasModule } from './ventas/ventas.module';
 import { SucursalModule } from './sucursal/sucursal.module';
+import { ProductoSubscriber } from './almacen/producto/subscribers/existencia.subscriber';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SucursalModule } from './sucursal/sucursal.module';
         username:config.get<string>(DATABASE_USERNAME),
         password:config.get<string>(DATABASE_PASSWORD),
         database:config.get<string>(DATABASE_NAME),
+        subscribers:[ProductoSubscriber],
         entities: [__dirname + '../**/**/*entity{.ts,.js'],
         autoLoadEntities: true,
         synchronize: true,

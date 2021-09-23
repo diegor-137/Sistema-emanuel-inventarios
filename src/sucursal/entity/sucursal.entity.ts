@@ -5,6 +5,7 @@ import { Compra } from '../../compras/compra/entity/compra.entity';
 import { Cotizacion } from '../../ventas/cotizacion/entity/cotizacion.entity';
 import { Venta } from '../../ventas/venta/entity/venta.entity';
 import { Pedido } from '../../compras/pedido/entity/pedido-entity';
+import { Inventario } from '../../almacen/producto/entities/inventario.entity';
 
 @Entity('sucursal')
 export class Sucursal{
@@ -51,4 +52,11 @@ export class Sucursal{
         cotizacion => cotizacion.sucursal
     )
     cotizacion:Cotizacion
+
+    /********Almacen*******/
+    @OneToMany(
+        type => Inventario,
+        inventario => inventario.sucursal
+    )
+    inventario:Inventario
 }

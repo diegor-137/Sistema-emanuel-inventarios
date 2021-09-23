@@ -3,10 +3,12 @@ import { CreateVentaDto } from './dto/create-venta.dto';
 import { getConnection } from 'typeorm';
 import { DataService } from '../../common/service/common.service';
 import { Venta } from './entity/venta.entity';
+import { InventarioService } from '../../almacen/producto/inventario.service';
 
 
 @Injectable()
 export class VentaService extends DataService(Venta){
+    constructor(private readonly invertarioService:InventarioService){super()}
 
     async CreateOne(dto:CreateVentaDto){
         const connection = getConnection()
@@ -16,6 +18,7 @@ export class VentaService extends DataService(Venta){
         try {
             const venta = this.repository.create(dto)
             const saved =  await queryRunner.manager.save(venta)
+            await this.invertarioService.Egreso(saved)
             await queryRunner.commitTransaction()
             await queryRunner.release()
             return saved
@@ -28,6 +31,7 @@ export class VentaService extends DataService(Venta){
             await queryRunner.release()   
         }
     }
+
     async FindOne_Venta(id:number){
         return await this.repository.find({
             where:[{id}],

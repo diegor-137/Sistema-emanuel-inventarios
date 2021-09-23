@@ -9,13 +9,13 @@ export class Precio {
     @PrimaryGeneratedColumn({name: 'id_precio'})
     id:number
 
-    @Column({type: 'int', default: 0, nullable: true })
+    @Column({type: 'decimal', default: 0, precision:6,scale:2})
     precio:number
 
     @Column({ type: 'bool', default: true })
     estado:boolean
 
-    @ManyToOne(()=> Producto, producto => producto.precios, {
+    @ManyToOne(()=> Producto, producto => producto.precio, {
         onDelete: "CASCADE",
         orphanedRowAction: "delete"        
     })

@@ -22,7 +22,7 @@ export class ProductoController extends CommonController(ProductoService){
   @UseInterceptors(FilesInterceptor('files', 5, storage))
   async uploadFiles( @UploadedFiles() files: Express.Multer.File[], @Body() producto: CreateProductoDto, ) {
 
-    return await this.productoService.uploads(files, producto);
+    return await this.productoService.uploads(files,producto);
   }
 
   @Put(':id')
