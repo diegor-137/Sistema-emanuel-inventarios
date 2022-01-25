@@ -12,23 +12,24 @@ export class InventarioService extends DataService(Inventario){
 
 
     async Ingreso(dto:CreateCompraDto){
-
+        //console.log('object :>> ', dto.detalle_compra);
         const productoRepository = getRepository(Producto)
         for (let i = 0; i < dto.detalle_compra.length; i++) {  
-            const productos = dto.detalle_compra[i]
-
 
             const inventario = await this.repository.find({
-                where:{sucursal: dto.sucursal.id,producto:productos.producto}})
+                where:{sucursal: dto.sucursal.id,producto:dto.detalle_compra[i].producto}})
             inventario[0].cantidad = dto.detalle_compra[i].cantidad + inventario[0].cantidad
             await this.repository.save(inventario)
 
 
             const producto = await productoRepository.find({
-                where:{id:productos.producto}})
-            producto[0].costo_prom_old = producto[0].costo_prom
-            producto[0].ultimo_precio = productos.precio
-            producto[0].costo_prom = (+producto[0].costo_prom + producto[0].ultimo_precio)/2
+                where:{id:dto.detalle_compra[i].producto}})
+            //console.log('object :>> ',producto);
+            //console.log('object :>> ', dto.detalle_compra[i].precio);
+            //console.log('object :>> ', productos);
+            producto[0].costo_prom_old = +producto[0].costo_prom
+            producto[0].ultimo_precio = dto.detalle_compra[i].precio
+            producto[0].costo_prom = ((+producto[0].costo_prom) + (+dto.detalle_compra[i].precio))/2
             await productoRepository.save(producto)
         }
     }

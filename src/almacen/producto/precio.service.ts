@@ -19,4 +19,5 @@ export class PrecioService extends DataService(Precio){
 
         }
     }
+
 }

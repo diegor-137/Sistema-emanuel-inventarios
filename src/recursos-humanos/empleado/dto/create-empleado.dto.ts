@@ -1,14 +1,18 @@
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsOptional, IsString, IsNotEmpty } from 'class-validator';
 import { Puesto } from '../../puesto/entity/puesto.entity';
+import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
 
 export class CreateEmpleadoDto{
     @IsString()
     nombre:string
 
     @IsString()
-    direccion:string
+    apellido:string
 
     @IsString()
+    direccion:string
+
+    @IsNotEmpty()
     telefono:string
 
     @IsBoolean()
@@ -16,4 +20,7 @@ export class CreateEmpleadoDto{
      
     @IsOptional()
     puesto:Puesto
+
+    @IsOptional()
+    sucursal:Sucursal 
 }

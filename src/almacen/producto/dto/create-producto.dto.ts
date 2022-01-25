@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, ValidateNested, IsNotEmpty } from 'class-validator';
 import { Categoria } from "src/almacen/categoria/entity/categoria.entity";
 import { Foto } from '../entities/foto.entity';
 import { PrecioDto } from './precio.dto';
@@ -15,26 +15,55 @@ import { Optional } from "@nestjs/common";
 export class CreateProductoDto {
 
     @IsString()
+    nombre: string
+
+    @IsString()
     descripcion: string
 
     @IsNumber()
     @IsOptional()
     codigoBarras: number
 
-    @Type(()=> CategoriaDto)
-    @ValidateNested()  
-    categoria: CategoriaDto;
+    @IsBoolean()
+    estado:boolean
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    costo_prom:number
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    costo_prom_old:number
+
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    ultimo_precio:number
+
+    //@Type(()=> CategoriaDto)
+    //@ValidateNested()  
+    //categoria: CategoriaDto;
        
-    @Type(()=> MarcaDto)
-    @ValidateNested()
-    marca: MarcaDto;
+    //@Type(()=> MarcaDto)
+    //@ValidateNested()
+    //marca: MarcaDto;
     
+    @IsOptional()
+    categoria:Categoria
+
+    @IsOptional()
+    marca:Marca
+
     @IsOptional()
     fotos : Foto[];
 
+    //@Optional()
     @Type(()=> PrecioDto)
     @ValidateNested({each: true})
-    precio: Precio;
+    precio: Precio[];
 
     @Optional()
     Inventario:Inventario[]

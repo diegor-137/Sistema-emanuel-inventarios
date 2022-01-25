@@ -13,7 +13,7 @@ import { Inventario } from './entities/inventario.entity';
 export class ProductoService extends DataService(Producto) {
 
   async products(){
-    return await this.repository.find({relations: ['categoria', 'marca', 'precios', 'precios.tipoPrecio']});
+    return await this.repository.find({relations: ['categoria', 'marca','precio','precio.tipoPrecio']});
   }
 
   async findProductImages(id:number){
@@ -33,6 +33,7 @@ export class ProductoService extends DataService(Producto) {
         await queryRunner.release()
         return saved
     } catch (err) {
+
         await queryRunner.rollbackTransaction()
         await queryRunner.release()
         return err
@@ -58,7 +59,9 @@ export class ProductoService extends DataService(Producto) {
         } catch (err) {
             await queryRunner.rollbackTransaction()
             await queryRunner.release()
+            console.log('object :>> ', err);
             return err.detail
+
         }finally{
             await queryRunner.release()   
         }

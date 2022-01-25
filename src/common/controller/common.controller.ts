@@ -15,7 +15,7 @@ type Constructor<I> = new (...args: any[]) => I // Main Point
         return await this.repository.findAll();
     }
 
-    @Get(':id')
+    @Get('uno/:id')
     async findById(@Param('id', ParseIntPipe) id:number){
         return await this.repository.findById(id);
     }
@@ -25,7 +25,7 @@ type Constructor<I> = new (...args: any[]) => I // Main Point
         const data = await this.repository.deleteById(id);
         return { status : 'Eliminado', data}
     }
-    @Get('buscar/:nombre')
+    @Get(':nombre?')
     async findByName(
       @Param('nombre') nombre:string
     ){

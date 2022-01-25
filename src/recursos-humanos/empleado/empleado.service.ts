@@ -20,14 +20,14 @@ export class EmpleadoService extends DataService(Empleado){
 
     async findMany_Empleado(){
         return await this.repository.find({
-            relations:["puesto"]
+            relations:["puesto","sucursal"]
         })
     }
 
     async findOne_Empelado(id:number){
         return await this.repository.find({
             where:[{id:id}],
-            relations:["puesto"]
+            relations:["puesto","sucursal"]
         })
     }
 

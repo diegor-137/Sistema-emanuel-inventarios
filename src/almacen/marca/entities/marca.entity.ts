@@ -7,12 +7,14 @@ export class Marca {
     @PrimaryGeneratedColumn({name: 'id_marca'})
     id: number
 
-    @Column({type: 'varchar', length: 255, default: '', nullable: true})
+    @Column({type: 'varchar', length: 25, nullable: true})
     nombre: string
 
     @Column({ type: 'bool', default: true })
     estado: boolean
-
-    @OneToMany(() => Producto, producto => producto.marca)
+  
+    @OneToMany(() => Producto, producto => producto.marca,{
+    })
     productos: Producto[];
+
 }

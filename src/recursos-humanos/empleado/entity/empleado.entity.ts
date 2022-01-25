@@ -14,6 +14,9 @@ export class Empleado{
     @Column({type:'varchar',length:75,nullable:false})
     nombre:string
 
+    @Column({type:'varchar',length:75,nullable:true})
+    apellido:string
+
     @Column({type:'varchar',length:125,nullable:true})
     direccion:string
 

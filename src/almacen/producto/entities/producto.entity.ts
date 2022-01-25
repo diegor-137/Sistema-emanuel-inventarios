@@ -1,6 +1,6 @@
 import { DetalleCompra } from "src/compras/compra/entity/detalle-compra.entity";
 import { DetallePedido } from "src/compras/pedido/entity/detalle-pedido.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Marca } from '../../marca/entities/marca.entity';
 import { Foto } from './foto.entity';
@@ -15,7 +15,10 @@ export class Producto {
     @PrimaryGeneratedColumn({name: 'id_producto'})
     id: number
 
-    @Column({ type: 'varchar', length: 255, default: '', nullable: true })
+    @Column({ type: 'varchar', length: 55})
+    nombre: string
+
+    @Column({ type: 'varchar', length: 255, nullable: true})
     descripcion: string
 
     @Column({name: 'codigo_barras',type: 'int', default: 0, nullable: true })
@@ -24,22 +27,27 @@ export class Producto {
     @Column({ type: 'bool', default: true })
     estado: boolean
 
-    @Column({type: 'decimal', default: 0, precision:6,scale:2})
+    @Column({type: 'decimal', default: 0, precision:6,scale:2,nullable: true })
     costo_prom:number
 
-    @Column({type: 'decimal', default: 0, precision:6,scale:2})
+    @Column({type: 'decimal', default: 0, precision:6,scale:2,nullable: true})
     costo_prom_old:number
 
-    @Column({type: 'decimal', default: 0, precision:6,scale:2})
+    @Column({type: 'decimal', default: 0, precision:6,scale:2, nullable: true})
     ultimo_precio:number
 
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+    createdAt: Date;
+
     //Tablas Padre
-    @ManyToOne(() => Categoria, categoria => categoria.productos)
+ 
+    @ManyToOne(() => Categoria, categoria => categoria.productos,{
+    })
     categoria: Categoria;
     
+
     @ManyToOne(() => Marca, marca => marca.productos)
     marca: Marca;
-
 
     //Tablas Hijas
     @OneToMany(()=> Foto, foto => foto.producto, {
@@ -50,14 +58,14 @@ export class Producto {
     @OneToMany(()=> Precio, precio => precio.producto, {
         cascade: true
     })
-    precio : Precio;
+    precio : Precio[];
 
     @OneToMany(
         type=> Inventario, 
         inventario => inventario.producto,
-        {cascade:["insert","update","remove"]
+        {cascade:["insert","update"]
         })
-    inventario : Inventario;
+    inventario : Inventario[];
 
     //---------Compras-------------
     @OneToMany(

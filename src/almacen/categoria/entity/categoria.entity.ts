@@ -10,13 +10,14 @@ export class Categoria {
     @PrimaryGeneratedColumn({name: 'id_categoria'})
     id: number
 
-    @Column({type: 'varchar', length: 255, default: '', nullable: true})
+    @Column({type: 'varchar', length: 25, nullable: true})
     nombre: string
 
     @Column({ type: 'bool', default: true })
     estado: boolean
 
-    @OneToMany(() => Producto, producto => producto.categoria)
+    @OneToMany(() => Producto, producto => producto.categoria,{
+    })
     productos: Producto[];
 
 }

@@ -37,6 +37,8 @@ export class ProductoController extends CommonController(ProductoService){
   }
 }
 
+
+
 /* @Post('upload/:id')
 @UseInterceptors(FileInterceptor('file', storage))
 async uploadFile(@UploadedFile() file: Express.Multer.File , @Param('id', ParseIntPipe) id: number){

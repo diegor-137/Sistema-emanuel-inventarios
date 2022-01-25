@@ -12,7 +12,7 @@ export class CategoriaController extends CommonController(CategoriaService) {
         return this.categoriaService.save(categoria)
     }
 
-    @Put('id')
+    @Put(':id')
     async editOne(@Param('id', ParseIntPipe) id: number, @Body() categoria: CategoriaDto){
         return this.categoriaService.editOne(id, categoria);
     }
