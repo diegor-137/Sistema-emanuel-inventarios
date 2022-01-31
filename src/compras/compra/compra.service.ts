@@ -34,9 +34,12 @@ export class CompraService extends DataService(Compra) {
     }
 
     async FindOne_Compra(id:number){
-        return await this.repository.find({
+        return await this.repository.findOne({
             where:[{id}],
             relations:[
+                "empleado",
+                "proveedor",
+                "sucursal",
                 "detalle_compra",
                 "detalle_compra.producto"
             ]
@@ -44,11 +47,19 @@ export class CompraService extends DataService(Compra) {
     }
 
     async FindMany_Compra(){
-        return await this.repository.find({
-            relations:[
-                "detalle_compra",
-                "detalle_compra.producto"
-            ]
-        })
+        return await getRepository(Compra)
+        .createQueryBuilder("compra")
+        .leftJoinAndSelect("compra.empleado","empleado")
+        .leftJoinAndSelect("compra.proveedor","proveedor")
+        .leftJoinAndSelect("compra.sucursal","sucursal")
+        .leftJoinAndSelect("compra.detalle_compra","detalle_compra")
+        .select(["compra.id as id","compra.documento as documento",
+        "proveedor.nombre as proveedor","sucursal.nombre as sucursal",
+        "compra.created_At","SUM(detalle_compra.cantidad*detalle_compra.precio)as total"])
+        //.select(["empleado.nombre","proveedor.nombre","sucursal.nombre",
+        //"detalle_compra"])
+        .groupBy("compra.id,compra.documento,proveedor.nombre,sucursal.nombre")
+        .getRawMany()
     }
+
 }
