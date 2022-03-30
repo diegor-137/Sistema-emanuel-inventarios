@@ -16,6 +16,31 @@ export class ProductoService extends DataService(Producto) {
     return await this.repository.find({relations: ['categoria', 'marca','precio','precio.tipoPrecio']});
   }
 
+  async productoVenta(){
+    return await this.repository.find({
+        where: {
+        },
+        relations: [
+            'categoria', 
+            'marca',
+            'precio',
+            'precio.tipoPrecio',
+            "inventario",
+            'inventario.sucursal']
+        });
+  }
+  async prod(){
+    return await getRepository(Producto)
+    .createQueryBuilder("producto")
+    .leftJoinAndSelect("producto.categoria","categoria")
+    .leftJoinAndSelect("producto.marca","marca")
+    .leftJoinAndSelect("producto.precio","precio")
+    .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
+    .leftJoinAndSelect("producto.inventario","inventario")
+    .leftJoinAndSelect("inventario.sucursal","sucursal")
+    .where("sucursal.id =:id",{id:1})
+    .getMany()
+  }
   async findProductImages(id:number){
     return await this.repository.findOne(id, {relations: ['fotos']});      
   }

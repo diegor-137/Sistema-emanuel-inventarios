@@ -11,11 +11,18 @@ export class DetalleCotizacion{
     cantidad:number
     
     @Column({type:"decimal",precision:6,scale:2})
-    precio:number
+    precio_venta:number
+
+    @Column("simple-json")
+    precio_seleccionado: { param: string }
+
+
+    @Column("simple-json")
+    precios: { param: string }
 
     @ManyToOne(
         type => Cotizacion,
-        cotizacion => cotizacion.detalle_cotizacion,
+        cotizacion => cotizacion.detalle,
         {onDelete:'CASCADE',
         orphanedRowAction:"delete"}
         )

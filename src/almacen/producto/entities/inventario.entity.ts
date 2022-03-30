@@ -12,13 +12,6 @@ export class Inventario {
     @Column({type: 'int', default: 0, nullable: true })
     cantidad:number
 
-    //@Column({type:"decimal",precision:6,scale:2})
-    //costo_promedio:number
-
-    //@Column({type:"decimal",precision:6,scale:2})
-    //ultimo_precio:number
-
-
     @ManyToOne(type=> Producto, producto => producto.inventario, {
         onDelete: "CASCADE",
         orphanedRowAction: "delete"        

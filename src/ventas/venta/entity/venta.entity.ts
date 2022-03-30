@@ -43,5 +43,5 @@ export class Venta{
             detalle_venta => detalle_venta.venta,
             {cascade:["insert","update","remove"]
         })
-            detalle_venta: DetalleVenta[];
+            detalle: DetalleVenta[];
 }

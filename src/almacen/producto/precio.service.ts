@@ -7,8 +7,8 @@ import { CreateCompraDto } from '../../compras/compra/dto/create-compra.dto';
 export class PrecioService extends DataService(Precio){
 
     async Costo(dto:CreateCompraDto){
-        for (let i = 0; i < dto.detalle_compra.length; i++) {  
-            const productos = dto.detalle_compra[i]          
+        for (let i = 0; i < dto.detalle.length; i++) {  
+            const productos = dto.detalle[i]          
             const precio = await this.repository.find({
                 where:{
                     producto:productos.producto

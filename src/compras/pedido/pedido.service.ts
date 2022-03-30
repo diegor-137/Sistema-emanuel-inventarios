@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataService } from '../../common/service/common.service';
 import { Pedido } from './entity/pedido-entity';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { EditPedidoDto } from './dto/edit-pedido.dto';
 
 @Injectable()
@@ -50,21 +50,31 @@ export class PedidoService extends DataService(Pedido) {
     }
 
     async findOne_Pedido(id:number){
-        return await this.repository.find({
+        return await this.repository.findOne({
             where:[{id}],
             relations:[
-                "detalle_pedido",
-                "detalle_pedido.producto"
+                "empleado",
+                "proveedor",
+                "sucursal",
+                "detalle",
+                "detalle.producto"
             ]
         })
     }
 
     async findMany_Pedido(){
-        return await this.repository.find({
-            relations:[
-                "detalle_pedido",
-                "detalle_pedido.producto"
-            ]
-        })
+        return await getRepository(Pedido)
+        .createQueryBuilder("pedido")
+        .leftJoinAndSelect("pedido.empleado","empleado")
+        .leftJoinAndSelect("pedido.proveedor","proveedor")
+        .leftJoinAndSelect("pedido.sucursal","sucursal")
+        .leftJoinAndSelect("pedido.detalle","detalle")
+        .select(["pedido.id as id","pedido.documento as documento",
+        "proveedor.nombre as proveedor","sucursal.nombre as sucursal",
+        "pedido.created_At","SUM(detalle.cantidad*detalle.precio)as total"])
+        //.select(["empleado.nombre","proveedor.nombre","sucursal.nombre",
+        //"detalle"])
+        .groupBy("pedido.id,pedido.documento,proveedor.nombre,sucursal.nombre")
+        .getRawMany()
     }
 }

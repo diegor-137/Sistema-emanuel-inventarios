@@ -22,7 +22,7 @@ export class CreatePedidoDto {
     empleado:Empleado
 
     @IsOptional()
-    detalle_pedido:DetallePedido[]
+    detalle:DetallePedido[]
 
     @IsOptional()
     sucursal:Sucursal

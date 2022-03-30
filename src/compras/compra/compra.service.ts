@@ -40,8 +40,8 @@ export class CompraService extends DataService(Compra) {
                 "empleado",
                 "proveedor",
                 "sucursal",
-                "detalle_compra",
-                "detalle_compra.producto"
+                "detalle",
+                "detalle.producto"
             ]
         })
     }
@@ -52,10 +52,10 @@ export class CompraService extends DataService(Compra) {
         .leftJoinAndSelect("compra.empleado","empleado")
         .leftJoinAndSelect("compra.proveedor","proveedor")
         .leftJoinAndSelect("compra.sucursal","sucursal")
-        .leftJoinAndSelect("compra.detalle_compra","detalle_compra")
+        .leftJoinAndSelect("compra.detalle","detalle")
         .select(["compra.id as id","compra.documento as documento",
         "proveedor.nombre as proveedor","sucursal.nombre as sucursal",
-        "compra.created_At","SUM(detalle_compra.cantidad*detalle_compra.precio)as total"])
+        "compra.created_At","SUM(detalle.cantidad*detalle.precio)as total"])
         //.select(["empleado.nombre","proveedor.nombre","sucursal.nombre",
         //"detalle_compra"])
         .groupBy("compra.id,compra.documento,proveedor.nombre,sucursal.nombre")

@@ -18,13 +18,13 @@ export class DetalleVenta{
 
     @ManyToOne(
         type => Venta,
-        venta => venta.detalle_venta,
+        venta => venta.detalle,
         {onDelete:'CASCADE',
         orphanedRowAction:"delete"}
         )
     venta: Venta;
     @ManyToOne(
-        type => Producto,
+        () => Producto,
         producto => producto.detalle_venta,
         )
         producto: Producto;

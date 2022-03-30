@@ -19,7 +19,7 @@ export class CreateCotizacionDto{
     empleado:Empleado
 
     @IsOptional()
-    detalle_cotizacion:DetalleCotizacion[]
+    detalle:DetalleCotizacion[]
 
     @IsOptional()
     sucursal:Sucursal

@@ -51,5 +51,5 @@ export class Pedido{
             detalle_pedido => detalle_pedido.pedido,
             {cascade:true}
             )
-            detalle_pedido: DetallePedido[];
+            detalle: DetallePedido[];
 }

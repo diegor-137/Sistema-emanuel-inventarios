@@ -19,7 +19,7 @@ export class CreateVentaDto{
     empleado:Empleado
 
     @IsOptional()
-    detalle_venta:DetalleVenta[]
+    detalle:DetalleVenta[]
 
     @IsOptional()
     sucursal:Sucursal

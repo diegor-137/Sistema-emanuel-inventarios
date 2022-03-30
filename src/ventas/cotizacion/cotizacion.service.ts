@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { DataService } from '../../common/service/common.service';
 import { Cotizacion } from './entity/cotizacion.entity';
 import { CreateCotizacionDto } from './dto/create-cotizacion.dto';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { EditCotizacionDto } from './dto/edit-cotizacion.dto';
 
 @Injectable()
 export class CotizacionService extends DataService(Cotizacion) {
     async createOne(dto:CreateCotizacionDto){
+        //eturn console.log('object :>> ', dto);
         const connection = getConnection()
         const queryRunner = connection.createQueryRunner()
         await queryRunner.connect()
@@ -49,21 +50,32 @@ export class CotizacionService extends DataService(Cotizacion) {
     }
 
     async findOne_Cotizacion(id:number){
-        return await this.repository.find({
+        return await this.repository.findOne({
             where:[{id}],
             relations:[
-                "detalle_cotizacion",
-                "detalle_cotizacion.producto"
+                "empleado",
+                "cliente",
+                "sucursal",
+                "detalle",
+                "detalle.producto"
             ]
         })
     }
 
     async findMany_Cotizacion(){
-        return await this.repository.find({
-            relations:[
-                "detalle_cotizacion",
-                "detalle_cotizacion.producto"
-            ]
-        })
+        return await getRepository(Cotizacion)
+        .createQueryBuilder("cotizacion")
+        .leftJoinAndSelect("cotizacion.empleado","empleado")
+        .leftJoinAndSelect("cotizacion.cliente","cliente")
+        .leftJoinAndSelect("cotizacion.sucursal","sucursal")
+        .leftJoinAndSelect("cotizacion.detalle","detalle")
+        .select(["cotizacion.id as id",
+        "cliente.nombre as cliente","sucursal.nombre as sucursal",
+        "cotizacion.created_At","SUM(detalle.cantidad*detalle.precio_venta)as total"])
+        //.select(["empleado.nombre","proveedor.nombre","sucursal.nombre",
+        //"detalle"])
+        .groupBy("cotizacion.id,cliente.nombre,sucursal.nombre")
+        .getRawMany()
+
     }
 }

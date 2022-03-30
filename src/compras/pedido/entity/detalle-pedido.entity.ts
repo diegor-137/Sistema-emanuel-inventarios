@@ -18,7 +18,7 @@ export class DetallePedido{
 
     @ManyToOne(
         type => Pedido,
-        pedido => pedido.detalle_pedido,
+        pedido => pedido.detalle,
         {onDelete:'CASCADE',
         orphanedRowAction:"delete"}
         )

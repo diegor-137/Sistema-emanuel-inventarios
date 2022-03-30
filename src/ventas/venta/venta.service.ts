@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateVentaDto } from './dto/create-venta.dto';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { DataService } from '../../common/service/common.service';
 import { Venta } from './entity/venta.entity';
 import { InventarioService } from '../../almacen/producto/inventario.service';
@@ -11,6 +11,7 @@ export class VentaService extends DataService(Venta){
     constructor(private readonly invertarioService:InventarioService){super()}
 
     async CreateOne(dto:CreateVentaDto){
+        //return console.log('object :>> ', dto);
         const connection = getConnection()
         const queryRunner = connection.createQueryRunner()
         await queryRunner.connect()
@@ -33,22 +34,32 @@ export class VentaService extends DataService(Venta){
     }
 
     async FindOne_Venta(id:number){
-        return await this.repository.find({
+        return await this.repository.findOne({
             where:[{id}],
             relations:[
-                "detalle_venta",
-                "detalle_venta.producto"
+                "empleado",
+                "cliente",
+                "sucursal",
+                "detalle",
+                "detalle.producto"
             ]
         })
     }
 
     async FindMany_Venta(){
-        return await this.repository.find({
-            relations:[
-                "detalle_venta",
-                "detalle_venta.producto"
-            ]
-        })
+        return await getRepository(Venta)
+        .createQueryBuilder("venta")
+        .leftJoinAndSelect("venta.empleado","empleado")
+        .leftJoinAndSelect("venta.cliente","cliente")
+        .leftJoinAndSelect("venta.sucursal","sucursal")
+        .leftJoinAndSelect("venta.detalle","detalle")
+        .select(["venta.id as id",
+        "cliente.nombre as cliente","sucursal.nombre as sucursal",
+        "venta.created_At","SUM(detalle.cantidad*detalle.precio_venta)as total"])
+        //.select(["empleado.nombre","proveedor.nombre","sucursal.nombre",
+        //"detalle"])
+        .groupBy("venta.id,cliente.nombre,venta.created_At,sucursal.nombre")
+        .getRawMany()
     }
 
 }

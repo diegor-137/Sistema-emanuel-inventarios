@@ -7,15 +7,22 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { FotoDto } from './dto/foto.dto';
 import { storage } from './const/product-constant';
 import { Precio } from './entities/precio.entity';
+import { InventarioService } from './inventario.service';
 
 
 @Controller('producto')
 export class ProductoController extends CommonController(ProductoService){
-  constructor(private readonly productoService: ProductoService) {super()}
+  constructor(private readonly productoService: ProductoService,
+              private readonly inventarioService:InventarioService) {super()}
 
   @Get('productos')
   async products(){
     return this.productoService.products();
+  }
+
+  @Get('venta')
+  async productoVenta(){
+    return this.productoService.prod();
   }
 
   @Post()

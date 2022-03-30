@@ -45,8 +45,8 @@ export class Compra{
     //------Tablas Hijas---------
     @OneToMany(
         type => DetalleCompra,
-        detalle_compra => detalle_compra.compra,
+        detalle => detalle.compra,
         {cascade:["insert","update","remove"]
     })
-        detalle_compra: DetalleCompra[];
+        detalle: DetalleCompra[];
 }

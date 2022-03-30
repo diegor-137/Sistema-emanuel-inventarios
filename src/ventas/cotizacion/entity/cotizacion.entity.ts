@@ -43,5 +43,5 @@ export class Cotizacion{
             detalle_cotizacion => detalle_cotizacion.cotizacion,
             {cascade:true
         })
-            detalle_cotizacion: DetalleCotizacion[];
+            detalle: DetalleCotizacion[];
 }
