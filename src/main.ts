@@ -8,6 +8,8 @@ async function bootstrap() {
   const logger = new Logger()
   const config = app.get(ConfigService)
   const port = parseInt(config.get<string>(SERVER_PORT),10)|| 3000
+  
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist:true
