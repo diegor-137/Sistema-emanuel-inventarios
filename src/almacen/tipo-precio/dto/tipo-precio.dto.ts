@@ -6,6 +6,6 @@ export class TipoPrecioDto{
     id?:number
     
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     nombre:string
 }

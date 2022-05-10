@@ -18,8 +18,8 @@ import { AuthModule } from './auth/auth.module';
 import { AccessControlModule } from 'nest-access-control';
 import { roles } from './app.roles';
 import { UserModule } from './user/user.module';
-import { PermissionGuard } from './auth/guards/permission-guard.guard';
 import { ConfiguracionesModule } from './configuraciones/configuraciones.module';
+import { FinanzasModule } from './finanzas/finanzas.module';
 
 @Module({
   imports: [
@@ -47,7 +47,7 @@ import { ConfiguracionesModule } from './configuraciones/configuraciones.module'
       //esto es para no instanciar config en cada modulo
       isGlobal:true,
       //Para indicar donde esta el archivo .ENV
-      envFilePath:'.env'
+      envFilePath:`.env.${process.env.NODE_ENV || 'development'}`
     }),
     AlmacenModule,
     RecursosHumanosModule,
@@ -58,6 +58,7 @@ import { ConfiguracionesModule } from './configuraciones/configuraciones.module'
     AccessControlModule.forRoles(roles),
     UserModule,
     ConfiguracionesModule,
+    FinanzasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

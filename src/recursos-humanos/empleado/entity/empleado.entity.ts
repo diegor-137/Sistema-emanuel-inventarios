@@ -6,6 +6,7 @@ import { Pedido } from '../../../compras/pedido/entity/pedido-entity';
 import { Cotizacion } from '../../../ventas/cotizacion/entity/cotizacion.entity';
 import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Cobro } from 'src/finanzas/cobro/entities/cobro.entity';
 
 @Entity('empleado')
 export class Empleado{
@@ -80,5 +81,8 @@ export class Empleado{
         )
         cotizacion: Cotizacion;
 
+    /*********Cobro*********/ 
+    @OneToOne(() => Cobro, (cobro) => cobro.empleado)
+    cobro:Cobro
     
 }

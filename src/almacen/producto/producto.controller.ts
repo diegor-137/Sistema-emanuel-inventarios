@@ -29,7 +29,8 @@ export class ProductoController extends CommonController(ProductoService){
   @Post()
   @UseInterceptors(FilesInterceptor('files', 5, storage))
   async uploadFiles( @UploadedFiles() files: Express.Multer.File[], @Body() producto: CreateProductoDto, ) {
-
+    console.log(producto);
+    
     return await this.productoService.uploads(files,producto);
   }
 
