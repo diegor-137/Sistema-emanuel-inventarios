@@ -3,8 +3,9 @@ import { CommonController } from '../../common/controller/common.controller';
 import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { EditPedidoDto } from './dto/edit-pedido.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('Pedido endPoints')
 @Controller('pedido')
 export class PedidoController extends CommonController (PedidoService) {
     constructor(private readonly pedidoService:PedidoService){super()}

@@ -2,7 +2,9 @@ import { Body, Controller, Get, Param, Post, ParseIntPipe } from '@nestjs/common
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { CommonController } from '../../common/controller/common.controller';
 import { VentaService } from './venta.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Venta endPoints')
 @Controller('venta')
 export class VentaController extends CommonController(VentaService){
 

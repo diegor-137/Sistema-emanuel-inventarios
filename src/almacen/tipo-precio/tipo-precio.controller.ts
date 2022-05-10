@@ -1,8 +1,10 @@
 import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CommonController } from '../../common/controller/common.controller';
 import { TipoPrecioDto } from './dto/tipo-precio.dto';
 import { TipoPrecioService } from './tipo-precio.service';
 
+@ApiTags('tipo-precio endPoints')
 @Controller('tipo-precio')
 export class TipoPrecioController extends CommonController(TipoPrecioService) {
 

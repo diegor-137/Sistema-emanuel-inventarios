@@ -3,7 +3,9 @@ import { CommonController } from '../../common/controller/common.controller';
 import { ProveedorService } from './proveedor.service';
 import { CreateProveedorDto } from './dto/create-proveedor.dto';
 import { EditProveedorDto } from './dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Proveedor endPoints')
 @Controller('proveedor')
 export class ProveedorController extends CommonController (ProveedorService) {
 

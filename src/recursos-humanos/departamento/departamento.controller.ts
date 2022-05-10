@@ -3,7 +3,9 @@ import { EditDepartamentoDto } from './dto';
 import { DepartamentoService } from './departamento.service';
 import { CommonController } from 'src/common/controller/common.controller';
 import { CreateDepartamentoDto } from './dto/create-departamento.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Departamento endPoints')
 @Controller('departamento')
 export class DepartamentoController extends CommonController(DepartamentoService){
 

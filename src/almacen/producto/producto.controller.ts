@@ -8,8 +8,9 @@ import { FotoDto } from './dto/foto.dto';
 import { storage } from './const/product-constant';
 import { Precio } from './entities/precio.entity';
 import { InventarioService } from './inventario.service';
+import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('Producto endPoints')
 @Controller('producto')
 export class ProductoController extends CommonController(ProductoService){
   constructor(private readonly productoService: ProductoService,

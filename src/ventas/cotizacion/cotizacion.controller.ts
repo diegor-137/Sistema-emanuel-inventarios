@@ -1,9 +1,11 @@
 import { Body, Controller, Param, Post, Put, ParseIntPipe, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CommonController } from '../../common/controller/common.controller';
 import { CotizacionService } from './cotizacion.service';
 import { CreateCotizacionDto } from './dto/create-cotizacion.dto';
 import { EditCotizacionDto } from './dto/edit-cotizacion.dto';
 
+@ApiTags('Cotizacion endPoints')
 @Controller('cotizacion')
 export class CotizacionController extends CommonController(CotizacionService) {
     constructor(private readonly cotizacionService:CotizacionService){super()}

@@ -1,10 +1,11 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, BeforeInsert, BeforeUpdate, OneToOne } from 'typeorm';
 import { Puesto } from '../../puesto/entity/puesto.entity';
 import { Compra } from '../../../compras/compra/entity/compra.entity';
 import { Venta } from '../../../ventas/venta/entity/venta.entity';
 import { Pedido } from '../../../compras/pedido/entity/pedido-entity';
 import { Cotizacion } from '../../../ventas/cotizacion/entity/cotizacion.entity';
 import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity('empleado')
 export class Empleado{
@@ -29,6 +30,9 @@ export class Empleado{
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
 
+    @Column({ type: 'varchar', length: 255, nullable: false })
+    email: string;
+
     //Tablas Padre
     /*********Puesto*********/
     @ManyToOne(
@@ -43,6 +47,10 @@ export class Empleado{
         sucursal => sucursal.empleado,
         )
     sucursal: Sucursal
+
+    /*********Usuario*********/
+    @OneToOne(() => User, (user) => user.empleado) // specify inverse side as a second parameter
+    user:User
 
     //Tablas Hijas
 

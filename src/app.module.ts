@@ -14,6 +14,12 @@ import { ComprasModule } from './compras/compras.module';
 import { VentasModule } from './ventas/ventas.module';
 import { SucursalModule } from './sucursal/sucursal.module';
 import { ProductoSubscriber } from './almacen/producto/subscribers/existencia.subscriber';
+import { AuthModule } from './auth/auth.module';
+import { AccessControlModule } from 'nest-access-control';
+import { roles } from './app.roles';
+import { UserModule } from './user/user.module';
+import { PermissionGuard } from './auth/guards/permission-guard.guard';
+import { ConfiguracionesModule } from './configuraciones/configuraciones.module';
 
 @Module({
   imports: [
@@ -47,7 +53,11 @@ import { ProductoSubscriber } from './almacen/producto/subscribers/existencia.su
     RecursosHumanosModule,
     ComprasModule,
     VentasModule,
-    SucursalModule
+    SucursalModule,
+    AuthModule,
+    AccessControlModule.forRoles(roles),
+    UserModule,
+    ConfiguracionesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Param, Post, ParseIntPipe } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CommonController } from 'src/common/controller/common.controller';
 
 import { CompraService } from './compra.service';
 import { CreateCompraDto } from './dto/create-compra.dto';
 
+@ApiTags('Compra endPoints')
 @Controller('compra')
 export class CompraController extends CommonController(CompraService) {
     constructor(private readonly compraService: CompraService) {super()}
