@@ -39,6 +39,7 @@ import { FinanzasModule } from './finanzas/finanzas.module';
         entities: [__dirname + '../**/**/*entity{.ts,.js'],
         autoLoadEntities: true,
         synchronize: true,
+        ssl: {rejectUnauthorized: false}
       })
     }),
     //config module es para activar las variables de entorno
