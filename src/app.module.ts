@@ -39,7 +39,7 @@ import { FinanzasModule } from './finanzas/finanzas.module';
         entities: [__dirname + '../**/**/*entity{.ts,.js'],
         autoLoadEntities: true,
         synchronize: true,
-        ssl: {rejectUnauthorized: false}
+        //ssl: {rejectUnauthorized: false}
       })
     }),
     //config module es para activar las variables de entorno
@@ -48,7 +48,8 @@ import { FinanzasModule } from './finanzas/finanzas.module';
       //esto es para no instanciar config en cada modulo
       isGlobal:true,
       //Para indicar donde esta el archivo .ENV
-      envFilePath:`.env.${process.env.NODE_ENV || 'development'}`
+      //envFilePath:`.env.${process.env.NODE_ENV || 'development'}`
+      envFilePath:`.env`
     }),
     AlmacenModule,
     RecursosHumanosModule,

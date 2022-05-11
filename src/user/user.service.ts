@@ -43,7 +43,7 @@ export class UserService{
 
   async getOne(id: number) {
     const user = await this.userRepository
-      .findOne(id, {relations: ["empleado"]});
+      .findOne(id, {relations: ["empleado", "empleado.sucursal"]});
 
     if (!user)
       throw new NotFoundException('Usur does not exists or unauthorized');

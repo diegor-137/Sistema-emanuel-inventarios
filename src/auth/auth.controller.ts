@@ -25,7 +25,9 @@ export class AuthController {
 
   @Auth()
   @Get('profile')
-  async profile(@User() user: UserEntity) {    
+  async profile(@User() user: UserEntity) {
+    console.log(user.empleado.sucursal.id);
+        
     const data = await this.authService.login(user);
     return {
       message: 'Petición correcta',
