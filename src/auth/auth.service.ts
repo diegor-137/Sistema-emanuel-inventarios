@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { EmpleadoService } from 'src/recursos-humanos/empleado/empleado.service';
 import { compare } from 'bcryptjs';
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
@@ -50,5 +50,14 @@ export class AuthService {
           accessToken: await this.jwtService.signAsync(payload),
         };
       }
-
+ 
+      async decodeToken(token:string){
+        try {
+          const { sub } = await this.jwtService.verifyAsync(token)
+         return await this.userService.getOne(sub);          
+        } catch (error) {
+          throw new NotFoundException('Token Invalido')          
+        } 
+      }
+      
 }

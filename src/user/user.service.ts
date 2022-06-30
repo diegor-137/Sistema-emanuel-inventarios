@@ -32,6 +32,12 @@ export class UserService{
     return await this.userRepository.find({relations: ["empleado"]});
   }
 
+  async usuario() {
+    return await this.userRepository.createQueryBuilder('user')
+    .where("user.roles @> ARRAY[:...roles]", {roles: ['CAJERO']})
+    .getMany();
+  }
+
   async findOne(data: UserFindOne) {
     return await this.userRepository
       .createQueryBuilder('user')

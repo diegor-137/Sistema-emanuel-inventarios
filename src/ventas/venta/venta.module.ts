@@ -12,6 +12,7 @@ import { ProductoModule } from '../../almacen/producto/producto.module';
     ProductoModule
   ],
   controllers: [VentaController],
-  providers: [VentaService]
+  providers: [VentaService], 
+  exports: [VentaService]
 })
 export class VentaModule {}

@@ -27,8 +27,10 @@
     "@nestjs/jwt": "^8.0.0",
     "@nestjs/passport": "^8.2.1",
     "@nestjs/platform-express": "^8.4.4",
+    "@nestjs/platform-socket.io": "^8.4.4",
     "@nestjs/swagger": "^5.2.1",
     "@nestjs/typeorm": "^8.0.3",
+    "@nestjs/websockets": "^8.4.4",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
@@ -43,7 +45,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.5",
     "swagger-ui-express": "^4.3.0",
-    "typeorm": "^0.2.31",
+    "typeorm": "^0.2.45",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

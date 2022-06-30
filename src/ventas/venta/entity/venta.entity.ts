@@ -50,4 +50,7 @@ export class Venta {
             cascade: ["insert", "update", "remove"]
         })
     detalle: DetalleVenta[];
+
+    @Column({ type: 'varchar', length: 45, default: 'PENDIENTE'})
+    status: string
 }

@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Cobro } from "./cobro.entity";
+import { TipoCobro } from '../../tipo-cobro/entities/tipo-cobro.entity';
 
 
 @Entity('detalle_cobro')
@@ -15,7 +16,7 @@ export class DetalleCobro {
     cantidad:number
 
     //-----Tablas Padre--------
-
+    /*********Cobro*********/
     @ManyToOne(() => Cobro, cobro => cobro.detalleCobro,
     {
         onDelete:'CASCADE',
@@ -23,4 +24,9 @@ export class DetalleCobro {
     })
     @JoinColumn({ name: "id_cobro"})
     cobro: Cobro;
+
+    /*********Tipo Cobro*********/
+    @ManyToOne(() => TipoCobro, tipoCobro => tipoCobro.detalleCobro)
+    @JoinColumn({ name: "id_tipo_cobro"})
+    tipoCobro:TipoCobro;
 }

@@ -23,6 +23,7 @@ import { UserModule } from 'src/user/user.module';
   }),
   EmpleadoModule, UserModule],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [AuthService]
 })
 export class AuthModule {}
