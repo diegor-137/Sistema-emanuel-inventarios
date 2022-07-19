@@ -1,4 +1,4 @@
-import { Controller, Param, Put, ParseIntPipe, Body, Post, Get } from '@nestjs/common';
+import { Controller, Param, Put, ParseIntPipe, Body, Post} from '@nestjs/common';
 import { EditDepartamentoDto } from './dto';
 import { DepartamentoService } from './departamento.service';
 import { CommonController } from 'src/common/controller/common.controller';

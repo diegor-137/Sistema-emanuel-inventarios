@@ -3,8 +3,8 @@ import { DataService } from '../../common/service/common.service';
 import { Compra } from './entity/compra.entity';
 import { CreateCompraDto } from './dto/create-compra.dto';
 import { getConnection,getRepository } from 'typeorm';
-import { InventarioService } from '../../almacen/producto/inventario.service';
-import { PrecioService } from '../../almacen/producto/precio.service';
+import { InventarioService } from '../../almacen/producto/services/inventario.service';
+import { PrecioService } from '../../almacen/producto/services/precio.service';
 
 
 @Injectable()
@@ -20,7 +20,7 @@ export class CompraService extends DataService(Compra) {
         try {
             const compra = this.repository.create(dto)
             const saved =  await queryRunner.manager.save(compra)
-            await this.inventarioService.Ingreso(saved)
+            //await this.inventarioService.Ingreso(saved)
             await queryRunner.commitTransaction()
             await queryRunner.release()
             return saved
@@ -62,4 +62,9 @@ export class CompraService extends DataService(Compra) {
         .getRawMany()
     }
 
+    async editOne(id:number , dto:CreateCompraDto){
+        const compra = await this.repository.findOne(id);
+        const editCompra = Object.assign(compra, dto);
+        return await this.repository.save(editCompra);
+    }
 }
