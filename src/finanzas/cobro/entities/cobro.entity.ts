@@ -1,8 +1,10 @@
 import { Caja } from "src/finanzas/caja/entities/caja.entity";
 import { Empleado } from "src/recursos-humanos/empleado/entity/empleado.entity";
 import { Venta } from "src/ventas/venta/entity/venta.entity";
-import { CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { CreateDateColumn, Entity, EntityRepository, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
 import { DetalleCobro } from "./detalle-cobro";
+import { CorteCaja } from '../../corte-caja/entities/corte-caja.entity';
 
 
 @Entity('cobro')
@@ -16,7 +18,7 @@ export class Cobro {
 
     //-----Tablas Padre--------
 
-    @OneToOne(() => Empleado, (empleado) => empleado.cobro)
+    @ManyToOne(() => Empleado, (empleado) => empleado.cobro)
     @JoinColumn({ name: "id_empleado"})
     empleado:Empleado
 
@@ -24,9 +26,12 @@ export class Cobro {
     @JoinColumn({ name: "id_venta"})
     venta:Venta
 
-    @OneToOne(() => Caja, (caja) => caja.cobro)
+    @ManyToOne(() => Caja, (caja) => caja.cobro)
     @JoinColumn({ name: "id_caja"})
     caja:Caja
+    
+    @ManyToOne(()=> CorteCaja, (corteCaja)=> corteCaja.cobro)
+    corteCaja:CorteCaja
 
     //-------Tablas Hijas--------
 
@@ -35,5 +40,8 @@ export class Cobro {
         cascade: ["insert", "update", "remove"]
     })
     detalleCobro: DetalleCobro[];
+
+
+
 
 }

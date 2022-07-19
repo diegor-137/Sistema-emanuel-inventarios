@@ -13,16 +13,16 @@ export class ConfiguracionesGlobalService {
     private readonly repository: Repository<ConfiguracionesGlobal>,
   ) {}
 
-  create(createConfiguracionesGlobalDto: CreateConfiguracionesGlobalDto[]) {
-    return this.repository.save(createConfiguracionesGlobalDto);
+  async create(createConfiguracionesGlobalDto: CreateConfiguracionesGlobalDto[]) {
+    return await this.repository.save(createConfiguracionesGlobalDto);
   }
 
-  findAll() {
-    return this.repository.find({order: {id: 'ASC'}});
+  async findAll() {
+    return await this.repository.find({order: {id: 'ASC'}});
   }
 
-  findPermissions() {
-    return this.repository.find({where: {checked: true}, order: {id: 'ASC'}});
+  async findPermissions() {
+    return await this.repository.find({where: {checked: true}, order: {id: 'ASC'}});
   }
 
   findOne(id: number) {

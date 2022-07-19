@@ -22,7 +22,7 @@ export class User {
     @JoinColumn()
     empleado: Empleado
 
-    @Column({ type: 'simple-array' })
+    @Column("text", {default: "{}", array:true })
     roles: string[];
 
     @Column({type: 'enum', enum: Permission, array: true, default: []})

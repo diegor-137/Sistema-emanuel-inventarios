@@ -24,11 +24,15 @@ export class AuthController {
   }
 
   @Auth()
-  @Get('profile')
-  async profile(@User() user: UserEntity) {
-    //console.log(user.empleado.sucursal.id);
-        
+  @Get('profile')        
+  async profile(@User() user: UserEntity) {     
     const data = await this.authService.login(user);
+
+    delete data.user.empleado.createdAt
+    delete data.user.empleado.direccion
+    delete data.user.empleado.email
+    delete data.user.empleado.telefono
+
     return {
       message: 'Petición correcta',
       accessToken: data.accessToken,

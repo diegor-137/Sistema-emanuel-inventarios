@@ -3,13 +3,15 @@ import { RolesBuilder } from 'nest-access-control';
 export enum Role {
   ADMIN = 'ADMIN',
   EMPLEADO = 'EMPLEADO',
-  BODEGUERO = 'BODEGUERO'
+  BODEGUERO = 'BODEGUERO',
+  CAJERO = 'CAJERO'
 }
 
 export enum Recurso {
   EMPLEADO = 'EMPLEADO',
   VENTA = 'VENTA',
-  USER = 'USER'
+  USER = 'USER',
+  CAJERO = 'CAJERO'
 }
 
 export const roles: RolesBuilder = new RolesBuilder();
@@ -24,7 +26,9 @@ roles
   .extend(Role.EMPLEADO)
   .createAny([Recurso.EMPLEADO, Recurso.USER])
   .updateAny([Recurso.EMPLEADO, Recurso.USER])
-  .deleteAny([Recurso.EMPLEADO, Recurso.VENTA, Recurso.USER]);
+  .deleteAny([Recurso.EMPLEADO, Recurso.VENTA, Recurso.USER])
+  .grant(Role.CAJERO)
+  .createOwn([Recurso.CAJERO])
 
 
 

@@ -17,11 +17,11 @@ export class EmpleadoController extends CommonController (EmpleadoService) {
     constructor(private readonly empleadoService:EmpleadoService)
     {super()}
 
-   /*  @Auth({
+    @Auth({
         action: 'create',
         possession: 'any',
         resource: Recurso.EMPLEADO
-    }) */
+    })
     //@PermissionsRequired(Permission.CrearEmpleado)
     @Post()
     async CreateOne(
