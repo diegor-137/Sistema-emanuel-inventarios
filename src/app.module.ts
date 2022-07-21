@@ -20,6 +20,8 @@ import { roles } from './app.roles';
 import { UserModule } from './user/user.module';
 import { ConfiguracionesModule } from './configuraciones/configuraciones.module';
 import { FinanzasModule } from './finanzas/finanzas.module';
+import { CompraSubscriber } from './compras/compra/subscribers/existencia-compra.subscriber';
+import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.subscriber';
 
 @Module({
   imports: [
@@ -35,7 +37,7 @@ import { FinanzasModule } from './finanzas/finanzas.module';
         username:config.get<string>(DATABASE_USERNAME),
         password:config.get<string>(DATABASE_PASSWORD),
         database:config.get<string>(DATABASE_NAME),
-        subscribers:[ProductoSubscriber],
+        subscribers:[ProductoSubscriber, CompraSubscriber,ventaSubscriber],
         entities: [__dirname + '../**/**/*entity{.ts,.js'],
         autoLoadEntities: true,
         synchronize: true,

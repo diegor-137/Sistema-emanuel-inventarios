@@ -1,6 +1,8 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CommonController } from '../common/controller/common.controller';
+import { CreateSucursalDto } from './dto/create-sucursal.dto';
+import { EditSucursalDto } from './dto/edit-sucursal.dto';
 import { SucursalService } from './sucursal.service';
 
 @ApiTags('Sucursal endPoints')
@@ -8,4 +10,18 @@ import { SucursalService } from './sucursal.service';
 export class SucursalController extends CommonController(SucursalService){
     constructor(private readonly sucursalService:SucursalService){super()}
 
+    @Post()
+    async CreateOne(
+        @Body() dto:CreateSucursalDto)
+        {
+            return await this.sucursalService.CreateOne(dto)
+        }
+
+    @Put(':id')
+    async editOne(
+        @Param('id',ParseIntPipe) id:number,
+        @Body() dto:EditSucursalDto)
+        {
+            return await this.sucursalService.editOne(id,dto)
+        }
 }

@@ -15,7 +15,8 @@ export class CategoriaController extends CommonController(CategoriaService) {
     }
 
     @Put(':id')
-    async editOne(@Param('id', ParseIntPipe) id: number, @Body() categoria: CategoriaDto){
+    async editOne(@Param('id', ParseIntPipe) id: number,
+                  @Body() categoria: CategoriaDto){
         return this.categoriaService.editOne(id, categoria);
     }
 }

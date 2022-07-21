@@ -3,11 +3,14 @@ import { CategoriaModule } from './categoria/categoria.module';
 import { MarcaModule } from './marca/marca.module';
 import { ProductoModule } from './producto/producto.module';
 import { TipoPrecioModule } from './tipo-precio/tipo-precio.module';
+import { InventarioModule } from './inventario/inventario.module';
 
 @Module({
   imports: [
     CategoriaModule, 
     MarcaModule, 
-    ProductoModule, TipoPrecioModule]
+    ProductoModule, 
+    TipoPrecioModule, 
+    InventarioModule]
 })
 export class AlmacenModule {}

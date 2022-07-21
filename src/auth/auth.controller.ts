@@ -24,7 +24,7 @@ export class AuthController {
   }
 
   @Auth()
-  @Get('profile')
+  @Get('profile')        
   async profile(@User() user: UserEntity) {     
     const data = await this.authService.login(user);
     console.log(data);

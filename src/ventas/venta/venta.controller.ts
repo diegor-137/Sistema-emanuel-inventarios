@@ -1,19 +1,26 @@
+
 import { Body, Controller, Get, Param, Post, ParseIntPipe } from '@nestjs/common';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { CommonController } from '../../common/controller/common.controller';
 import { VentaService } from './venta.service';
 import { ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { User } from 'src/auth/decorators/user.decorator';
+import { User as UserEntity} from 'src/user/entities/user.entity';
 
 @ApiTags('Venta endPoints')
 @Controller('venta')
 export class VentaController extends CommonController(VentaService){
 
     constructor(private readonly ventaService:VentaService){super()}
-
+    @Auth()
     @Post()
     async CreateOne(
-        @Body() dto:CreateVentaDto
+        @Body() dto:CreateVentaDto,
+        @User() user: UserEntity
     ){
+        dto.empleado = user.empleado
+        dto.sucursal = user.empleado.sucursal
         return await this.ventaService.CreateOne(dto)
     }
 

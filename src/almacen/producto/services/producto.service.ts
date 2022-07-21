@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { CreateProductoDto } from './dto/create-producto.dto';
-import { UpdateProductoDto } from './dto/update-producto.dto';
-import { DataService } from '../../common/service/common.service';
-import { Producto } from './entities/producto.entity';
+import { CreateProductoDto } from '../dto/create-producto.dto';
+import { UpdateProductoDto } from '../dto/update-producto.dto';
+import { DataService } from '../../../common/service/common.service';
+import { Producto } from '../entities/producto.entity';
 import { join } from 'path';
-import { FotoDto } from './dto/foto.dto';
-import { getConnection, getRepository } from 'typeorm';
-import { Sucursal } from '../../sucursal/entity/sucursal.entity';
-import { Inventario } from './entities/inventario.entity';
+import { FotoDto } from '../dto/foto.dto';
+import { getConnection, getManager, getRepository } from 'typeorm';
+import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Inventario } from '../entities/inventario.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProductoService extends DataService(Producto) {
@@ -16,20 +17,8 @@ export class ProductoService extends DataService(Producto) {
     return await this.repository.find({relations: ['categoria', 'marca','precio','precio.tipoPrecio']});
   }
 
-  async productoVenta(){
-    return await this.repository.find({
-        where: {
-        },
-        relations: [
-            'categoria', 
-            'marca',
-            'precio',
-            'precio.tipoPrecio',
-            "inventario",
-            'inventario.sucursal']
-        });
-  }
-  async prod(){
+  //Se usa para llamaer los productos disponibles en los modulos de ventas y compras
+  async prodPorSucursal(user:User){
     return await getRepository(Producto)
     .createQueryBuilder("producto")
     .leftJoinAndSelect("producto.categoria","categoria")
@@ -38,7 +27,7 @@ export class ProductoService extends DataService(Producto) {
     .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
     .leftJoinAndSelect("producto.inventario","inventario")
     .leftJoinAndSelect("inventario.sucursal","sucursal")
-    .where("sucursal.id =:id",{id:1})
+    .where("sucursal.id =:id",{id:user.empleado.sucursal.id})
     .getMany()
   }
   async findProductImages(id:number){
@@ -66,7 +55,8 @@ export class ProductoService extends DataService(Producto) {
         await queryRunner.release()   
     }
   }
-  
+
+
   async uploads(files: Express.Multer.File[], producto:CreateProductoDto){
 
         const connection = getConnection()
@@ -76,9 +66,9 @@ export class ProductoService extends DataService(Producto) {
         try {
             const creado = this.repository.create(producto)
             const saved =  await queryRunner.manager.save(creado)
+            //this.afterInsert(saved)
             await queryRunner.commitTransaction()
             await queryRunner.release()
-            this.afterInsert(saved)
             return saved
             
         } catch (err) {

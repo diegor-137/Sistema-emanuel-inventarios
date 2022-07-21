@@ -3,7 +3,7 @@ import { CreateVentaDto } from './dto/create-venta.dto';
 import { getConnection, getRepository } from 'typeorm';
 import { DataService } from '../../common/service/common.service';
 import { Venta } from './entity/venta.entity';
-import { InventarioService } from '../../almacen/producto/inventario.service';
+import { InventarioService } from '../../almacen/producto/services/inventario.service';
 
 
 @Injectable()
@@ -19,7 +19,7 @@ export class VentaService extends DataService(Venta){
         try {
             const venta = this.repository.create(dto)
             const saved =  await queryRunner.manager.save(venta)
-            await this.invertarioService.Egreso(saved)
+            //await this.invertarioService.Egreso(saved)
             await queryRunner.commitTransaction()
             await queryRunner.release()
             return saved

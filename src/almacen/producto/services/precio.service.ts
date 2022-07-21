@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { DataService } from '../../common/service/common.service';
-import { Precio } from "./entities/precio.entity";
-import { CreateCompraDto } from '../../compras/compra/dto/create-compra.dto';
+import { DataService } from '../../../common/service/common.service';
+import { Precio } from "../entities/precio.entity";
+import { CreateCompraDto } from '../../../compras/compra/dto/create-compra.dto';
 
 @Injectable()
 export class PrecioService extends DataService(Precio){

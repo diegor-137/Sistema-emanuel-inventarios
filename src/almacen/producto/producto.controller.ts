@@ -1,14 +1,17 @@
 import { Controller, Get, Post, Body, Param, Put, UseInterceptors, ParseIntPipe, Res, UploadedFiles, HttpException, HttpStatus, Request, ParseArrayPipe } from '@nestjs/common';
-import { ProductoService } from './producto.service';
+import { ProductoService } from './services/producto.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { CommonController } from '../../common/controller/common.controller';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FotoDto } from './dto/foto.dto';
 import { storage } from './const/product-constant';
-import { Precio } from './entities/precio.entity';
-import { InventarioService } from './inventario.service';
+import { InventarioService } from './services/inventario.service';
 import { ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { User } from 'src/auth/decorators/user.decorator';
+import { User as UserEntity} from 'src/user/entities/user.entity';
+import { InventarioDto } from './dto/inventario.dto';
 
 @ApiTags('Producto endPoints')
 @Controller('producto')
@@ -19,11 +22,6 @@ export class ProductoController extends CommonController(ProductoService){
   @Get('productos')
   async products(){
     return this.productoService.products();
-  }
-
-  @Get('venta')
-  async productoVenta(){
-    return this.productoService.prod();
   }
 
   @Post()
@@ -44,6 +42,35 @@ export class ProductoController extends CommonController(ProductoService){
   async productImage(@Param('id', ParseIntPipe) idProduc: number, @Body() foto:FotoDto, @Res() res:any){  
     return await this.productoService.productImage(idProduc, foto,res);        
   }
+
+    //Para generar consultas de los productos y de su inventario
+    @Auth()
+    @Get('transacciones')
+    async productoVenta(@User() user: UserEntity){
+      return this.productoService.prodPorSucursal(user);
+    }
+  
+    //Para el modulo Inventario
+    @Auth()
+    @Get('inventario')
+    async productoVentaDos(@User() user: UserEntity){
+      return this.inventarioService.prodPorSucursal(user);
+    }
+
+    @Auth()
+    @Get('inventario/:id')
+    async Validador(@User() user: UserEntity,
+                    @Param('id',ParseIntPipe) id:number){
+      return this.inventarioService.getProductoSucursal(user,id);
+    }
+
+    @Put('inventario/:id')
+   async updateInventario(
+    @Param('id',ParseIntPipe) id:number,
+    @Body() dto:InventarioDto
+   ){
+     return this.inventarioService.editOne(id,dto)
+   }
 }
 
 
