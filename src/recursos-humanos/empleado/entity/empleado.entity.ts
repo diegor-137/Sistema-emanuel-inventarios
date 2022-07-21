@@ -98,5 +98,11 @@ export class Empleado{
 
     @OneToMany(() => Gasto, (gasto) => gasto.empleado)
     gastos:Gasto[]
+
+    @OneToMany(() => Gasto, (gasto) => gasto.deleteResponsible)
+    gastosDelete:Gasto[]
+
+    @OneToMany(() => Cobro, (cobro) => cobro.deleteResponsible)
+    cobroDeleted:Cobro[]
     
 }

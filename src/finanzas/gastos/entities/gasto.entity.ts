@@ -12,6 +12,11 @@ export class Gasto {
     @CreateDateColumn({ name: 'fecha', type: 'timestamp' })
     fecha:Date
 
+    @Column({ name: 'deleted_at', nullable: true, type: 'timestamp with time zone' })
+    deletedAt: Date;
+
+
+
     @Column({type: 'varchar', length: 45, nullable: false})
     descripcion:string
 
@@ -27,6 +32,9 @@ export class Gasto {
 
     @ManyToOne(()=> Empleado, empleado=> empleado.gastos)
     empleado:Empleado
+
+    @ManyToOne(()=> Empleado, empleado=> empleado.gastosDelete)
+    deleteResponsible:Empleado
 
     @ManyToOne(()=> CorteCaja, (corteCaja)=> corteCaja.gasto)
     corteCaja:CorteCaja

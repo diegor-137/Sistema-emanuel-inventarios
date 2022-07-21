@@ -79,4 +79,72 @@ export class CorteCajaController {
     return this.corteCajaService.findOne(+id);
   }
 
+  @Auth()
+  @Get('totalGasto/caja')
+  async totalGasto(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {gasto} = await this.corteCajaService.totalGasto(caja.id)
+    return gasto;
+  }
+
+  @Auth()
+  @Get('totalCobro/caja')
+  async totalCobro(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {total} = await this.corteCajaService.totalCobro(caja.id)
+    return total;
+  }
+
+  @Auth()
+  @Get('saldo/caja')
+  async saldo(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    return this.corteCajaService.saldo(caja.id)
+  }
+
+  @Auth()
+  @Get('ingreso/caja')
+  async totalIngresos(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {ingreso} = await this.corteCajaService.totalIngresos(caja.id)
+    return ingreso;
+  }
+
+  @Auth()
+  @Get('egreso/caja')
+  async totalEgresos(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {egreso} = await this.corteCajaService.totalEgresos(caja.id)
+    return egreso;
+  }
+
+  /* DETALLES DE CORTE */
+
+
+
+  @Auth()
+  @Get('detalle/ventas-cobros/:idCorte/:idCaja')
+  async ventasCobrosCorte(@Param('idCorte') idCorte: string, @Param('idCaja') idCaja: string){
+    return await this.corteCajaService.ventasCobrosCorte(+idCorte, +idCaja)
+
+  }
+
+  @Auth()
+  @Get('detalle/gastos/:idCorte/:idCaja')
+  async gastosCorte(@Param('idCorte') idCorte: string, @Param('idCaja') idCaja: string){
+    return await this.corteCajaService.gastosCorte(+idCorte, +idCaja)
+  }
+
+  @Auth()
+  @Get('detalle/ingresos/:idCorte/:idCaja')
+  async ingresosCorte(@Param('idCorte') idCorte: string, @Param('idCaja') idCaja: string){
+    return await this.corteCajaService.ingresosCorte(+idCorte, +idCaja)
+  }
+
+  @Auth()
+  @Get('detalle/egresos/:idCorte/:idCaja')
+  async egresosCorte(@Param('idCorte') idCorte: string, @Param('idCaja') idCaja: string){
+    return await this.corteCajaService.egresosCorte(+idCorte, +idCaja)
+  }
+
 }

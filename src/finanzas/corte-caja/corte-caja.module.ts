@@ -9,6 +9,8 @@ import { MovimientoCajaModule } from '../movimiento-caja/movimiento-caja.module'
 import { CajaModule } from '../caja/caja.module';
 import { AuthModule } from '../../auth/auth.module';
 import { GastosModule } from '../gastos/gastos.module';
+import { IngresosModule } from '../ingresos/ingresos.module';
+import { EgresosModule } from '../egresos/egresos.module';
 
 @Module({
   imports: [
@@ -16,7 +18,9 @@ import { GastosModule } from '../gastos/gastos.module';
     forwardRef(() => CajaModule),    
     forwardRef(() => CobroModule),    
     forwardRef(() => MovimientoCajaModule),
-    //forwardRef(()=>GastosModule),
+    forwardRef(()=>GastosModule),
+    forwardRef(()=>IngresosModule),
+    forwardRef(()=>EgresosModule),
     TypeOrmModule.forFeature([CorteCaja, CorteCajaDetalle])
   ],
   controllers: [CorteCajaController],

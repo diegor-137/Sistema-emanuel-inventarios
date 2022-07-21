@@ -9,6 +9,7 @@ import { CobroGateway } from './cobro.gateway';
 import { MovimientoCajaModule } from '../movimiento-caja/movimiento-caja.module';
 import { CajaModule } from '../caja/caja.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { EgresosModule } from '../egresos/egresos.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthModule } from 'src/auth/auth.module';
     VentaModule,
     MovimientoCajaModule,
     forwardRef(() => CajaModule),
+    forwardRef(() => EgresosModule),
   ],
   controllers: [CobroController],
   providers: [CobroService, CobroGateway],

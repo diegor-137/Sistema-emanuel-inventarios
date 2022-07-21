@@ -4,6 +4,8 @@ import { Empleado } from "src/recursos-humanos/empleado/entity/empleado.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { CorteCaja } from '../../corte-caja/entities/corte-caja.entity';
 import { Gasto } from '../../gastos/entities/gasto.entity';
+import { Ingreso } from '../../ingresos/entities/ingreso.entity';
+import { Egreso } from '../../egresos/entities/egreso.entity';
 
 
 @Entity('caja')
@@ -37,5 +39,11 @@ export class Caja {
 
     @OneToMany(() => Gasto, (gasto) => gasto.caja)
     gastos:Gasto[]
+
+    @OneToMany(() => Ingreso, (ingreso) => ingreso.caja)
+    ingreso:Ingreso[]
+
+    @OneToMany(() => Egreso, (egreso) => egreso.caja)
+    egreso:Egreso[]
 
 }

@@ -29,13 +29,17 @@ export class CobroController {
     return await this.cobroService.findAll(query.start, query.end, query.id);
   }
 
+  @Auth()
   @Get('ventas')
-  async findVentaToday(){
-    return await this.cobroService.findVentaToday()
+  async findVentaToday(@User() user: UserEntity){
+    return await this.cobroService.findVentaToday(user)
   }
-  @Get('todos')
-  async findAllCobros(){
-    return await this.cobroService.findAllCobros()
+
+  @Auth()
+  @Get('cobros-dia')
+  async findAllCobros(@User() user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    return await this.cobroService.findAllCobros(caja.id)
   }
     
   @Get(':id')
@@ -47,8 +51,17 @@ export class CobroController {
     return this.cobroService.findCobro(+id);
   }
 
+  @Auth()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cobroService.remove(+id);
+  async remove(@Param('id') id: string, @User() user: UserEntity) {
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    return this.cobroService.remove(+id, user, caja);
+  }
+
+  @Auth()
+  @Delete('anular/:id')
+  async delete(@Param('id') id: string, @User() user: UserEntity) {
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    return this.cobroService.delete(+id, user, caja);
   }
 }
