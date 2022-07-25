@@ -4,7 +4,11 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { SERVER_PORT } from './config/constants';
 import { initSwagger } from './app.swagger';
+import { initializeTransactionalContext, patchTypeORMRepositoryWithBaseRepository } from 'typeorm-transactional-cls-hooked';
 async function bootstrap() {
+
+  initializeTransactionalContext()
+  patchTypeORMRepositoryWithBaseRepository()
   const app = await NestFactory.create(AppModule);
   const logger = new Logger()
   const config = app.get(ConfigService)

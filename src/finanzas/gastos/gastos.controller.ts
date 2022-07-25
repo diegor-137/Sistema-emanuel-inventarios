@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { GastosService } from './gastos.service';
 import { CreateGastoDto } from './dto/create-gasto.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
@@ -7,6 +7,7 @@ import { AuthService } from '../../auth/auth.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { User as UserEntity} from 'src/user/entities/user.entity';
+import { CajaGuard } from '../caja/guards/caja-verification.guard';
 
 @Controller('gastos')
 export class GastosController {
@@ -15,6 +16,7 @@ export class GastosController {
               private readonly authService:AuthService){}
 
   @Auth()
+  @UseGuards(CajaGuard)
   @Post()
   async create(@Body() createGastoDto: CreateGastoDto, @User() user: UserEntity) {
     const decodedJwtAccessToken = await this.authService.decodeToken(createGastoDto.token);
@@ -22,6 +24,14 @@ export class GastosController {
     createGastoDto.empleado= decodedJwtAccessToken.empleado
     createGastoDto.caja= caja
     return this.gastosService.create(createGastoDto);
+  }
+
+  @Auth()
+  @UseGuards(CajaGuard)
+  @Delete('delete/:id')
+  async deleteGasto(@Param('id') id: number, @User() user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)    
+    return this.gastosService.deleteGasto(id, user, caja);
   }
 
   @Auth()
@@ -36,13 +46,6 @@ export class GastosController {
       id = caja.id
     }    
     return this.gastosService.findAll(start, end, id);
-  }
-
-  @Auth()
-  @Delete('delete/:id')
-  async deleteGasto(@Param('id') id: number, @User() user: UserEntity){
-    const caja = await this.cajaService.findOne(user.empleado.id)    
-    return this.gastosService.deleteGasto(id, user, caja);
   }
 
   @Auth()

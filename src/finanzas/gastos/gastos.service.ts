@@ -1,13 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Caja } from '../caja/entities/caja.entity';
 import { IngresosService } from '../ingresos/ingresos.service';
 import { MovimientoCajaService } from '../movimiento-caja/movimiento-caja.service';
 import { CreateGastoDto } from './dto/create-gasto.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
 import { Gasto } from './entities/gasto.entity';
+import { CorteCaja } from '../corte-caja/entities/corte-caja.entity';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class GastosService {
@@ -19,12 +21,27 @@ export class GastosService {
   private readonly ingresosService: IngresosService
   ){}
 
-
+  @Transactional()
   async create(createGastoDto: CreateGastoDto) {
+    const {balance} = await this.movimientoCajaService.ultimoMovimiento(createGastoDto.caja.id);
+    if(createGastoDto.monto>balance) throw new BadRequestException('El gasto no puede ser mayor al monto que se tiene en caja!') 
     const gasto = await this.gastoRepository.save(createGastoDto)
     const {monto, caja} = createGastoDto;
     await this.movimientoCajaService.create(monto, `EGRESO GASTO NO.${gasto.id}`, 2, caja, false) 
   }
+
+  @Transactional()
+  async deleteGasto(id:number, user:User, caja:Caja){
+    const gasto = await this.gastoRepository.findOne(id, {relations: ['corteCaja']})
+    if(!gasto || gasto.deletedAt != null )throw new BadRequestException('El gasto no existe o ya ha sido eliminado')
+    gasto.deletedAt = new Date();
+    gasto.deleteResponsible = user.empleado; 
+    const gastoDeleted = await this.gastoRepository.save(gasto);
+    if(gastoDeleted.corteCaja != null)await this.ingresosService.create({caja, descripcion: `Ingreso por anulacion de gasto No. ${gasto.id}`, monto: gastoDeleted.monto});
+    delete gastoDeleted.deleteResponsible
+    await this.movimientoCajaService.create(gastoDeleted.monto, `INGRESO ANULACION GASTO NO.${gasto.id}`, 1, caja, true) 
+    return gasto;
+}
 
   async findAll(start: Date, end:Date, id:number) {
     const st = new Date(start)
@@ -42,19 +59,7 @@ export class GastosService {
     .orderBy("gastos.fecha", "ASC")
     .groupBy("gastos.id, empleado.id, caja.id_caja, cajaEmpleado.id")
     .getMany()
-  }
-
-  async deleteGasto(id:number, user:User, caja:Caja){
-      const gasto = await this.gastoRepository.findOne(id, {relations: ['corteCaja']})
-      if(!gasto || gasto.deletedAt != null )throw new BadRequestException('El gasto no existe o ya ha sido eliminado')
-      gasto.deletedAt = new Date();
-      gasto.deleteResponsible = user.empleado; 
-      const gastoDeleted = await this.gastoRepository.save(gasto);
-      if(gastoDeleted.corteCaja != null)await this.ingresosService.create({caja, descripcion: `Ingreso por anulacion de gasto No. ${gasto.id}`, monto: gastoDeleted.monto});
-      delete gastoDeleted.deleteResponsible
-      await this.movimientoCajaService.create(gastoDeleted.monto, `INGRESO ANULACION GASTO NO.${gasto.id}`, 1, caja, true) 
-      return gasto;
-  }
+  }  
 
   async findAllDeletedGastos(start: Date, end:Date, id:number){
     const st = new Date(start)
@@ -75,4 +80,37 @@ export class GastosService {
     .getMany()
     
   }
+
+
+
+  /* FUNCIONES USADAS FUERA DE SU MODULO*/
+
+  async totalGasto(id:number){
+    return await this.gastoRepository.createQueryBuilder("gastos")                                
+    .leftJoinAndSelect("gastos.caja", "caja")
+    .leftJoinAndSelect("gastos.corteCaja", "corte")
+    .select('SUM(gastos.monto)', 'gasto')
+    .where('caja.id = :id', {id})
+    .andWhere('corte.id is null')
+    .andWhere('gastos.deletedAt is null')
+    .getRawOne() 
+  }
+
+  async gastosCorte(idCorte:number, idCaja:number){
+    return await this.gastoRepository.find({
+      where: { caja: {id: idCaja}, corteCaja: {id: idCorte}}
+    });
+  }
+
+  async gastos(corte:CorteCaja){
+    const gastos = await this.gastoRepository.find({
+      relations: ["corteCaja"], 
+      where: { caja: {id: corte.caja.id}, corteCaja: {id: IsNull()}, deletedAt:IsNull()}
+    });
+    if(gastos) {
+      gastos.map(gasto=> gasto.corteCaja = corte)
+      await this.gastoRepository.save(gastos);
+    };
+  }
+
 }

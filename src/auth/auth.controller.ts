@@ -27,8 +27,6 @@ export class AuthController {
   @Get('profile')        
   async profile(@User() user: UserEntity) {     
     const data = await this.authService.login(user);
-    console.log(data);
-    
     delete data.user.empleado.createdAt
     delete data.user.empleado.direccion
     delete data.user.empleado.email

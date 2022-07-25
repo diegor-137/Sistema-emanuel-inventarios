@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
+import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { Caja } from '../caja/entities/caja.entity';
 import { CreateMovimientoCajaDto } from './dto/create-movimiento-caja.dto';
 import { MovimientoCaja } from './entities/movimiento-caja.entity';
@@ -13,6 +14,7 @@ export class MovimientoCajaService {
     private readonly movimientoCajaRepository: Repository<MovimientoCaja>,
   ) {}
 
+  @Transactional({propagation: Propagation.MANDATORY})
   async create(monto:number, descripcion:string, num: number, caja?:Caja, type?:boolean) {
     const movimiento : CreateMovimientoCajaDto = {
       monto, descripcion, caja, type
@@ -27,26 +29,11 @@ export class MovimientoCajaService {
       case 3:balance = Number(movimiento.monto);
         break;        
     }    
-    movimiento.balance = balance;    
+    movimiento.balance = balance;
     return await this.movimientoCajaRepository.save(movimiento);
   }
 
   async ultimoMovimiento(id:number){
-    /* return await this.movimientoCajaRepository.createQueryBuilder("movimiento_caja")
-    .innerJoinAndSelect("movimiento_caja.caja", "caja")
-    .select("movimiento_caja")
-    .where("caja.id = :id", {id})
-    .andWhere((qb)=>{const subQuery= qb.subQuery()
-                  .select("MAX(movimiento_caja.fecha)", "fecha")
-                  .from(MovimientoCaja, "movimiento_caja")
-                  .getQuery()
-                  return "movimiento_caja.fecha = " + subQuery  
-                 })
-    .getOne() */
-  /*   return await this.movimientoCajaRepository.createQueryBuilder("movimiento_caja")
-    .select("MAX(fecha)", "fecha")
-    .where("movimiento_caja.caja.id = :id", {id: 37})
-    .getRawOne() */
     return await this.movimientoCajaRepository.createQueryBuilder("movimiento_caja")
     .where("movimiento_caja.caja.id = :id", {id})
     .andWhere((qb)=>{const subQuery= qb.subQuery()

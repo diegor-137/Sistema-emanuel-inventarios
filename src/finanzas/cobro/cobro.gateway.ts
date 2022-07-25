@@ -1,4 +1,5 @@
-import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { UseGuards } from '@nestjs/common';
+import { MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -23,11 +24,10 @@ export class CobroGateway implements OnGatewayConnection {
   }
 
 
-  //@Auth()
   @SubscribeMessage('getFacturas')
-  async handleMessage(socket:Socket) {
-    const data = socket.handshake.headers.authorization;
-    const user = await this.authService.decodeToken(data);   
+  async handleMessage(socket:Socket, @MessageBody() usertoken: any) {    
+    const {token} = usertoken  
+    const user = await this.authService.decodeToken(token);           
     const ventas = await this.cobroService.findVentaToday(user);
     this.server.emit(user.empleado.sucursal.nombre, ventas);
   }

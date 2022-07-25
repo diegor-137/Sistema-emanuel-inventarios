@@ -10,6 +10,7 @@ import { Cobro } from 'src/finanzas/cobro/entities/cobro.entity';
 import { Caja } from 'src/finanzas/caja/entities/caja.entity';
 import { CorteCaja } from '../../../finanzas/corte-caja/entities/corte-caja.entity';
 import { Gasto } from '../../../finanzas/gastos/entities/gasto.entity';
+import { Ingreso } from 'src/finanzas/ingresos/entities/ingreso.entity';
 
 @Entity('empleado')
 export class Empleado{
@@ -89,8 +90,8 @@ export class Empleado{
     cobro:Cobro[]
 
     /*********Caja*********/ 
-    @OneToMany(() => Caja, (caja) => caja.empleado)
-    caja:Caja[]
+    @OneToOne(() => Caja, (caja) => caja.empleado)
+    caja:Caja
 
     /*********Caja*********/
     @OneToMany(()=> CorteCaja, (corteCaja)=> corteCaja.empleado)

@@ -1,6 +1,7 @@
 import { Caja } from "src/finanzas/caja/entities/caja.entity"
 import { CorteCaja } from "src/finanzas/corte-caja/entities/corte-caja.entity"
 import { Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Entity } from 'typeorm';
+import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 
 @Entity('ingreso')
 export class Ingreso {
@@ -8,6 +9,8 @@ export class Ingreso {
     @PrimaryGeneratedColumn()
     id:number
 
+    @Column({ name: 'deleted_at', nullable: true, type: 'timestamp with time zone' })
+    deletedAt: Date;
     
     @CreateDateColumn({ name: 'fecha', type: 'timestamp' })
     fecha:Date

@@ -12,7 +12,7 @@ export class DetalleCobro {
     @Column({ type: 'varchar', length: 350, nullable: true })
     descripcion:string
 
-    @Column({type:"decimal",precision:6,scale:2})
+    @Column({type:"decimal",precision:10,scale:2})
     cantidad:number
 
     //-----Tablas Padre--------

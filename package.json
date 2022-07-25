@@ -46,6 +46,7 @@
     "rxjs": "^7.5.5",
     "swagger-ui-express": "^4.3.0",
     "typeorm": "^0.2.45",
+    "typeorm-transactional-cls-hooked": "^0.1.21",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

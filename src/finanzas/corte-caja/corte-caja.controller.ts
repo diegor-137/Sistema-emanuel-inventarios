@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, Inject, forwardRef } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, Inject, forwardRef, UseGuards } from '@nestjs/common';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { CorteCajaService } from './corte-caja.service';
@@ -8,6 +8,7 @@ import { UpdateCorteCajaDto } from './dto/update-corte-caja.dto';
 import { CajaService } from '../caja/caja.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../../auth/auth.service';
+import { CajaGuard } from '../caja/guards/caja-verification.guard';
 
 @Controller('corte-caja')
 export class CorteCajaController {
@@ -15,71 +16,27 @@ export class CorteCajaController {
               private readonly cajaService:CajaService, 
               private readonly authService:AuthService) {}
 
-/*   @Post()
-  create(@Body() createCorteCajaDto: CreateCorteCajaDto) {
-    return this.corteCajaService.create(createCorteCajaDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.corteCajaService.findAll();
-  }
-
-  @Get('lastCorte/:id')
-  lastCorte(@Param('id') id: string) {
-    return this.corteCajaService.lastCorte(+id);
-  }
-
-  @Get('getBalance/:id')
-  getBalance(@Param('id') id: string) {
-    return this.corteCajaService.getBalance(+id);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.corteCajaService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCorteCajaDto: UpdateCorteCajaDto) {
-    return this.corteCajaService.update(+id, updateCorteCajaDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.corteCajaService.remove(+id);
-  } */
-
-  /* TODO:USANDO */
   @Auth()
+  @UseGuards(CajaGuard)
   @Post(':monto')
-  async create(@Param('monto', ParseIntPipe) monto: number, @Body() createCorteCajaDto: CreateCorteCajaDto, @User()user: UserEntity) { 
+  async create(@Param('monto') monto: number, @Body() createCorteCajaDto: CreateCorteCajaDto, @User()user: UserEntity) { 
     const decodedJwtAccessToken = await this.authService.decodeToken(createCorteCajaDto.token);  
     const caja = await this.cajaService.findOne(user.empleado.id)
     createCorteCajaDto.caja = caja
     createCorteCajaDto.empleado = decodedJwtAccessToken.empleado;
-    return this.corteCajaService.create(createCorteCajaDto, monto);
+    return this.corteCajaService.create(createCorteCajaDto, +monto);
   }
 
-  /* TODO:USANDO */
   @Auth()
+  @UseGuards(CajaGuard)
   @Get('lastCorte')
   async lastCorte(@User()user: UserEntity){
     const {id} = await this.cajaService.findOne(user.empleado.id)   
     return this.corteCajaService.lastCorte(+id);
   }
 
-  @Get()
-  findAll(@Query() query: { start: Date, end:Date, id:number }) {
-    return this.corteCajaService.findAll(query.start, query.end, query.id);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.corteCajaService.findOne(+id);
-  }
-
   @Auth()
+  @UseGuards(CajaGuard)
   @Get('totalGasto/caja')
   async totalGasto(@User()user: UserEntity){
     const caja = await this.cajaService.findOne(user.empleado.id)
@@ -88,6 +45,7 @@ export class CorteCajaController {
   }
 
   @Auth()
+  @UseGuards(CajaGuard)
   @Get('totalCobro/caja')
   async totalCobro(@User()user: UserEntity){
     const caja = await this.cajaService.findOne(user.empleado.id)
@@ -96,6 +54,7 @@ export class CorteCajaController {
   }
 
   @Auth()
+  @UseGuards(CajaGuard)
   @Get('saldo/caja')
   async saldo(@User()user: UserEntity){
     const caja = await this.cajaService.findOne(user.empleado.id)
@@ -103,6 +62,7 @@ export class CorteCajaController {
   }
 
   @Auth()
+  @UseGuards(CajaGuard)
   @Get('ingreso/caja')
   async totalIngresos(@User()user: UserEntity){
     const caja = await this.cajaService.findOne(user.empleado.id)
@@ -111,11 +71,35 @@ export class CorteCajaController {
   }
 
   @Auth()
+  @UseGuards(CajaGuard)
   @Get('egreso/caja')
   async totalEgresos(@User()user: UserEntity){
     const caja = await this.cajaService.findOne(user.empleado.id)
     const {egreso} = await this.corteCajaService.totalEgresos(caja.id)
     return egreso;
+  }
+
+  @Auth()
+  @UseGuards(CajaGuard)
+  @Get('ultimoMovimiento/caja')
+  async ultimoMovimiento(@User()user: UserEntity){
+    const {id} = await this.cajaService.findOne(user.empleado.id)  
+    const movimiento = await this.corteCajaService.ultimoMovimiento(id);
+    return movimiento.balance
+  }
+
+  /* BUSQUEDA POR PARTE DEL ADMINISTRADOR!!!!*/
+  
+  @Auth()
+  @Get()
+  findAll(@Query() query: { start: Date, end:Date, id:number }) {
+    return this.corteCajaService.findAll(query.start, query.end, query.id);
+  }
+
+  @Auth()
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.corteCajaService.findOne(+id);
   }
 
   /* DETALLES DE CORTE */
