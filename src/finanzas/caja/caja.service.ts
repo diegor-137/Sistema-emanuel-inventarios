@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmpleadoService } from 'src/recursos-humanos/empleado/empleado.service';
-import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Repository, IsNull } from 'typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { CorteCajaService } from '../corte-caja/corte-caja.service';
 import { CreateCorteCajaDto } from '../corte-caja/dto/create-corte-caja.dto';
 import { MovimientoCajaService } from '../movimiento-caja/movimiento-caja.service';
@@ -20,41 +22,68 @@ export class CajaService {
     private readonly corteCajaService: CorteCajaService
   ) {}
 
-
-  async create(createCajaDto: CreateCajaDto) {
-    const created = await this.cajaRepository.findOne({where: { lugar: createCajaDto.lugar}})
+  @Transactional()
+  async create(createCajaDto: CreateCajaDto, user:User) {
+    const limitCaja = await this.cajaRepository.find({where: {sucursal: {id: user.empleado.sucursal.id}, deletedAt: IsNull(), status: true}})
+    if(limitCaja.length>2)throw new UnauthorizedException('Ya no puede habilitar mas cajas')
+    const cajaEmpleado = await this.cajaRepository.findOne({relations: ['empleado'] ,where: {empleado: {id: createCajaDto.empleado.id}}});
+    if(cajaEmpleado)throw new UnauthorizedException(`El empleado ${cajaEmpleado.empleado.nombre} ya tiene asignado una caja!`)                                        
+    const created = await this.cajaRepository.findOne({where: { lugar: createCajaDto.lugar, sucursal: {id: user.empleado.sucursal.id}}})
     if(created) throw new BadRequestException('Ya existe la caja registrada.')
+    createCajaDto.sucursal = user.empleado.sucursal;
     const caja = await this.cajaRepository.save(createCajaDto);
     await this.movimientoCajaService.create(createCajaDto.monto, 'FONDO DE APERTURA', 3, caja, true);
     let corte : CreateCorteCajaDto = {
-      caja:caja, corteCajaDetalle : [{monto: createCajaDto.monto, concepto: 'APERTURA', type: true }], empleado:createCajaDto.empleado
+      caja:caja, corteCajaDetalle : [{monto: createCajaDto.monto, concepto: 'APERTURA', type: true }], empleado:user.empleado
     }
-    await this.corteCajaService.corteCajaRepository.save(corte)
+    await this.corteCajaService.save(corte)
     return {message: 'successful', ok: true}
   }
 
-  async findAll() {
+  async findAll(user:User) {
     return await this.cajaRepository.createQueryBuilder("caja")
       .leftJoinAndSelect("caja.empleado", "empleado")
-      .select(["caja.id","caja.lugar", "caja.estado","empleado.id", "empleado.nombre", "empleado.apellido"])
+      .select(["caja.id","caja.lugar", "caja.estado","empleado.id", "empleado.nombre", "empleado.apellido", "caja.status"])
+      .where("caja.sucursal.id = :id", {id: user.empleado.sucursal.id})
+      .orderBy("caja.id", "ASC")
       .getMany();
   }
 
-  async cajeros(){
+  async cajeros(user:User){
     return await this.empleadoService.repository.createQueryBuilder('empleado').innerJoin ("empleado.user", "user")
       .select(["empleado.id", "empleado.nombre", "empleado.apellido", "user.roles"])      
       .where("user.roles @> ARRAY[:...roles]", {roles:["CAJERO"]})
+      .andWhere("empleado.sucursal.id = :id", {id: user.empleado.sucursal.id})
       .getMany();                           
   }
 
-  async update(id: number) {
-    const caja = await this.cajaRepository.findOne({ where: {id}});
-    caja.estado = 'INACTIVO';
-    return await this.cajaRepository.save(caja);
+  /* Deshabilitar */
+  @Transactional()
+  async update(id: number, user:User) {
+    const caja = await this.cajaRepository.findOne({ where: {id, sucursal: {id: user.empleado.sucursal.id}}});
+    const {balance} = await this.movimientoCajaService.ultimoMovimiento(caja.id);
+    if(balance != 0) throw new BadRequestException(`El saldo de la caja '${caja.lugar}' debe estar a Q.0.00`)
+    if(caja.status === true && caja.deletedAt === null){
+      caja.estado = 'INACTIVO';
+      caja.status = false;
+      caja.deletedAt = new Date();
+      await this.movimientoCajaService.create(0, 'DESHABILITACION DE CAJA', 3, caja, false);
+      return await this.cajaRepository.save(caja);      
+    }else{
+      const limitCaja = await this.cajaRepository.find({where: {sucursal: {id: user.empleado.sucursal.id}, deletedAt: IsNull(), status: true}})
+      if(limitCaja.length>2)throw new UnauthorizedException('Ya no puede habilitar mas cajas')      
+      caja.estado = 'ACTIVO';
+      caja.status = true;
+      caja.deletedAt = null;
+      await this.movimientoCajaService.create(0, 'HABILITACION DE CAJA', 3, caja, true);
+      return await this.cajaRepository.save(caja); 
+    }
+    
   }
 
+  /* FUNCIONES USADAS FUERA DE SU MODULO*/
   async findOne(id:number){
-    return this.cajaRepository.findOne({where: {
+    return await this.cajaRepository.findOne({where: {
       empleado: {id}
     }})
   }

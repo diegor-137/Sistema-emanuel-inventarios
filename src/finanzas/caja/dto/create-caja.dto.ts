@@ -1,5 +1,6 @@
 import { IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 import { Empleado } from "src/recursos-humanos/empleado/entity/empleado.entity";
+import { Sucursal } from 'src/sucursal/entity/sucursal.entity';
 
 
 export class CreateCajaDto {
@@ -16,5 +17,7 @@ export class CreateCajaDto {
 
     @IsOptional()
     estado:string
+
+    sucursal:Sucursal
 
 }

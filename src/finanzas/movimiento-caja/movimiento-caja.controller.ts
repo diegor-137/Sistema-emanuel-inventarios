@@ -11,13 +11,6 @@ export class MovimientoCajaController {
   constructor(private readonly movimientoCajaService: MovimientoCajaService,
               private readonly cajaService:CajaService
               ) {}
-
-/*   @Post()
-  create(@Body() createMovimientoCajaDto: CreateMovimientoCajaDto) {
-    return this.movimientoCajaService.create(createMovimientoCajaDto);
-  } */
-
-  /* TODO:USANDO */
   @Auth()
   @Get()
   async findAll(@User()user: UserEntity) {
@@ -26,6 +19,7 @@ export class MovimientoCajaController {
     return movimiento.balance;
   }
 
+  @Auth()
   @Get('all')
   async movimientos(@Query() query: { start: Date, end:Date, id:number }) {    
     return await this.movimientoCajaService.movimientos(query.start, query.end, query.id);

@@ -33,6 +33,12 @@ export class VentaService extends DataService(Venta){
         }
     }
 
+    async editOne(id,dto:CreateVentaDto){
+        const departamento = await this.findById(id)
+        const Edited = Object.assign(departamento,dto)
+        return await this.repository.save(Edited)
+    }
+
     async FindOne_Venta(id:number){
         return await this.repository.findOne({
             where:[{id}],

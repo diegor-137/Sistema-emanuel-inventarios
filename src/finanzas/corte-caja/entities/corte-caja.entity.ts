@@ -4,6 +4,8 @@ import { CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, Column, On
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { CorteCajaDetalle } from './corte-caja-detalle';
 import { Gasto } from '../../gastos/entities/gasto.entity';
+import { Ingreso } from '../../ingresos/entities/ingreso.entity';
+import { Egreso } from '../../egresos/entities/egreso.entity';
 
 
 @Entity('corte_caja')
@@ -72,6 +74,16 @@ export class CorteCaja {
         nullable: true
     })
     gasto: Gasto[];
+
+    @OneToMany(() => Ingreso, ingreso => ingreso.corteCaja, {
+        nullable: true
+    })
+    ingreso:Ingreso[]
+
+    @OneToMany(() => Egreso, egreso => egreso.corteCaja, {
+        nullable: true
+    })
+    egreso:Egreso[]
 
     //-------Tablas Padre--------
 

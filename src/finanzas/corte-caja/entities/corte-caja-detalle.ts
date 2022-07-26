@@ -8,7 +8,7 @@ export class CorteCajaDetalle {
     @PrimaryGeneratedColumn()
     id:number
 
-    @Column({type:"decimal",precision:6,scale:2})
+    @Column({type:"decimal",precision:10,scale:2})
     monto: number
 
     @Column({ type: 'varchar', length: 350, nullable: true })

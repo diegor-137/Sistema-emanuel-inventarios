@@ -4,28 +4,15 @@ import { Pedido } from './entity/pedido-entity';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { getConnection, getRepository } from 'typeorm';
 import { EditPedidoDto } from './dto/edit-pedido.dto';
+import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class PedidoService extends DataService(Pedido) {
 
+    @Transactional()
     async createOne(dto:CreatePedidoDto){
-        const connection = getConnection()
-        const queryRunner = connection.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
             const pedido = this.repository.create(dto)
-            const saved =  await queryRunner.manager.save(pedido)
-            await queryRunner.commitTransaction()
-            await queryRunner.release()
-            return saved
-        } catch (err) {
-            await queryRunner.rollbackTransaction()
-            await queryRunner.release()
-            return err.detail
-        }finally{
-            await queryRunner.release()   
-        }
+            return await this.repository.save(pedido)
     }
 
     async editOne(id:number, dto:EditPedidoDto){

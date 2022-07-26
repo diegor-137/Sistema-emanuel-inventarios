@@ -11,13 +11,13 @@ export class MovimientoCaja {
     @CreateDateColumn({ name: 'fecha', type: 'timestamp' })
     fecha:Date
 
-    @Column({type: 'varchar', length: 45, nullable: false})
+    @Column({type: 'varchar', length: 100, nullable: true})
     descripcion:string
 
-    @Column({type:"decimal",precision:6,scale:2})
+    @Column({type:"decimal",precision:10,scale:2})
     monto:number;
 
-    @Column({type:"decimal",precision:6,scale:2})
+    @Column({type:"decimal",precision:10,scale:2})
     balance:number;
 
     @ManyToOne(()=> Caja, caja=> caja.MovimientoCaja)

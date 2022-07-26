@@ -39,8 +39,8 @@ export class Venta {
     sucursal: Sucursal;
 
     /*********Cobro*********/
-    @OneToOne(() => Cobro, (cobro) => cobro.venta)
-    cobro: Cobro
+    @OneToMany(() => Cobro, (cobro) => cobro.venta)
+    cobro: Cobro[]
 
     //-------Tablas Hijas--------
     @OneToMany(

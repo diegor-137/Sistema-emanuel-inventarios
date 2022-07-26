@@ -6,15 +6,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../../auth/auth.module';
 import { CajaModule } from '../caja/caja.module';
 import { MovimientoCajaModule } from '../movimiento-caja/movimiento-caja.module';
+import { IngresosModule } from '../ingresos/ingresos.module';
 
 @Module({
   imports:[
     AuthModule,
+    IngresosModule,
     forwardRef(()=>CajaModule),
-    MovimientoCajaModule,
+    forwardRef(()=>MovimientoCajaModule),
     TypeOrmModule.forFeature([Gasto]),
   ],
   controllers: [GastosController],
-  providers: [GastosService]
+  providers: [GastosService],
+  exports: [GastosService]
 })
 export class GastosModule {}

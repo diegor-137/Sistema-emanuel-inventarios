@@ -1,5 +1,5 @@
 
-import { Body, Controller, Get, Param, Post, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, ParseIntPipe, Put } from '@nestjs/common';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { CommonController } from '../../common/controller/common.controller';
 import { VentaService } from './venta.service';
@@ -23,6 +23,14 @@ export class VentaController extends CommonController(VentaService){
         dto.sucursal = user.empleado.sucursal
         return await this.ventaService.CreateOne(dto)
     }
+
+    @Put(':id')
+    async editOne(
+        @Param('id',ParseIntPipe) id:number,
+        @Body() dto:CreateVentaDto)
+        {
+            return await this.ventaService.editOne(id,dto)
+        }
 
     @Get("encontrar/:id")
     async findByIdVenta(

@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { CobroService } from '../cobro/cobro.service';
 import { GastosService } from '../gastos/gastos.service';
+import { IngresosService } from '../ingresos/ingresos.service';
 import { MovimientoCajaService } from '../movimiento-caja/movimiento-caja.service';
 import { CreateCorteCajaDetalle, CreateCorteCajaDto } from './dto/create-corte-caja.dto';
 import { CorteCaja } from './entities/corte-caja.entity';
+import { EgresosService } from '../egresos/egresos.service';
+import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 
 
 @Injectable()
@@ -16,25 +19,37 @@ export class CorteCajaService {
     public readonly corteCajaRepository: Repository<CorteCaja>,
     private readonly movimientoCajaService: MovimientoCajaService,
     private readonly cobroService:CobroService,
-    //private readonly gastosService:GastosService
+    private readonly gastosService:GastosService,
+    private readonly ingresosService:IngresosService,
+    private readonly egresosService:EgresosService
   ) {}
 
+  /* ############################################ FUNCIONES USADAS EN CONTROLADORES ############################################*/
+
+  @Transactional()
   async create(createCorteCajaDto: CreateCorteCajaDto, monto:number){
     let {caja} = createCorteCajaDto    
     const {balance} = await this.movimientoCajaService.ultimoMovimiento(caja.id);
     const {total} = await this.totalCobro(caja.id);
-    //const {gasto} = await this.totalGasto(caja.id);
+    const {gasto} = await this.totalGasto(caja.id);
+    const {ingreso} = await this.totalIngresos(caja.id);
+    const {egreso} = await this.totalEgresos(caja.id);
+    if(monto>balance) throw new BadRequestException('El monto no puede ser mayor al que se quiere retirar!')
     let detalle: CreateCorteCajaDetalle[] = [
       {monto: balance, concepto: 'SALADO CAJA', type :true},
-      {monto: total, concepto: 'VENTAS', type :true},      
-      {monto, concepto: 'MONTO A RETIRAR', type :false},
-      //{monto:gasto, concepto: 'GASTOS', type :false},
+      {monto: Number(total), concepto: 'VENTAS', type :true},      
+      {monto: Number(ingreso), concepto: 'INGRESOS', type :true},      
+      {monto: Number(gasto), concepto: 'GASTOS', type :false},
+      {monto: Number(egreso), concepto: 'EGRESOS', type :false},
+      {monto: Number(monto), concepto: 'MONTO A RETIRAR', type :false},
     ]
     const data = detalle.filter((det)=>det.monto !== 0 && det.monto != null)
     createCorteCajaDto.corteCajaDetalle = data;
     const corte = await this.corteCajaRepository.save(createCorteCajaDto);
     await this.cobros(corte);
-    //await this.gastos(corte)    
+    await this.gastos(corte);    
+    await this.ingresos(corte);    
+    await this.egresos(corte);    
     await this.movimientoCajaService.create(monto, `EGRESO CORTE NO. ${corte.id}`, 2, createCorteCajaDto.caja, false)
   }
 
@@ -53,50 +68,40 @@ export class CorteCajaService {
     .getOne() 
   }  
 
+  async totalGasto(id:number){
+    return await this.gastosService.totalGasto(id);
+  }
+
   async totalCobro(id:number){
-    return await this.cobroService.cobroRepository.createQueryBuilder("cobro")                                
-    .innerJoinAndSelect("cobro.detalleCobro", "detalle")
-    .leftJoinAndSelect("cobro.caja", "caja")
-    .leftJoinAndSelect("cobro.corteCaja", "corte")
-    .select('SUM(detalle.cantidad)', 'total')
-    .where('caja.id = :id', {id})
-    .andWhere('corte.id is null')
-    .getRawOne() 
+    return await this.cobroService.totalCobro(id)
   }
 
- /*  async totalGasto(id:number){
-    return await this.gastosService.gastoRepository.createQueryBuilder("gastos")                                
-    .leftJoinAndSelect("gastos.caja", "caja")
-    .leftJoinAndSelect("gastos.corteCaja", "corte")
-    .select('SUM(gastos.monto)', 'gasto')
-    .where('caja.id = :id', {id})
-    .andWhere('corte.id is null')
-    .getRawOne() 
-  } */
-
-  async cobros(corte:CorteCaja ){
-    const cobros = await this.cobroService.cobroRepository.find({
-      relations: ["corteCaja"], 
-      where: { caja: {id: corte.caja.id}, corteCaja: {id: IsNull()}}
-    });
-    if(cobros) {
-      cobros.map(cobro=> cobro.corteCaja = corte)
-      await this.cobroService.cobroRepository.save(cobros);
-    };
+  async saldo(id:number){
+    const {total} = await this.totalCobro(id);
+    let {balance} = await this.ultimoMovimiento(id);
+    balance = Number(balance-total)
+    const {gasto} = await this.totalGasto(id);
+    balance += Number(gasto);
+    const {egreso} = await this.totalEgresos(id);
+    balance += Number(egreso);
+    const {ingreso} = await this.totalIngresos(id);
+    balance -= Number(ingreso);
+    return balance;
   }
 
-  /* async gastos(corte:CorteCaja ){
-    const gastos = await this.gastosService.gastoRepository.find({
-      relations: ["corteCaja"], 
-      where: { caja: {id: corte.caja.id}, corteCaja: {id: IsNull()}}
-    });
-    if(gastos) {
-      gastos.map(cobro=> cobro.corteCaja = corte)
-      await this.gastosService.gastoRepository.save(gastos);
-    };
-  } */
 
-  //FIXME: ARREGLAR ESTA FUNCION CON CAJA
+  async totalIngresos(id:number){
+    return await this.ingresosService.totalIngresos(id)
+  }
+
+  async totalEgresos(id:number){
+    return await this.egresosService.totalEgresos(id)
+  }
+
+  async ultimoMovimiento(id:number){
+    return this.movimientoCajaService.ultimoMovimiento(id);
+  }
+
   async findAll(start: Date, end:Date, id:number) {
     const st = new Date(start)
     const en = new Date(end)
@@ -116,97 +121,75 @@ export class CorteCajaService {
   }
 
   async findOne(id:number){
-    return await this.corteCajaRepository.createQueryBuilder("corte_caja")
+    const corte = await this.corteCajaRepository.createQueryBuilder("corte_caja")
     .leftJoin("corte_caja.empleado", "empleado")
     .leftJoin("corte_caja.caja", "caja")
     .leftJoin("caja.empleado", "cajaEmpleado")
     .leftJoin("corte_caja.corteCajaDetalle", "corteCajaDetalle")
-    .select(["corte_caja", "corteCajaDetalle","empleado.nombre", "empleado.apellido", "caja.lugar", "cajaEmpleado.nombre", "cajaEmpleado.apellido"])
+    .select(["corte_caja", "corteCajaDetalle","empleado.nombre", "empleado.apellido", "caja.id", "caja.lugar", "cajaEmpleado.nombre", "cajaEmpleado.apellido"])
     .where({id})
     .orderBy('corteCajaDetalle.id', 'ASC')
     .getOne()
+    for (let i = 0; i < corte.corteCajaDetalle.length; i++) {
+      corte.corteCajaDetalle[i].monto = Number(corte.corteCajaDetalle[i].monto)
+      const element = corte.corteCajaDetalle[i];
+      if(element.concepto === 'VENTAS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){                
+        corte.corteCajaDetalle[0].monto -= corte.corteCajaDetalle[i].monto 
+      }
+      if(element.concepto === 'GASTOS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
+        corte.corteCajaDetalle[0].monto += corte.corteCajaDetalle[i].monto
+      }
+      if(element.concepto === 'EGRESOS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
+        corte.corteCajaDetalle[0].monto += corte.corteCajaDetalle[i].monto
+      }
+      if(element.concepto === 'INGRESOS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
+        corte.corteCajaDetalle[0].monto -= corte.corteCajaDetalle[i].monto
+      }
+    }
+    return corte;
   }
+
+  async ventasCobrosCorte(idCaja:number, idCorte:number){
+    return await this.cobroService.ventasCobrosCorte(idCaja, idCorte);
+
+  }
+
+  async gastosCorte(idCorte:number, idCaja:number){
+    return await this.gastosService.gastosCorte(idCorte, idCaja);
+  }
+
+  
+  async ingresosCorte(idCorte:number, idCaja:number){
+    return await this.ingresosService.ingresosCorte(idCorte, idCaja);
+  }
+
+  async egresosCorte(idCorte:number, idCaja:number){
+    return await this.egresosService.egresosCorte(idCorte, idCaja);
+  }
+
+  /*############################################ FUNCIONES EXTRAS############################################ */
+
+  async cobros(corte:CorteCaja ){
+    return await this.cobroService.cobros(corte)
+  }
+
+  async gastos(corte:CorteCaja ){
+    return await this.gastosService.gastos(corte);
+  }
+
+  async ingresos(corte:CorteCaja ){
+    return await this.ingresosService.ingresos(corte);
+  }
+
+  async egresos(corte:CorteCaja ){
+    return await this.egresosService.egresos(corte);
+  }
+
+  /*############################################ FUNCIONES USADAS FUERA DE SU MODULO ############################################*/
+  
+  @Transactional({propagation: Propagation.MANDATORY})
+  async save(corte:CreateCorteCajaDto){
+    return this.corteCajaRepository.save(corte)
+  }
+
 }
-
-
-//const ultimoCorte = await getManager().query(`SELECT "balance", "fecha" FROM corte_caja where "cajaId" = ${caja.id} AND fecha = (SELECT MAX(fecha) FROM corte_caja)`)
-/* const ultimoCorte = await this.corteCajaRepository.createQueryBuilder()
-    .select("corte_caja").from(CorteCaja, "corte_caja")
-    .where((qb)=>{const subQuery= qb.subQuery()
-                  .select("MAX(corte_caja.fecha)", "fecha").from(CorteCaja, "corte_caja")
-                  .getQuery()
-                  return "corte_caja.fecha = " + subQuery  
-                 }).getOne() */
-
-
-
-  /* async totalCobro(id:number){
-    return await this.cobroService.cobroRepository.createQueryBuilder("cobro")                                
-    .innerJoinAndSelect("cobro.detalleCobro", "detalle")
-    .leftJoinAndSelect("cobro.caja", "caja")
-    .leftJoinAndSelect("cobro.corteCaja", "corte")
-    .select('SUM(detalle.cantidad)', 'total')
-    .andWhere('caja.id = :id', {id})
-    .andWhere('corte.id is null')
-    .getRawOne() 
-  }
-
-  async ultimoCorte(id:number){
-    return await this.corteCajaRepository.createQueryBuilder("corte_caja")
-    .innerJoinAndSelect("corte_caja.caja", "caja")
-    .select("corte_caja")
-    .where("caja.id = :id", {id})
-    .andWhere((qb)=>{const subQuery= qb.subQuery()
-                  .select("MAX(corte_caja.fecha)", "fecha")
-                  .from(CorteCaja, "corte_caja")
-                  .getQuery()
-                  return "corte_caja.fecha = " + subQuery  
-                 })
-    .getOne() 
-  }
-
-  async lastCorte(id:number){
-    return await this.corteCajaRepository.createQueryBuilder("corte_caja")
-    .leftJoinAndSelect("corte_caja.caja", "caja")
-    .leftJoinAndSelect("corte_caja.empleado", "empleado")
-    .select(["corte_caja.fechas", "corte_caja.id", "empleado.nombre", "empleado.apellido"])
-    .where("caja.id = :id", {id})
-    .andWhere((qb)=>{const subQuery= qb.subQuery()
-                  .select("MAX(corte_caja.fecha)", "fecha")
-                  .from(CorteCaja, "corte_caja")
-                  .getQuery()
-                  return "corte_caja.fecha = " + subQuery  
-                 })
-    .getOne() 
-  }
-
-  async create(createCorteCajaDto: CreateCorteCajaDto) {
-    let {caja} = createCorteCajaDto 
-    const balance = await this.getBalance(caja.id);   
-    createCorteCajaDto.balance = balance - createCorteCajaDto.monto ;            
-    const corte = await this.corteCajaRepository.save(createCorteCajaDto);
-    const cobros = await this.cobroService.cobroRepository.find({
-      relations: ["corteCaja"], 
-      where: { caja: {id: caja.id}, corteCaja: {id: IsNull()}}
-    });
-    if(cobros) cobros.map(cobro=> cobro.corteCaja = corte);
-    await this.cobroService.cobroRepository.save(cobros);
-    return corte;   
-  }
-
-  async getBalance(id:number){
-    const {total} = await this.totalCobro(id);       
-    const ultimoCorte = await this.ultimoCorte(id)
-    const balance = Number(ultimoCorte.balance) + Number(total);     
-    return balance;
-  }
-
-  async findAll() {
-    return await this.corteCajaRepository.createQueryBuilder("corte_caja")
-    .leftJoinAndSelect("corte_caja.empleado", "empleado")
-    .leftJoinAndSelect("corte_caja.caja", "caja")
-    .select(["corte_caja", "empleado.nombre", "empleado.apellido"])
-    .where("caja.id = :id", {id:19})
-    .orderBy("corte_caja.fechas", "ASC")
-    .getMany()
-  } */
