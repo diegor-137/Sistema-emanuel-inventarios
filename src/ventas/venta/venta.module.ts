@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VentaController } from './venta.controller';
-import { VentaService } from './venta.service';
+import { VentaService } from './services/venta.service';
 import { Venta } from './entity/venta.entity';
 import { DetalleVenta } from './entity/detalle-venta.entity';
 import { ProductoModule } from '../../almacen/producto/producto.module';
+import { ExistenciaVentaService } from './services/existencia-venta.service';
 
 @Module({
   imports:[
@@ -12,7 +13,7 @@ import { ProductoModule } from '../../almacen/producto/producto.module';
     ProductoModule
   ],
   controllers: [VentaController],
-  providers: [VentaService], 
+  providers: [VentaService, ExistenciaVentaService], 
   exports: [VentaService]
 })
 export class VentaModule {}

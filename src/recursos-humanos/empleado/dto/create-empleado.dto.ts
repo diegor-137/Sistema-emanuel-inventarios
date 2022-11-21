@@ -24,6 +24,4 @@ export class CreateEmpleadoDto{
     @IsOptional()
     sucursal:Sucursal 
 
-    @IsEmail()
-    email: string;
 }

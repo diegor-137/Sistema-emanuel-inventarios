@@ -2,67 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { DataService } from '../../common/service/common.service';
 import { Cotizacion } from './entity/cotizacion.entity';
 import { CreateCotizacionDto } from './dto/create-cotizacion.dto';
-import { getConnection, getRepository } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
 import { EditCotizacionDto } from './dto/edit-cotizacion.dto';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class CotizacionService extends DataService(Cotizacion) {
-    async createOne(dto:CreateCotizacionDto){
-        //eturn console.log('object :>> ', dto);
-        const connection = getConnection()
-        const queryRunner = connection.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            const cotizacion = this.repository.create(dto)
-            const saved =  await queryRunner.manager.save(cotizacion)
-            await queryRunner.commitTransaction()
-            await queryRunner.release()
-            return saved
-        } catch (err) {
-            await queryRunner.rollbackTransaction()
-            await queryRunner.release()
-            return err.detail
-        }finally{
-            await queryRunner.release()   
-        }
-    }
-
-    async editOne(id:number, dto:EditCotizacionDto){
-        const connection = getConnection()
-        const queryRunner = connection.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            const data = await this.findById(id)
-            const Edited = Object.assign(data,dto)
-            const saved = await queryRunner.manager.save(Edited)
-            await queryRunner.commitTransaction()
-            await queryRunner.release()
-            return saved
-        } catch (err) {
-            await queryRunner.rollbackTransaction()
-            await queryRunner.release()
-            return err
-        }finally{
-            await queryRunner.release()   
-        }
-    }
-
-    async findOne_Cotizacion(id:number){
-        return await this.repository.findOne({
-            where:[{id}],
-            relations:[
-                "empleado",
-                "cliente",
-                "sucursal",
-                "detalle",
-                "detalle.producto"
-            ]
-        })
-    }
-
-    async findMany_Cotizacion(){
+export class CotizacionService{
+    constructor(
+        @InjectRepository(Cotizacion)
+        public readonly repository:Repository<Cotizacion>
+    ){}
+    
+    async findAll(start: Date, end:Date){
+        const st = new Date(start)
+        const en = new Date(end)
+        const es = true 
         return await getRepository(Cotizacion)
         .createQueryBuilder("cotizacion")
         .leftJoinAndSelect("cotizacion.empleado","empleado")
@@ -72,10 +27,41 @@ export class CotizacionService extends DataService(Cotizacion) {
         .select(["cotizacion.id as id",
         "cliente.nombre as cliente","sucursal.nombre as sucursal",
         "cotizacion.created_At","SUM(detalle.cantidad*detalle.precio_venta)as total"])
-        //.select(["empleado.nombre","proveedor.nombre","sucursal.nombre",
-        //"detalle"])
+        .andWhere("cotizacion.created_at>=:st",{st})
+        .andWhere("cotizacion.created_at<:en",{en})
+        .andWhere("cotizacion.estado",{es})
         .groupBy("cotizacion.id,cliente.nombre,sucursal.nombre")
-        .getRawMany()
+        .getRawMany()}
+        
+    async findById(id:number){
+        return await this.repository.findOne({
+            where:[{id}],
+            relations:[
+                "empleado",
+                "cliente",
+                "sucursal",
+                "detalle",
+                "detalle.producto"
+            ]
+        })}
 
+    @Transactional()
+    async createOne(dto:CreateCotizacionDto){
+        const cotizacion = this.repository.create(dto)
+        return await this.repository.save(cotizacion)
+    }
+
+    @Transactional()
+    async editOne(id:number, dto:EditCotizacionDto){
+            const data = await this.findById(id)
+            const Edited = Object.assign(data,dto)
+            const saved = await this.repository.save(Edited)
+            return saved
+    }
+
+    async deleteById(id:number){
+        const data = await this.findById(id)
+        data.estado = false
+        return await this.repository.save(data)
     }
 }

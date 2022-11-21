@@ -18,13 +18,13 @@ implements EntitySubscriberInterface<Producto>{
     }
 
     async afterInsert(event:LoadEvent<Producto>){
-        //console.log(event)
+/* 
         await event.queryRunner.commitTransaction();
         await event.queryRunner.startTransaction();
         const sucRep = getRepository(Sucursal)
         const sucursal = await sucRep.find()
 
-        //var product = event.entity.id;
+
         for (let i = 0; i < sucursal.length; i++) {
             var suc:any = sucursal[i].id;
             event.manager 
@@ -36,6 +36,5 @@ implements EntitySubscriberInterface<Producto>{
             ]).execute()
         }
         return
-        //await event.queryRunner.commitTransaction()
-    }
+ */    }
 }

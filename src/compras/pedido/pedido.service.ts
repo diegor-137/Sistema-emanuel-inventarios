@@ -1,55 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataService } from '../../common/service/common.service';
 import { Pedido } from './entity/pedido-entity';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
-import { getConnection, getRepository } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
 import { EditPedidoDto } from './dto/edit-pedido.dto';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class PedidoService extends DataService(Pedido) {
+export class PedidoService{
+    constructor(
+        @InjectRepository(Pedido)
+        public readonly repository:Repository<Pedido>
+    ){}
 
-    @Transactional()
-    async createOne(dto:CreatePedidoDto){
-            const pedido = this.repository.create(dto)
-            return await this.repository.save(pedido)
-    }
-
-    async editOne(id:number, dto:EditPedidoDto){
-        const connection = getConnection()
-        const queryRunner = connection.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            const data = await this.findById(id)
-            const Edited = Object.assign(data,dto)
-            const saved = await queryRunner.manager.save(Edited)
-            await queryRunner.commitTransaction()
-            await queryRunner.release()
-            return saved
-        } catch (err) {
-            await queryRunner.rollbackTransaction()
-            await queryRunner.release()
-            return err
-        }finally{
-            await queryRunner.release()   
-        }
-    }
-
-    async findOne_Pedido(id:number){
-        return await this.repository.findOne({
-            where:[{id}],
-            relations:[
-                "empleado",
-                "proveedor",
-                "sucursal",
-                "detalle",
-                "detalle.producto"
-            ]
-        })
-    }
-
-    async findMany_Pedido(){
+    async findAll(start: Date, end:Date){
+        const st = new Date(start)
+        const en = new Date(end)
+        const es = true
         return await getRepository(Pedido)
         .createQueryBuilder("pedido")
         .leftJoinAndSelect("pedido.empleado","empleado")
@@ -61,7 +29,45 @@ export class PedidoService extends DataService(Pedido) {
         "pedido.created_At","SUM(detalle.cantidad*detalle.precio)as total"])
         //.select(["empleado.nombre","proveedor.nombre","sucursal.nombre",
         //"detalle"])
+        .andWhere("pedido.created_at>=:st",{st})
+        .andWhere("pedido.created_at<:en",{en})
+        .andWhere("pedido.estado",{es})
         .groupBy("pedido.id,pedido.documento,proveedor.nombre,sucursal.nombre")
-        .getRawMany()
+        .getRawMany()}
+
+    async findById(id:number){
+        const data = this.repository.findOne({
+            where:[{id}],
+            relations:[
+                "empleado",
+                "proveedor",
+                "sucursal",
+                "detalle",
+                "detalle.producto"
+            ]
+        })
+            if(!data) throw new NotFoundException(`El registro no fue encontrado`);
+            return data;
+    }
+
+    @Transactional()
+    async createOne(dto:CreatePedidoDto){
+            const pedido = this.repository.create(dto)
+            return await this.repository.save(pedido)
+    }
+
+    @Transactional()
+    async editOne(id:number, dto:EditPedidoDto){
+            const data = await this.findById(id)
+            const Edited = Object.assign(data,dto)
+            const saved = await this.repository.save(Edited)
+            return saved
+
+    }
+
+    async deleteById(id:number){
+        const data = await this.findById(id)
+        data.estado = false
+        return await this.repository.save(data)
     }
 }

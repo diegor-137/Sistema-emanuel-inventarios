@@ -15,7 +15,7 @@ export class Cotizacion{
     @Column({type:'bool',default:true})
     estado:boolean
 
-    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
     createdAt: Date
 
         //-----Tablas Padre--------

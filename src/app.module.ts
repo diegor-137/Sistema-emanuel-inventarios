@@ -22,7 +22,6 @@ import { ConfiguracionesModule } from './configuraciones/configuraciones.module'
 import { FinanzasModule } from './finanzas/finanzas.module';
 import { CompraSubscriber } from './compras/compra/subscribers/existencia-compra.subscriber';
 import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.subscriber';
-
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({

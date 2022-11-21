@@ -4,10 +4,30 @@ import { Puesto } from './entity/puesto.entity';
 import { CreatePuestoDto } from './dto/create-puesto.dto';
 import { EditPuestoDto } from './dto/edit-puesto.dto';
 import { Departamento } from '../departamento/entity/departamento.entity';
-import { getRepository, getConnection, ILike } from 'typeorm';
+import { getRepository, getConnection, ILike, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class PuestoService extends DataService(Puesto){
+export class PuestoService{
+    constructor(
+        @InjectRepository(Puesto)
+        public readonly repository:Repository<Puesto>
+    ){}
+
+    async findAll(){
+        return await this.repository.find({
+            where:[{estado:true}],
+            relations:["departamento"]}) 
+    }
+
+    async findById(id:number){
+        const data = await this.repository.findOne({
+            where:[{id:id}],
+            relations:["departamento"]
+        })
+        if(!data) throw new NotFoundException(`El registro no fue encontrado`);
+        return data;
+    }
 
     async createOne(dto: CreatePuestoDto) {
         const puesto = this.repository.create(dto);
@@ -20,14 +40,9 @@ export class PuestoService extends DataService(Puesto){
         return await this.repository.save(Edited)
     }
 
-    async findMany_Puesto(){
-        return await this.repository.find({relations:["departamento"]})
-    }
-   
-    async findOne_Puesto(id:number){
-        return await this.repository.find({
-            where:[{id:id}],
-            relations:["departamento"]
-        })
+    async deleteById(id:number){
+        const data = await this.findById(id)
+        data.estado = false
+        return await this.repository.save(data)
     }
 }

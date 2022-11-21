@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param, ParseIntPipe, Get } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, ParseIntPipe, Get, Delete, Query } from '@nestjs/common';
 import { CommonController } from '../../common/controller/common.controller';
 import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
@@ -10,8 +10,20 @@ import { User as UserEntity} from 'src/user/entities/user.entity';
 
 @ApiTags('Pedido endPoints')
 @Controller('pedido')
-export class PedidoController extends CommonController (PedidoService) {
-    constructor(private readonly pedidoService:PedidoService){super()}
+export class PedidoController{
+    constructor(private readonly pedidoService:PedidoService){}
+
+    @Auth()
+    @Get()
+    async findAll(@Query() query: { start: Date, end:Date}){
+        return await this.pedidoService.findAll(query.start,query.end)
+    }
+
+    @Auth()
+    @Get(':id')
+    async findById(@Param('id',ParseIntPipe) id:number){
+        return await this.pedidoService.findById(id)
+    } 
 
     @Auth()
     @Post()
@@ -24,6 +36,7 @@ export class PedidoController extends CommonController (PedidoService) {
         return await this.pedidoService.createOne(dto)
     }
 
+    @Auth()
     @Put(':id')
     async editOne(
         @Param('id',ParseIntPipe) id:number,
@@ -32,16 +45,9 @@ export class PedidoController extends CommonController (PedidoService) {
         return await this.pedidoService.editOne(id,dto)
     }
 
-    @Get("encontrar/:id")
-    async findByIdCompra(
-        @Param ('id',ParseIntPipe) id:number
-    ){
-        return await this.pedidoService.findOne_Pedido(id)
+    @Auth()
+    @Delete(':id')
+    async deleteById(@Param('id',ParseIntPipe) id:number){
+        return await this.pedidoService.deleteById(id)
     }
-
-    @Get("encontrar")
-    async FindManyCompra(){
-        return await this.pedidoService.findMany_Pedido()
-    }
-
 }

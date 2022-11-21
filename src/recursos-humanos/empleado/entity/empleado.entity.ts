@@ -35,9 +35,6 @@ export class Empleado{
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
 
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    email: string;
-
     //Tablas Padre
     /*********Puesto*********/
     @ManyToOne(

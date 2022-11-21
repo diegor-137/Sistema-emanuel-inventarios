@@ -1,19 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { MarcaDto } from './dto/marca.dto';
-import { DataService } from '../../common/service/common.service';
 import { Marca } from './entities/marca.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class MarcaService extends DataService(Marca) {
+export class MarcaService{
 
-  async create(marca: MarcaDto) {
-        return this.repository.save(marca);
-  }
-
-  async update(id: number, marca: MarcaDto) {
-        const marc = await this.repository.findOne(id);
-        const editMarc = Object.assign(marc, marca);
-        return await this.repository.save(editMarc);
-  }
-
+      constructor(
+            @InjectRepository(Marca)
+            public readonly repository:Repository<Marca>
+        ){}
+    
+        async findAll(){
+            return await this.repository.find({
+                where:[{
+                    estado:true
+                }]
+            })
+        }
+        
+        async findById(id:number){
+            const data = await this.repository.findOne(id);
+            if(!data) throw new NotFoundException(`El registro no fue encontrado`);
+            return data;
+        }
+    
+        async createOne(dto: MarcaDto) {
+            const marca = this.repository.create(dto);
+            return await this.repository.save(marca);
+          }
+    
+        async editOne(id:number, dto:MarcaDto){
+            const marca = await this.findById(id)
+            const Edited = Object.assign(marca,dto)
+            return await this.repository.save(Edited)
+        }
+    
+        async deleteById(id:number){
+            const data = await this.findById(id)
+            data.estado = false
+            return await this.repository.save(data)
+        }
 }

@@ -10,7 +10,7 @@ implements EntitySubscriberInterface<Venta>{
         return Venta
     }
 
-    async afterInsert(event:LoadEvent<Venta>){
+    async afterInsert(event:LoadEvent<Venta>){/* 
         await event.queryRunner.commitTransaction();
         await event.queryRunner.startTransaction();
         const inventarioRepository = getRepository(Inventario)
@@ -22,7 +22,7 @@ implements EntitySubscriberInterface<Venta>{
             inventario[0].cantidad = (+inventario[0].cantidad) - (event.entity.detalle[i].cantidad)
             await inventarioRepository.save(inventario)
         }
-        return
+        return */
     }
 
     async afterUpdate(event: UpdateEvent<Venta>){

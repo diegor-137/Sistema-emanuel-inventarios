@@ -1,15 +1,31 @@
-import { Body, Controller, Param, Post, Put, ParseIntPipe, Req, Get, Header} from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, ParseIntPipe, Req, Get, Header, Delete} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 import { CommonController } from '../../common/controller/common.controller';
 import { CreatePuestoDto, EditPuestoDto } from './dto';
 import { PuestoService } from './puesto.service';
 
 @ApiTags('Puesto endPoints')
 @Controller('puesto')
-export class PuestoController extends CommonController(PuestoService){
+export class PuestoController{
 
-    constructor(private readonly puestoService:PuestoService){super()}
+    constructor(private readonly puestoService:PuestoService){}
 
+    @Auth()
+    @Get()
+    async FindAll(){
+        return await this.puestoService.findAll()
+    }
+
+    @Auth()
+    @Get(":id")
+    async FindById(
+        @Param('id',ParseIntPipe) id:number
+    ){
+        return await this.puestoService.findById(id)
+    }
+
+    @Auth()
     @Post()
     async CreateOne(
         @Body() dto:CreatePuestoDto
@@ -18,6 +34,7 @@ export class PuestoController extends CommonController(PuestoService){
         return await this.puestoService.createOne(dto)
     }
 
+    @Auth()
     @Put(':id')
     async EditOne(
         @Param('id',ParseIntPipe) id:number,
@@ -26,23 +43,9 @@ export class PuestoController extends CommonController(PuestoService){
         return await this.puestoService.editOne(id,dto)
     }
 
-    @Get("encontrar")
-    async FindAllPuesto(){
-        return await this.puestoService.findMany_Puesto()
+    @Auth()
+    @Delete(':id')
+    async deleteById(@Param('id',ParseIntPipe) id:number){
+        return await this.puestoService.deleteById(id)
     }
-
-    @Get("encontrar/:id")
-    async FindByIdPuesto(
-        @Param('id',ParseIntPipe) id:number
-    ){
-        return await this.puestoService.findOne_Puesto(id)
-    }
-
-/*     @Get('nombre/:nombre?')
-    async findByNombre(
-        @Param('nombre') nombre:string
-    ){
-        return await this.puestoService.findByNombre(nombre)
-    } */
-
 }

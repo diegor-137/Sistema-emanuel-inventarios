@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { VentaService } from 'src/ventas/venta/venta.service';
+import { VentaService } from 'src/ventas/venta/services/venta.service';
 import { IsNull, Repository } from 'typeorm';
 import { MovimientoCajaService } from '../movimiento-caja/movimiento-caja.service';
 import { CreateCobroDto } from './dto/create-cobro.dto';
