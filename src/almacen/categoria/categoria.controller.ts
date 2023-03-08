@@ -16,7 +16,7 @@ export class CategoriaController{
     }
 
     @Auth()
-    @Get(':id')
+    @Get('uno/:id')
     async findById(@Param('id',ParseIntPipe) id:number){
         return await this.categoriaService.findById(id)     
     }
@@ -42,5 +42,13 @@ export class CategoriaController{
     @Delete(':id')
     async deleteById(@Param('id',ParseIntPipe) id:number){
         return await this.categoriaService.deleteById(id)
+    }
+
+    @Auth()
+    @Get(':nombre?')
+    async findByName(
+       @Param('nombre') nombre:string 
+    ){
+        return await this.categoriaService.findByName(nombre)
     }
 }

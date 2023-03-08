@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, On
 import { Cliente } from '../../cliente/entity/cliente.entity';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { DetalleCotizacion } from './detalle-cotizacion.entity';
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 
 @Entity('cotizacion')
 export class Cotizacion{

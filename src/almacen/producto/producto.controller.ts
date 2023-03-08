@@ -12,22 +12,27 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { User as UserEntity} from 'src/user/entities/user.entity';
 import { InventarioDto } from './dto/inventario.dto';
+import { CostoService } from './services/costo.service';
 
 @ApiTags('Producto endPoints')
 @Controller('producto')
 export class ProductoController extends CommonController(ProductoService){
   constructor(private readonly productoService: ProductoService,
-              private readonly inventarioService:InventarioService) {super()}
+              private readonly inventarioService:InventarioService,
+              private readonly costoService:CostoService) {super()}
 
+  @Auth()              
   @Get('productos')
-  async products(){
-    return this.productoService.products();
+  async products(@User() user: UserEntity){
+    //return console.log(user)
+    return this.productoService.products(user);
   }
 
   @Post()
   @UseInterceptors(FilesInterceptor('files', 5, storage))
-  async uploadFiles( @UploadedFiles() files: Express.Multer.File[], @Body() producto: CreateProductoDto, ) {
-    console.log(producto);
+  async uploadFiles( @UploadedFiles() files: Express.Multer.File[], 
+                     @Body() producto: CreateProductoDto, 
+                     @User() user:UserEntity) {
     
     return await this.productoService.uploads(files,producto);
   }
@@ -53,7 +58,7 @@ export class ProductoController extends CommonController(ProductoService){
     //Para el modulo Inventario
     @Auth()
     @Get('inventario')
-    async productoVentaDos(@User() user: UserEntity){
+    async getInventario(@User() user: UserEntity){
       return this.inventarioService.prodPorSucursal(user);
     }
 
@@ -72,7 +77,14 @@ export class ProductoController extends CommonController(ProductoService){
    ){
      return this.inventarioService.editOne(id,dto)
    }
+
+   @Post('costopost')
+   create(@Body() dto:any){
+    return this.costoService.createOne(dto)
+   }
 }
+
+
 
 
 

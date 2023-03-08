@@ -1,5 +1,4 @@
-import { IsBoolean, IsString } from "class-validator";
-
+import { IsBoolean, IsOptional, IsString } from "class-validator";
 export class CreateSucursalDto {
     @IsString()
     nombre:string

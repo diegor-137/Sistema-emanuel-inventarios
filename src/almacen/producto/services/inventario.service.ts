@@ -1,11 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { DataService } from '../../../common/service/common.service';
 import { Inventario } from "../entities/inventario.entity";
-import { CreateCompraDto } from '../../../compras/compra/dto/create-compra.dto';
 import { getRepository, Repository } from 'typeorm';
 import { Producto } from '../entities/producto.entity';
-import { CreateVentaDto } from "src/ventas/venta/dto/create-venta.dto";
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 import { User } from "src/user/entities/user.entity";
 import { InventarioDto } from "../dto/inventario.dto";
 import { Propagation, Transactional } from "typeorm-transactional-cls-hooked";
@@ -46,7 +43,7 @@ export class InventarioService{
         }
         return
     }
-
+    //consulta para el modulo de inventario
     async prodPorSucursal(user:User){
         return await getRepository(Inventario)
         .createQueryBuilder("inventario")

@@ -1,6 +1,6 @@
 import { IsBoolean, IsOptional, IsString, IsNotEmpty, MinLength, MaxLength, IsEmail, IsArray, IsEnum } from 'class-validator';
 import { Puesto } from '../../puesto/entity/puesto.entity';
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 
 export class CreateEmpleadoDto{
     @IsString()

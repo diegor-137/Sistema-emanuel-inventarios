@@ -3,7 +3,7 @@ import { DataService } from 'src/common/service/common.service';
 import { Categoria } from './entity/categoria.entity';
 import { CategoriaDto } from './dtos/categoria.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class CategoriaService{
@@ -42,4 +42,13 @@ export class CategoriaService{
         data.estado = false
         return await this.repository.save(data)
     }
+
+    async findByName(nombre:string){
+        return await this.repository.find({
+           where: {
+            nombre: ILike(`%${nombre}%`),
+            estado: true
+          } 
+        });
+      }
 }

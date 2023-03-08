@@ -1,6 +1,6 @@
-import { Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CommonController } from '../common/controller/common.controller';
+import { CommonController } from 'src/common/controller/common.controller';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { EditSucursalDto } from './dto/edit-sucursal.dto';
 import { SucursalService } from './sucursal.service';
@@ -24,4 +24,9 @@ export class SucursalController extends CommonController(SucursalService){
         {
             return await this.sucursalService.editOne(id,dto)
         }
+
+    @Get('region')
+    async findRegion(){
+        return await this.sucursalService.findAllSucursal()
+    }
 }

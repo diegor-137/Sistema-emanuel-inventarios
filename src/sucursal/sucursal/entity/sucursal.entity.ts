@@ -1,12 +1,13 @@
 import { type } from "node:os";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Empleado } from '../../recursos-humanos/empleado/entity/empleado.entity';
-import { Compra } from '../../compras/compra/entity/compra.entity';
-import { Cotizacion } from '../../ventas/cotizacion/entity/cotizacion.entity';
-import { Venta } from '../../ventas/venta/entity/venta.entity';
-import { Pedido } from '../../compras/pedido/entity/pedido-entity';
-import { Inventario } from '../../almacen/producto/entities/inventario.entity';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
+import { Compra } from '../../../compras/compra/entity/compra.entity';
+import { Cotizacion } from '../../../ventas/cotizacion/entity/cotizacion.entity';
+import { Venta } from '../../../ventas/venta/entity/venta.entity';
+import { Pedido } from '../../../compras/pedido/entity/pedido-entity';
+import { Inventario } from '../../../almacen/producto/entities/inventario.entity';
 import { Caja } from "src/finanzas/caja/entities/caja.entity";
+import { Region } from "src/sucursales/region/entity/region.entity";
 
 @Entity('sucursal')
 export class Sucursal{
@@ -17,8 +18,15 @@ export class Sucursal{
     nombre:string
 
     @Column({type:'bool',default:true})
-    estado:boolean    
+    estado:boolean  
     
+    //Tablas Padre
+
+    /*****************************/
+    @ManyToOne(() => Region, region => region.sucursal,
+    )
+    region: Region
+
     //Tablas HIjas
     
     /********Recursos Humanos*******/

@@ -9,6 +9,7 @@ import { Precio } from './precio.entity';
 import { DetalleVenta } from '../../../ventas/venta/entity/detalle-venta.entity';
 import { DetalleCotizacion } from '../../../ventas/cotizacion/entity/detalle-cotizacion.entity';
 import { Inventario } from './inventario.entity';
+import { Costo } from "./costo.entity";
 
 
 @Entity('productos')
@@ -68,6 +69,12 @@ export class Producto {
         })
     inventario : Inventario[];
 
+    @OneToMany(
+        type=> Costo, 
+        costo => costo.producto,
+        {cascade:["insert","update"]
+        })
+    costo: Costo[];
     //---------Compras-------------
     @OneToMany(
         ()=> DetalleCompra, 

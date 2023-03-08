@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, On
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { Proveedor } from '../../proveedor/entity/proveedor.entity';
 import { DetalleCompra } from './detalle-compra.entity';
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 
 
 @Entity('compra')

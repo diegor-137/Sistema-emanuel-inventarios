@@ -7,7 +7,7 @@ import { EntitySubscriberInterface,
         LoadEvent} from 'typeorm';
 import { Producto } from '../entities/producto.entity';
 import { Inventario } from '../entities/inventario.entity';
-import { Sucursal } from 'src/sucursal/entity/sucursal.entity';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 
 @EventSubscriber()
 export class ProductoSubscriber 

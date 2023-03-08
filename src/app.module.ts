@@ -12,7 +12,7 @@ import { AlmacenModule } from './almacen/almacen.module';
 import { RecursosHumanosModule } from './recursos-humanos/recursos-humanos.module';
 import { ComprasModule } from './compras/compras.module';
 import { VentasModule } from './ventas/ventas.module';
-import { SucursalModule } from './sucursal/sucursal.module';
+
 import { ProductoSubscriber } from './almacen/producto/subscribers/existencia.subscriber';
 import { AuthModule } from './auth/auth.module';
 import { AccessControlModule } from 'nest-access-control';
@@ -22,6 +22,9 @@ import { ConfiguracionesModule } from './configuraciones/configuraciones.module'
 import { FinanzasModule } from './finanzas/finanzas.module';
 import { CompraSubscriber } from './compras/compra/subscribers/existencia-compra.subscriber';
 import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.subscriber';
+import { SucursalModule } from './sucursal/sucursal/sucursal.module';
+import { SucursalesModule } from './sucursales/sucursales.module';
+import { ServicesService } from './precio/almacen/precio/services/services.service';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -62,8 +65,9 @@ import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.sub
     UserModule,
     ConfiguracionesModule,
     FinanzasModule,
+    SucursalesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ServicesService],
 })
 export class AppModule {}

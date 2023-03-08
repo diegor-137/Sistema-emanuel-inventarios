@@ -6,7 +6,7 @@ import { CorteCaja } from '../../corte-caja/entities/corte-caja.entity';
 import { Gasto } from '../../gastos/entities/gasto.entity';
 import { Ingreso } from '../../ingresos/entities/ingreso.entity';
 import { Egreso } from '../../egresos/entities/egreso.entity';
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 
 
 @Entity('caja')

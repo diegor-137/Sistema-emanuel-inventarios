@@ -1,6 +1,6 @@
 import { IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 import { Empleado } from "src/recursos-humanos/empleado/entity/empleado.entity";
-import { Sucursal } from 'src/sucursal/entity/sucursal.entity';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 
 
 export class CreateCajaDto {

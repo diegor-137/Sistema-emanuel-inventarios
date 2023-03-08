@@ -7,7 +7,7 @@ import { Column,
     ManyToOne, 
     OneToMany } from 'typeorm';
 import { DetallePedido } from './detalle-pedido.entity';
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 
 @Entity('pedido')
 export class Pedido{

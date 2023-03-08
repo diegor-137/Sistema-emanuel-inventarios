@@ -17,7 +17,7 @@ export class MarcaController{
   }
 
   @Auth()
-  @Get(':id')
+  @Get('uno/:id')
   async findById(@Param('id',ParseIntPipe) id:number){
     return await this.marcaService.findById(id)
   }
@@ -37,5 +37,13 @@ export class MarcaController{
     @Delete(':id')
     async deleteById(@Param('id',ParseIntPipe) id:number){
         return await this.marcaService.deleteById(id)
+    }
+
+    @Auth()
+    @Get(':nombre?')
+    async findByName(
+       @Param('nombre') nombre:string 
+    ){
+        return await this.marcaService.findByName(nombre)
     }
 }

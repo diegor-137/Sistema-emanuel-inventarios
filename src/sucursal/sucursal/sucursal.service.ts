@@ -3,13 +3,19 @@ import { Inventario } from 'src/almacen/producto/entities/inventario.entity';
 import { Producto } from 'src/almacen/producto/entities/producto.entity';
 import { getRepository } from 'typeorm';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
-import { DataService } from '../common/service/common.service';
+import { DataService } from '../../common/service/common.service';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { EditSucursalDto } from './dto/edit-sucursal.dto';
 import { Sucursal } from './entity/sucursal.entity';
 
 @Injectable()
 export class SucursalService extends DataService(Sucursal){
+
+    async findAllSucursal(){
+        return await this.repository.find({
+            relations:["region"]
+        })        
+    }
  
     @Transactional()
     async CreateOne(sucursal : CreateSucursalDto){

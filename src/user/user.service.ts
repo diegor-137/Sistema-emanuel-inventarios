@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -48,12 +48,23 @@ export class UserService{
   }
 
   async getOne(id: number) {
+
+    const users = await getRepository(User)
+    .createQueryBuilder("user")
+    .leftJoinAndSelect("user.empleado","empleado")
+    .leftJoinAndSelect("empleado.sucursal","sucursal")
+    .leftJoinAndSelect("sucursal.region","region")
+    .getOne()
     const user = await this.userRepository
-      .findOne(id, {relations: ["empleado", "empleado.sucursal"]});
+      .findOne(id, {relations: ["empleado", "empleado.sucursal","empleado.sucursal.region"]});
 
     if (!user)
-      throw new NotFoundException('Usur does not exists or unauthorized');
+      throw new NotFoundException('User does not exists or unauthorized');
 
+      //console.log(user.empleado.sucursal)
+      //Object.keys(user.empleado.sucursal.region)
+      //console.log(typeof(user.empleado.sucursal))
+      //console.log(user.empleado.sucursal)
     return user;
   } 
   /* PENDIENTE */

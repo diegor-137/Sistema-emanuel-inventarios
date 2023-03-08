@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { MarcaDto } from './dto/marca.dto';
 import { Marca } from './entities/marca.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class MarcaService{
@@ -42,4 +42,13 @@ export class MarcaService{
             data.estado = false
             return await this.repository.save(data)
         }
+
+        async findByName(nombre:string){
+            return await this.repository.find({
+               where: {
+                nombre: ILike(`%${nombre}%`),
+                estado: true
+              } 
+            });
+          }
 }

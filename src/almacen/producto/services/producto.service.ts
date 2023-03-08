@@ -5,9 +5,7 @@ import { DataService } from '../../../common/service/common.service';
 import { Producto } from '../entities/producto.entity';
 import { join } from 'path';
 import { FotoDto } from '../dto/foto.dto';
-import { getConnection, getManager, getRepository } from 'typeorm';
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
-import { Inventario } from '../entities/inventario.entity';
+import { getConnection, getRepository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { InventarioService } from './inventario.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
@@ -15,9 +13,24 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 @Injectable()
 export class ProductoService extends DataService(Producto) {
     constructor(private readonly inventario:InventarioService){super()}
+ 
+  async products(user:User){
+    const data = await getRepository(Producto)
+    .createQueryBuilder("producto")
+    .leftJoinAndSelect("producto.categoria","categoria")
+    .leftJoinAndSelect("producto.marca","marca")
+    .leftJoinAndSelect("producto.precio","precio",'precio.region.id = :id',{id:user.empleado.sucursal.region.id})
+    .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
+    .leftJoinAndSelect("precio.region","region")
+    .leftJoinAndSelect("producto.costo","costo",'costo.region.id = :id',{id:user.empleado.sucursal.region.id})
+    //.andWhere("region.id =:id",{id:user.empleado.sucursal.region.id})
+    .getMany()
+    
+    return data
 
-  async products(){
-    return await this.repository.find({relations: ['categoria', 'marca','precio','precio.tipoPrecio']});
+    return await this.repository.find({
+      relations: ['categoria', 'marca','precio','precio.tipoPrecio','precio.region','costo'],
+    });
   }
 
   //Se usa para llamaer los productos disponibles en los modulos de ventas y compras
@@ -28,9 +41,12 @@ export class ProductoService extends DataService(Producto) {
     .leftJoinAndSelect("producto.marca","marca")
     .leftJoinAndSelect("producto.precio","precio")
     .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
+    .leftJoinAndSelect("precio.region","region")
     .leftJoinAndSelect("producto.inventario","inventario")
     .leftJoinAndSelect("inventario.sucursal","sucursal")
-    .where("sucursal.id =:id",{id:user.empleado.sucursal.id})
+    .leftJoinAndSelect("producto.costo","costo")
+    .andWhere("sucursal.id =:id",{id:user.empleado.sucursal.id})
+    .andWhere("region.id =:id",{id:user.empleado.sucursal.region.id})
     .getMany()
   }
   async findProductImages(id:number){

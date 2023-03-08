@@ -4,7 +4,7 @@ import { Compra } from '../../../compras/compra/entity/compra.entity';
 import { Venta } from '../../../ventas/venta/entity/venta.entity';
 import { Pedido } from '../../../compras/pedido/entity/pedido-entity';
 import { Cotizacion } from '../../../ventas/cotizacion/entity/cotizacion.entity';
-import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Cobro } from 'src/finanzas/cobro/entities/cobro.entity';
 import { Caja } from 'src/finanzas/caja/entities/caja.entity';

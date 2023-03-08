@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 import { Producto } from './producto.entity';
 import { TipoPrecio } from '../../tipo-precio/entities/tipo-precio.entity';
+import { Region } from "src/sucursales/region/entity/region.entity";
 
 
 @Entity('precios')
@@ -23,4 +24,7 @@ export class Precio {
 
     @ManyToOne(()=> TipoPrecio, tipoPrecio => tipoPrecio.precio)
     tipoPrecio: TipoPrecio
+
+    @ManyToOne(()=>Region, region => region.precio)
+    region:Region
 }

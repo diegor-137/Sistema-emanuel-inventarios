@@ -8,13 +8,15 @@ import { Precio } from './entities/precio.entity';
 import { Inventario } from './entities/inventario.entity';
 import { InventarioService } from './services/inventario.service';
 import { PrecioService } from './services/precio.service';
+import { Costo } from './entities/costo.entity';
+import { CostoService } from './services/costo.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Producto, Foto, Precio, Inventario])
+    TypeOrmModule.forFeature([Producto, Foto, Precio, Inventario, Costo])
   ],
   controllers: [ProductoController],
-  providers: [ProductoService,InventarioService,PrecioService],
+  providers: [ProductoService,InventarioService,PrecioService, CostoService],
   exports:[InventarioService,PrecioService]
 })
 export class ProductoModule {}
