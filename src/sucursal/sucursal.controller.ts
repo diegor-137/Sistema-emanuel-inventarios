@@ -1,5 +1,8 @@
-import { Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
+import { Recurso } from 'src/app.roles';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 import { CommonController } from '../common/controller/common.controller';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { EditSucursalDto } from './dto/edit-sucursal.dto';
@@ -10,11 +13,14 @@ import { SucursalService } from './sucursal.service';
 export class SucursalController extends CommonController(SucursalService){
     constructor(private readonly sucursalService:SucursalService){super()}
 
+    @Auth({action: 'create',possession: 'any',resource: Recurso.SUCURSAL})
     @Post()
+    @UseInterceptors(FileInterceptor('fotoSend'))
     async CreateOne(
-        @Body() dto:CreateSucursalDto)
+        @Body() dto:CreateSucursalDto,
+        @UploadedFile() fotoSend: Express.Multer.File)
         {
-            return await this.sucursalService.CreateOne(dto)
+            return await this.sucursalService.CreateOne(dto, fotoSend)
         }
 
     @Put(':id')
@@ -24,4 +30,15 @@ export class SucursalController extends CommonController(SucursalService){
         {
             return await this.sucursalService.editOne(id,dto)
         }
+
+    @Get('todos')    
+    async findTodos(){
+        return await this.sucursalService.findTodos();
+    }  
+    
+    @Auth()
+    @Get("name/:nombre")
+    async sucursalName(@Param("nombre") nombre: string) {
+        return await this.sucursalService.sucursalName(nombre);
+    }
 }

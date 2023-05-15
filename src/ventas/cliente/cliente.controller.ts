@@ -1,5 +1,8 @@
-import { Body, Controller, Param, Post, Put, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, Get, ParseIntPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { User as UserEntity} from 'src/user/entities/user.entity';
+import { User } from 'src/auth/decorators/user.decorator';
 import { CommonController } from '../../common/controller/common.controller';
 import { ClienteService } from './cliente.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
@@ -10,15 +13,29 @@ import { EditClienteDto } from './dto/edit-cliente.dto';
 export class ClienteController extends CommonController(ClienteService){
     constructor(private readonly clienteService:ClienteService){super()}
 
+    @Auth()
     @Post()
-    async create(@Body() dto:CreateClienteDto){
-        return await this.clienteService.CreateOne(dto)
+    async create(@Body() dto:CreateClienteDto, @User() user: UserEntity){                   
+        return await this.clienteService.CreateOne(dto, user.empleado);
     }
 
+    @Auth()
     @Put(':id')
     async update(
         @Param('id', ParseIntPipe) id:number, 
-        @Body() dto:EditClienteDto){
-        return await this.clienteService.EditOne(id,dto)
+        @Body() dto:EditClienteDto,
+        @User() user: UserEntity){
+        return await this.clienteService.EditOne(id, dto, user.empleado)
+    }
+
+    @Auth()
+    @Get()
+    async all(@User() user: UserEntity){     
+      return  await this.clienteService.findTodos(user.empleado.sucursal.id)      
+    }
+
+    @Get(':nombre?')
+    async findNameAuto(@Param('nombre') nombre:string){
+      return await this.clienteService.findByName(nombre)
     }
 }

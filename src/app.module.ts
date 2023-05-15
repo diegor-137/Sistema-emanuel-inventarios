@@ -22,6 +22,8 @@ import { ConfiguracionesModule } from './configuraciones/configuraciones.module'
 import { FinanzasModule } from './finanzas/finanzas.module';
 import { CompraSubscriber } from './compras/compra/subscribers/existencia-compra.subscriber';
 import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.subscriber';
+import { FilesModule } from './files/files.module';
+import { CreditosModule } from './creditos/creditos.module';
 
 @Module({
   imports: [
@@ -63,6 +65,8 @@ import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.sub
     UserModule,
     ConfiguracionesModule,
     FinanzasModule,
+    FilesModule,
+    CreditosModule
   ],
   controllers: [AppController],
   providers: [AppService],

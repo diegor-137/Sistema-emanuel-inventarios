@@ -6,6 +6,7 @@ import { CorteCajaDetalle } from './corte-caja-detalle';
 import { Gasto } from '../../gastos/entities/gasto.entity';
 import { Ingreso } from '../../ingresos/entities/ingreso.entity';
 import { Egreso } from '../../egresos/entities/egreso.entity';
+import { CuentaPorCobrarDetalle } from "src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar-details.entity";
 
 
 @Entity('corte_caja')
@@ -84,6 +85,11 @@ export class CorteCaja {
         nullable: true
     })
     egreso:Egreso[]
+
+    @OneToMany(() => CuentaPorCobrarDetalle, cuentaPorCobrarDetalle => cuentaPorCobrarDetalle.corteCaja, {
+        nullable: true
+    })
+    cuentaPorCobrarDetalle:CuentaPorCobrarDetalle[]
 
     //-------Tablas Padre--------
 

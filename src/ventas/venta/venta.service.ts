@@ -4,22 +4,39 @@ import { getConnection, getRepository } from 'typeorm';
 import { DataService } from '../../common/service/common.service';
 import { Venta } from './entity/venta.entity';
 import { InventarioService } from '../../almacen/producto/services/inventario.service';
+import { CuentasPorCobrarService } from 'src/creditos/cuentas-por-cobrar/cuentas-por-cobrar.service';
+import { CreditoClienteService } from '../../creditos/credito-cliente/credito-cliente.service';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
 
 
 @Injectable()
 export class VentaService extends DataService(Venta){
-    constructor(private readonly invertarioService:InventarioService){super()}
+    constructor(private readonly invertarioService:InventarioService,
+                private readonly cuentasPorCobrarService: CuentasPorCobrarService,    
+                private readonly creditoClienteService: CreditoClienteService    
+        ){super()}
 
-    async CreateOne(dto:CreateVentaDto){
+    
+    @Transactional()
+    async CreateOne(dto:CreateVentaDto, empleado:Empleado){
         //return console.log('object :>> ', dto);
-        const connection = getConnection()
+        /* const connection = getConnection()
         const queryRunner = connection.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
-        try {
+        try { */
+            dto.pago.code? dto.status = 'CREDITO':null;
             const venta = this.repository.create(dto)
-            const saved =  await queryRunner.manager.save(venta)
+            const saved =  await this.repository.save(venta)                        
             //await this.invertarioService.Egreso(saved)
+            if(dto.pago.code){
+                await this.creditoClienteService.findOneAndAllowCredit(saved, empleado)
+                await this.cuentasPorCobrarService.create(saved, empleado);
+                console.log('Se ha guardo el credito!');                
+            }
+            return saved
+            /* throw new Error
             await queryRunner.commitTransaction()
             await queryRunner.release()
             return saved
@@ -30,7 +47,7 @@ export class VentaService extends DataService(Venta){
             return err.detail
         }finally{
             await queryRunner.release()   
-        }
+        } */
     }
 
     async FindOne_Venta(id:number){

@@ -1,8 +1,9 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { Proveedor } from '../../proveedor/entity/proveedor.entity';
 import { DetalleCompra } from './detalle-compra.entity';
 import { Sucursal } from '../../../sucursal/entity/sucursal.entity';
+import { CuentaPorPagar } from 'src/creditos/cuentas-por-pagar/entities/cuenta-por-pagar-entity';
 
 
 @Entity('compra')
@@ -16,7 +17,7 @@ export class Compra{
     @Column({type:'varchar',length:350,nullable:true})
     observacion:string
   
-    @Column({type:'bool',default:true})
+    @Column({type:'bool',default:false})
     estado:boolean
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
@@ -49,4 +50,7 @@ export class Compra{
         {cascade:["insert","update","remove"]
     })
         detalle: DetalleCompra[];
+
+    @OneToOne(()=> CuentaPorPagar, cuentaPorPagar =>cuentaPorPagar.compra)
+    cuentaPorPagar:CuentaPorPagar    
 }

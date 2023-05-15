@@ -15,10 +15,13 @@ export class User {
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
 
-    @Column({type:'varchar', length: 128, nullable: false, default:true, select:false})
+    @Column({type:'varchar', length: 128, nullable: false, select:false})
     password: string;
     
-    @OneToOne(() => Empleado, (empleado) => empleado.user)
+    @OneToOne(() => Empleado, (empleado) => empleado.user, {
+        cascade: true, 
+        onUpdate: 'CASCADE',        
+    })
     @JoinColumn()
     empleado: Empleado
 

@@ -23,4 +23,14 @@ export class CreateVentaDto{
 
     @IsOptional()
     sucursal:Sucursal
+
+    @IsOptional()
+    pago:Pago
+
+    status?:string
+}
+
+interface Pago {
+    name:string,
+    code:boolean
 }

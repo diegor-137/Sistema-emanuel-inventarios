@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, BeforeInsert, BeforeUpdate, OneToOne } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, BeforeInsert, BeforeUpdate, OneToOne, JoinColumn } from 'typeorm';
 import { Puesto } from '../../puesto/entity/puesto.entity';
 import { Compra } from '../../../compras/compra/entity/compra.entity';
 import { Venta } from '../../../ventas/venta/entity/venta.entity';
@@ -11,6 +11,7 @@ import { Caja } from 'src/finanzas/caja/entities/caja.entity';
 import { CorteCaja } from '../../../finanzas/corte-caja/entities/corte-caja.entity';
 import { Gasto } from '../../../finanzas/gastos/entities/gasto.entity';
 import { Ingreso } from 'src/finanzas/ingresos/entities/ingreso.entity';
+import { FileAws3 } from 'src/files/entities/file.entity';
 
 @Entity('empleado')
 export class Empleado{
@@ -105,5 +106,11 @@ export class Empleado{
 
     @OneToMany(() => Cobro, (cobro) => cobro.deleteResponsible)
     cobroDeleted:Cobro[]
+
+    @OneToOne(() => FileAws3, fileAws3 => fileAws3.empleado, {
+        nullable: true
+    })
+    @JoinColumn({ name: "id_foto"})
+    foto: FileAws3;
     
 }

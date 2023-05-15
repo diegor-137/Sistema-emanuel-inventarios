@@ -4,14 +4,16 @@ export enum Role {
   ADMIN = 'ADMIN',
   EMPLEADO = 'EMPLEADO',
   BODEGUERO = 'BODEGUERO',
-  CAJERO = 'CAJERO'
+  CAJERO = 'CAJERO',
+  SUPERADMIN = 'SUPERADMIN'
 }
 
 export enum Recurso {
   EMPLEADO = 'EMPLEADO',
   VENTA = 'VENTA',
   USER = 'USER',
-  CAJERO = 'CAJERO'
+  CAJERO = 'CAJERO',
+  SUCURSAL= 'SUCURSAL'
 }
 
 export const roles: RolesBuilder = new RolesBuilder();
@@ -29,6 +31,11 @@ roles
   .deleteAny([Recurso.EMPLEADO, Recurso.VENTA, Recurso.USER])
   .grant(Role.CAJERO)
   .createOwn([Recurso.CAJERO])
+  // SUPER ADMIN ROLE
+  .grant(Role.SUPERADMIN)
+  .createAny([Recurso.SUCURSAL])
+  .updateAny([Recurso.SUCURSAL])
+  .deleteAny([Recurso.SUCURSAL])
 
 
 

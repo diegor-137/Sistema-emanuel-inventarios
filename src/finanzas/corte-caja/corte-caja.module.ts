@@ -11,6 +11,7 @@ import { AuthModule } from '../../auth/auth.module';
 import { GastosModule } from '../gastos/gastos.module';
 import { IngresosModule } from '../ingresos/ingresos.module';
 import { EgresosModule } from '../egresos/egresos.module';
+import { CuentasPorCobrarModule } from '../../creditos/cuentas-por-cobrar/cuentas-por-cobrar.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EgresosModule } from '../egresos/egresos.module';
     forwardRef(()=>GastosModule),
     forwardRef(()=>IngresosModule),
     forwardRef(()=>EgresosModule),
+    //forwardRef(()=>CuentasPorCobrarModule),
     TypeOrmModule.forFeature([CorteCaja, CorteCajaDetalle])
   ],
   controllers: [CorteCajaController],
