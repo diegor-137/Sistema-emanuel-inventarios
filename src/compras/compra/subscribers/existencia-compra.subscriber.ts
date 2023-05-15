@@ -11,7 +11,7 @@ implements EntitySubscriberInterface<Compra>{
     }
 
     async afterInsert(event: LoadEvent<Compra>){
-        await event.queryRunner.commitTransaction();
+/*         await event.queryRunner.commitTransaction();
         await event.queryRunner.startTransaction();
         const productoRepository = getRepository(Producto)
         const inventarioRepository = getRepository(Inventario)
@@ -35,11 +35,11 @@ implements EntitySubscriberInterface<Compra>{
 
             
         }
-        return
+        return */
     }
 
     async afterUpdate(event: UpdateEvent<Compra>){
-        await event.queryRunner.commitTransaction();
+/*         await event.queryRunner.commitTransaction();
         await event.queryRunner.startTransaction();
         const productoRepository = getRepository(Producto)
         const inventarioRepository = getRepository(Inventario)
@@ -57,6 +57,6 @@ implements EntitySubscriberInterface<Compra>{
             producto[0].ultimo_precio = +producto[0].costo_prom_old
             producto[0].costo_prom = +producto[0].costo_prom_old
             await productoRepository.save(producto)
-        }
+        } */
     }
 }

@@ -1,8 +1,8 @@
 
-import { Body, Controller, Get, Param, Post, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, ParseIntPipe, Put, Delete, Query } from '@nestjs/common';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { CommonController } from '../../common/controller/common.controller';
-import { VentaService } from './venta.service';
+import { VentaService } from './services/venta.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
@@ -10,9 +10,23 @@ import { User as UserEntity} from 'src/user/entities/user.entity';
 
 @ApiTags('Venta endPoints')
 @Controller('venta')
-export class VentaController extends CommonController(VentaService){
+export class VentaController{
 
-    constructor(private readonly ventaService:VentaService){super()}
+    constructor(private readonly ventaService:VentaService){}
+    
+    @Auth()
+    @Get()
+    async FindAll(@Query() query: { start: Date, end:Date}){
+        return await this.ventaService.FindAll(query.start,query.end)
+    }
+
+    @Get(":id")
+    async findById(
+        @Param ('id',ParseIntPipe) id:number
+    ){
+        return await this.ventaService.findById(id)
+    }
+    
     @Auth()
     @Post()
     async CreateOne(
@@ -24,16 +38,18 @@ export class VentaController extends CommonController(VentaService){
         return await this.ventaService.CreateOne(dto, user.empleado)
     }
 
-    @Get("encontrar/:id")
-    async findByIdVenta(
-        @Param ('id',ParseIntPipe) id:number
-    ){
-        return await this.ventaService.FindOne_Venta(id)
-    }
+    @Auth()
+    @Put(':id')
+    async editOne(
+        @Param('id',ParseIntPipe) id:number,
+        @Body() dto:CreateVentaDto)
+        {
+            return await this.ventaService.editOne(id,dto)
+        }
 
-    @Get("encontrar")
-    async findManyVenta(){
-        return await this.ventaService.FindMany_Venta()
+    @Auth()
+    @Delete(':id')
+    async deleteById(@Param('id',ParseIntPipe) id:number){
+        return await this.ventaService.deleteById(id)
     }
-
 }

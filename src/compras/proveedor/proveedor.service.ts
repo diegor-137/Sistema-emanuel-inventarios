@@ -1,13 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataService } from '../../common/service/common.service';
 import { Proveedor } from './entity/proveedor.entity';
 import { EditProveedorDto } from './dto';
 import { CreateProveedorDto } from './dto/create-proveedor.dto';
+<<<<<<< HEAD
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
 import { CreditoProveedorService } from '../../creditos/credito-proveedor/credito-proveedor.service';
+=======
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Repository } from 'typeorm';
+>>>>>>> 34de35d63b5379a90ec65886837da6d76c32b55f
 
 @Injectable()
-export class ProveedorService extends DataService(Proveedor){
+export class ProveedorService{
+
+    constructor(
+        @InjectRepository(Proveedor)
+        public readonly repository:Repository<Proveedor>
+    ){}
+
+    async findAll(){
+        return await this.repository.find({
+            where:[{
+                estado:true
+            }]
+        })
+    }
+
+    async findById(id:number){
+        const data = await this.repository.findOne(id);
+        if(!data) throw new NotFoundException(`El registro no fue encontrado`);
+        return data;
+    }
 
     constructor(
         private readonly creditoProveedorService:CreditoProveedorService
@@ -46,6 +70,7 @@ export class ProveedorService extends DataService(Proveedor){
         return await this.repository.save(Edited)
     }
 
+<<<<<<< HEAD
     async findTodos(idSucursal:number){
         const proveedor = await this.repository.createQueryBuilder('proveedor')
                 .leftJoinAndSelect('proveedor.credito', 'credito', `credito.sucursal.id = ${idSucursal}`)                                                    
@@ -53,4 +78,20 @@ export class ProveedorService extends DataService(Proveedor){
         return proveedor
     }
 
+=======
+    async deleteById(id:number){
+        const data = await this.findById(id)
+        data.estado = false
+        return await this.repository.save(data)
+    }
+
+    async findByName(nombre:string){
+        return await this.repository.find({
+           where: {
+            nombre: ILike(`%${nombre}%`),
+            estado: true
+          } 
+        });
+      }
+>>>>>>> 34de35d63b5379a90ec65886837da6d76c32b55f
 }

@@ -20,7 +20,7 @@ export class Compra{
     @Column({type:'bool',default:false})
     estado:boolean
 
-    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
     createdAt: Date
 
 

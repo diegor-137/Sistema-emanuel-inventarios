@@ -57,6 +57,7 @@ export class ProductoController extends CommonController(ProductoService){
       return this.inventarioService.prodPorSucursal(user);
     }
 
+    
     @Auth()
     @Get('inventario/:id')
     async Validador(@User() user: UserEntity,

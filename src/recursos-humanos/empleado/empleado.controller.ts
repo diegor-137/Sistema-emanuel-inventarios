@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param, ParseIntPipe, Get, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, ParseIntPipe, Get, UseGuards, SetMetadata, Delete } from '@nestjs/common';
 import { CommonController } from '../../common/controller/common.controller';
 import { CreateEmpleadoDto } from './dto';
 import { EmpleadoService } from './empleado.service';
@@ -12,16 +12,23 @@ import Permission from 'src/auth/enums/permission.type';
 
 @ApiTags('Empleados endPoints')
 @Controller('empleado')
-export class EmpleadoController extends CommonController (EmpleadoService) {
-
+export class EmpleadoController{
     constructor(private readonly empleadoService:EmpleadoService)
-    {super()}
+    {}
 
-    @Auth({
-        action: 'create',
-        possession: 'any',
-        resource: Recurso.EMPLEADO
-    })
+    @Auth()
+    @Get()
+    async findAll(){
+        return await this.empleadoService.findAll()
+    }
+
+    @Auth()
+    @Get(':id')
+    async findById(@Param('id',ParseIntPipe) id:number){
+        return await this.empleadoService.findById(id)
+    }
+
+    @Auth()
     //@PermissionsRequired(Permission.CrearEmpleado)
     @Post()
     async CreateOne(
@@ -38,22 +45,9 @@ export class EmpleadoController extends CommonController (EmpleadoService) {
         return await this.empleadoService.editOne(id,dto)
     }
 
-    @Get("encontrar")
-    async findAllEmpledo(){
-        return await this.empleadoService.findMany_Empleado()
+    @Auth()
+    @Delete(':id')
+    async deleteById(@Param('id',ParseIntPipe) id:number){
+        return await this.empleadoService.deleteById(id)
     }
-
-    @Get("encontrar/:id")
-    async findByIdEmpleado(
-        @Param('id',ParseIntPipe) id:number
-    ){
-        return await this.empleadoService.findOne_Empelado(id)
-    }
-
-/*     @Get('nombre/:nombre?')
-    async findByNombre(
-        @Param('nombre') nombre:string
-    ){
-        return await this.empleadoService.findByNombre(nombre)
-    } */
 }
