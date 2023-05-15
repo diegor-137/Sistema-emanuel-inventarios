@@ -5,16 +5,20 @@ import { DataService } from '../../../common/service/common.service';
 import { Producto } from '../entities/producto.entity';
 import { join } from 'path';
 import { FotoDto } from '../dto/foto.dto';
-import { getConnection, getRepository } from 'typeorm';
+import { Repository, getConnection, getRepository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { InventarioService } from './inventario.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class ProductoService extends DataService(Producto) {
-    constructor(private readonly inventario:InventarioService){super()}
- 
-  async products(user:User){
+export class ProductoService{
+    constructor(
+      @InjectRepository(Producto)
+      public readonly repository:Repository<Producto>,      
+      private readonly inventario:InventarioService){}
+
+  async findAll(user:User){
     const data = await getRepository(Producto)
     .createQueryBuilder("producto")
     .leftJoinAndSelect("producto.categoria","categoria")
@@ -23,37 +27,30 @@ export class ProductoService extends DataService(Producto) {
     .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
     .leftJoinAndSelect("precio.region","region")
     .leftJoinAndSelect("producto.costo","costo",'costo.region.id = :id',{id:user.empleado.sucursal.region.id})
-    //.andWhere("region.id =:id",{id:user.empleado.sucursal.region.id})
+    .andWhere("producto.estado = true")
     .getMany()
-    
     return data
-
     return await this.repository.find({
       relations: ['categoria', 'marca','precio','precio.tipoPrecio','precio.region','costo'],
     });
   }
 
-  //Se usa para llamaer los productos disponibles en los modulos de ventas y compras
-  async prodPorSucursal(user:User){
-    return await getRepository(Producto)
-    .createQueryBuilder("producto")
-    .leftJoinAndSelect("producto.categoria","categoria")
-    .leftJoinAndSelect("producto.marca","marca")
-    .leftJoinAndSelect("producto.precio","precio")
-    .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
-    .leftJoinAndSelect("precio.region","region")
-    .leftJoinAndSelect("producto.inventario","inventario")
-    .leftJoinAndSelect("inventario.sucursal","sucursal")
-    .leftJoinAndSelect("producto.costo","costo")
-    .andWhere("sucursal.id =:id",{id:user.empleado.sucursal.id})
-    .andWhere("region.id =:id",{id:user.empleado.sucursal.region.id})
-    .getMany()
-  }
-  async findProductImages(id:number){
-    return await this.repository.findOne(id, {relations: ['fotos']});      
+  async findById(id:number){
+    const data = await this.repository.findOne(id);
+    if(!data) throw new NotFoundException(`El registro no fue encontrado`);
+    return data;
   }
 
-  async update(id: number, dto: UpdateProductoDto) {
+
+  @Transactional()
+  async createOne(files: Express.Multer.File[], producto:CreateProductoDto){
+            const creado = this.repository.create(producto)
+            const saved =  await this.repository.save(creado)
+            await this.inventario.afterCreateNewProd(saved)
+            return saved
+  }
+
+  async editOne(id: number, dto: UpdateProductoDto) {
     const connection = getConnection()
     const queryRunner = connection.createQueryRunner()
     await queryRunner.connect()
@@ -75,12 +72,30 @@ export class ProductoService extends DataService(Producto) {
     }
   }
 
-  @Transactional()
-  async uploads(files: Express.Multer.File[], producto:CreateProductoDto){
-            const creado = this.repository.create(producto)
-            const saved =  await this.repository.save(creado)
-            await this.inventario.afterCreateNewProd(saved)
-            return saved
+  async deleteById(id:number){
+    const data = await this.findById(id)
+    data.estado = false
+    return await this.repository.save(data)
+  }
+
+  //Se usa para llamaer los productos disponibles en los modulos de ventas y compras
+  async prodPorSucursal(user:User){
+    return await getRepository(Producto)
+    .createQueryBuilder("producto")
+    .leftJoinAndSelect("producto.categoria","categoria")
+    .leftJoinAndSelect("producto.marca","marca")
+    .leftJoinAndSelect("producto.precio","precio")
+    .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
+    .leftJoinAndSelect("precio.region","region")
+    .leftJoinAndSelect("producto.inventario","inventario")
+    .leftJoinAndSelect("inventario.sucursal","sucursal")
+    .leftJoinAndSelect("producto.costo","costo")
+    .andWhere("sucursal.id =:id",{id:user.empleado.sucursal.id})
+    .andWhere("region.id =:id",{id:user.empleado.sucursal.region.id})
+    .getMany()
+  }
+  async findProductImages(id:number){
+    return await this.repository.findOne(id, {relations: ['fotos']});      
   }
 
   async productImage(idProduc: number, foto:FotoDto, res:any){  

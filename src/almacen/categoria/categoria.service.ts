@@ -14,9 +14,12 @@ export class CategoriaService{
 
     async findAll(){
         return await this.repository.find({
-            where:[{
-                estado:true
-            }]
+        })
+    }
+
+    async findAllActive(){
+        return await this.repository.find({
+            where:[{estado:true}]
         })
     }
     

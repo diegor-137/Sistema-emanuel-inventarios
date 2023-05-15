@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class TipoPrecioDto{
     
@@ -8,4 +8,7 @@ export class TipoPrecioDto{
     @IsString()
     @IsOptional()
     nombre:string
+
+    @IsBoolean()
+    estado:boolean
 }

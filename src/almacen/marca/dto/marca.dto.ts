@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator"
+import { IsBoolean, IsOptional, IsString } from "class-validator"
 
 
 export class MarcaDto {
@@ -6,4 +6,6 @@ export class MarcaDto {
     @IsString()
     nombre: string
 
+    @IsBoolean()
+    estado: boolean
 }

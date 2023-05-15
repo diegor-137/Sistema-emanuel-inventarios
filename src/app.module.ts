@@ -24,7 +24,6 @@ import { CompraSubscriber } from './compras/compra/subscribers/existencia-compra
 import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.subscriber';
 import { SucursalModule } from './sucursal/sucursal/sucursal.module';
 import { SucursalesModule } from './sucursales/sucursales.module';
-import { ServicesService } from './precio/almacen/precio/services/services.service';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -68,6 +67,6 @@ import { ServicesService } from './precio/almacen/precio/services/services.servi
     SucursalesModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ServicesService],
+  providers: [AppService],
 })
 export class AppModule {}

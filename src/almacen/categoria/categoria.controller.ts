@@ -15,6 +15,11 @@ export class CategoriaController{
         return await this.categoriaService.findAll()
     }
 
+    @Get('active')
+    async findAllActive(){
+        return await this.categoriaService.findAllActive()
+    }
+
     @Auth()
     @Get('uno/:id')
     async findById(@Param('id',ParseIntPipe) id:number){

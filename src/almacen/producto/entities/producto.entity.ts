@@ -5,11 +5,12 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, CreateDat
 import { Categoria } from '../../categoria/entity/categoria.entity';
 import { Marca } from '../../marca/entities/marca.entity';
 import { Foto } from './foto.entity';
-import { Precio } from './precio.entity';
+
 import { DetalleVenta } from '../../../ventas/venta/entity/detalle-venta.entity';
 import { DetalleCotizacion } from '../../../ventas/cotizacion/entity/detalle-cotizacion.entity';
 import { Inventario } from './inventario.entity';
-import { Costo } from "./costo.entity";
+import { Costo } from "src/almacen/precio/entities/costo.entity";
+import { Precio } from "src/almacen/precio/entities/precio.entity";
 
 
 @Entity('productos')
@@ -63,18 +64,21 @@ export class Producto {
     precio : Precio[];
 
     @OneToMany(
+        type => Costo,
+        costo => costo.producto, {
+            cascade:true
+        }
+    )
+    costo:Costo[]
+
+
+    @OneToMany(
         type=> Inventario, 
         inventario => inventario.producto,
         {cascade:["insert","update"]
         })
     inventario : Inventario[];
 
-    @OneToMany(
-        type=> Costo, 
-        costo => costo.producto,
-        {cascade:["insert","update"]
-        })
-    costo: Costo[];
     //---------Compras-------------
     @OneToMany(
         ()=> DetalleCompra, 

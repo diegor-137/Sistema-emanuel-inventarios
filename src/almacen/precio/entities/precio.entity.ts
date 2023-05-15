@@ -1,7 +1,7 @@
+import { Producto } from "src/almacen/producto/entities/producto.entity"
+import { TipoPrecio } from "src/almacen/tipo-precio/entities/tipo-precio.entity"
+import { Region } from "src/sucursales/region/entity/region.entity"
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import { Producto } from './producto.entity';
-import { TipoPrecio } from '../../tipo-precio/entities/tipo-precio.entity';
-import { Region } from "src/sucursales/region/entity/region.entity";
 
 
 @Entity('precios')
@@ -16,6 +16,7 @@ export class Precio {
     @Column({ type: 'bool', default: true })
     estado:boolean
 
+    /**********RELACIONES***********/
     @ManyToOne(()=> Producto, producto => producto.precio, {
         onDelete: "CASCADE",
         orphanedRowAction: "delete"        

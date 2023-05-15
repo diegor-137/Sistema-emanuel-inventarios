@@ -1,7 +1,6 @@
 import { Controller, Post, Body, Param, Delete, Put, Get, ParseIntPipe } from '@nestjs/common';
 import { MarcaService } from './marca.service';
 import { MarcaDto } from './dto/marca.dto';
-import { CommonController } from '../../common/controller/common.controller';
 import { ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 
@@ -14,6 +13,11 @@ export class MarcaController{
   @Get()
   async findAll(){
     return await this.marcaService.findAll()
+  }
+
+  @Get('active')
+  async findAllActive(){
+    return await this.marcaService.findAllActive()
   }
 
   @Auth()

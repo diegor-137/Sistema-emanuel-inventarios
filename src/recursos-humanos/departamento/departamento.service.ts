@@ -16,12 +16,14 @@ export class DepartamentoService{
 
     async findAll(){
         return await this.repository.find({
-            where:[{
-                estado:true
-            }]
         })
     }
     
+    async findAllActive(){
+        return await this.repository.find({
+            where:[{estado:true}]
+        })
+    }
     async findById(id:number){
         const data = await this.repository.findOne(id);
         if(!data) throw new NotFoundException(`El registro no fue encontrado`);

@@ -1,5 +1,5 @@
-import { Costo } from "src/almacen/producto/entities/costo.entity";
-import { Precio } from "src/almacen/producto/entities/precio.entity";
+import { Costo } from "src/almacen/precio/entities/costo.entity";
+import { Precio } from "src/almacen/precio/entities/precio.entity";
 import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 

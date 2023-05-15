@@ -63,4 +63,11 @@ export class InventarioService{
                 producto:id}})
       }
 
+      async getInventarioTotalProducto(id:number){
+        return await this.repository.find({
+            where:[{producto:id}],
+            relations:["sucursal"]
+        })
+      }
+
 }

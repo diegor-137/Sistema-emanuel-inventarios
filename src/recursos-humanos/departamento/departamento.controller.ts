@@ -17,6 +17,11 @@ export class DepartamentoController{
         return await this.departamentoService.findAll()
     }
 
+    @Get('active')
+    async findAllActive(){
+        return await this.departamentoService.findAllActive()
+    }
+
     @Auth()
     @Get(':id')
     async findById(@Param('id',ParseIntPipe) id:number){

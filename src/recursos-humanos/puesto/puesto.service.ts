@@ -16,7 +16,6 @@ export class PuestoService{
 
     async findAll(){
         return await this.repository.find({
-            where:[{estado:true}],
             relations:["departamento"]}) 
     }
 

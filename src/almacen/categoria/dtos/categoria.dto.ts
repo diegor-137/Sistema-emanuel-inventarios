@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator"
+import { IsBoolean, IsOptional, IsString } from "class-validator"
 
 
 export class CategoriaDto {
@@ -6,4 +6,6 @@ export class CategoriaDto {
     @IsString()
     nombre: string
 
+    @IsBoolean()
+    estado:boolean
 }
