@@ -27,4 +27,13 @@ export class CreateCompraDto {
 
     @IsOptional()
     sucursal:Sucursal
+
+    @IsOptional()
+    pago:Pago
+
+}
+
+interface Pago {
+    name:string,
+    code:boolean
 }

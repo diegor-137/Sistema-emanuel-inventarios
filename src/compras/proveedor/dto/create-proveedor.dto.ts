@@ -1,4 +1,5 @@
-import { IsBoolean, IsOptional, IsString, IsNotEmpty } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsNotEmpty, IsArray } from 'class-validator';
+import { CreateCreditoProveedorDto } from '../../../creditos/credito-proveedor/dto/create-credito-proveedor.dto';
 
 export class CreateProveedorDto{
     
@@ -19,5 +20,12 @@ export class CreateProveedorDto{
 
     @IsBoolean()
     estado:boolean
+
+    @IsBoolean()
+    credit:boolean
+
+    @IsOptional()
+    @IsArray()
+    credito:CreateCreditoProveedorDto[]
 
 }

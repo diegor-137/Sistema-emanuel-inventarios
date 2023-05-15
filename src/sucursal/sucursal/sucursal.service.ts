@@ -1,25 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { Inventario } from 'src/almacen/producto/entities/inventario.entity';
-import { Producto } from 'src/almacen/producto/entities/producto.entity';
-import { getRepository } from 'typeorm';
-import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
-import { DataService } from '../../common/service/common.service';
+import { FilesService } from 'src/files/file.service';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { DataService } from 'src/common/service/common.service';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { EditSucursalDto } from './dto/edit-sucursal.dto';
 import { Sucursal } from './entity/sucursal.entity';
 
+
 @Injectable()
 export class SucursalService extends DataService(Sucursal){
+
+    constructor(private readonly filesService:FilesService){super()}
 
     async findAllSucursal(){
         return await this.repository.find({
             relations:["region"]
         })        
     }
+    
  
     @Transactional()
-    async CreateOne(sucursal : CreateSucursalDto){
-        return this.repository.save(sucursal);
+    async CreateOne(sucursal : CreateSucursalDto, foto:Express.Multer.File){
+        const uploadResult = await this.filesService.uploadPublicFile(foto.buffer, foto.originalname, `${sucursal.nombre}`); 
+        sucursal.foto = uploadResult;
+        console.log(sucursal);
+        
+        const sucursalCreated = await this.repository.save(sucursal);
+        return sucursalCreated;
     }
 
     async editOne(id:number ,sucursal : EditSucursalDto){
@@ -28,23 +35,22 @@ export class SucursalService extends DataService(Sucursal){
         return await this.repository.save(editSuc)
     }
 
-    @Transactional({propagation:Propagation.MANDATORY})
-    async afterCreateNewSuc(sucursal:CreateSucursalDto){
-        const productoRep = getRepository(Producto)
-        const producto = await productoRep.find()
-        const inventarioRep = getRepository(Inventario)
-        
-        for (let i = 0; i < producto.length; i++) {
-            await inventarioRep
-            .createQueryBuilder()
-            .insert()
-            .values([
-                {cantidad:0,producto:producto[0],sucursal}
-            ])
-            .execute()
-        }
-        return
+    async findTodos(){
+        return await this.repository.find({
+            relations: ['foto'],
+            where: { 
+                estado: true
+            }
+        })
     }
 
-
+    async sucursalName(nombre: string) {
+        const sucursalResutl = await this.repository
+        .findOne({
+            where: {
+                nombre
+            }
+        });
+        return sucursalResutl;    
+      }
 }

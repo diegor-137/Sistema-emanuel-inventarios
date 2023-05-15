@@ -9,6 +9,7 @@ import { CreateCorteCajaDetalle, CreateCorteCajaDto } from './dto/create-corte-c
 import { CorteCaja } from './entities/corte-caja.entity';
 import { EgresosService } from '../egresos/egresos.service';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
+import { CuentasPorCobrarService } from 'src/creditos/cuentas-por-cobrar/cuentas-por-cobrar.service';
 
 
 @Injectable()
@@ -21,7 +22,8 @@ export class CorteCajaService {
     private readonly cobroService:CobroService,
     private readonly gastosService:GastosService,
     private readonly ingresosService:IngresosService,
-    private readonly egresosService:EgresosService
+    private readonly egresosService:EgresosService,
+    //private readonly cuentasPorCobrarService:CuentasPorCobrarService
   ) {}
 
   /* ############################################ FUNCIONES USADAS EN CONTROLADORES ############################################*/
@@ -34,6 +36,7 @@ export class CorteCajaService {
     const {gasto} = await this.totalGasto(caja.id);
     const {ingreso} = await this.totalIngresos(caja.id);
     const {egreso} = await this.totalEgresos(caja.id);
+   /*  const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(caja.id); */
     if(monto>balance) throw new BadRequestException('El monto no puede ser mayor al que se quiere retirar!')
     let detalle: CreateCorteCajaDetalle[] = [
       {monto: balance, concepto: 'SALADO CAJA', type :true},
@@ -41,6 +44,7 @@ export class CorteCajaService {
       {monto: Number(ingreso), concepto: 'INGRESOS', type :true},      
       {monto: Number(gasto), concepto: 'GASTOS', type :false},
       {monto: Number(egreso), concepto: 'EGRESOS', type :false},
+      /* {monto: Number(cuentaPorCobrar), concepto: 'CUENTAS POR COBRAR', type :true}, */
       {monto: Number(monto), concepto: 'MONTO A RETIRAR', type :false},
     ]
     const data = detalle.filter((det)=>det.monto !== 0 && det.monto != null)
@@ -50,6 +54,7 @@ export class CorteCajaService {
     await this.gastos(corte);    
     await this.ingresos(corte);    
     await this.egresos(corte);    
+    await this.cuentasPorCobrar(corte);    
     await this.movimientoCajaService.create(monto, `EGRESO CORTE NO. ${corte.id}`, 2, createCorteCajaDto.caja, false)
   }
 
@@ -60,11 +65,11 @@ export class CorteCajaService {
     .select(["corte_caja.fechas", "corte_caja.id", "empleado.nombre", "empleado.apellido"])
     .where("corte_caja.caja.id = :id", {id})
     .andWhere((qb)=>{const subQuery= qb.subQuery()
-                  .select("MAX(corte_caja.fecha)", "fecha")
+                  .select("MAX(corte_caja.fecha)", "fechas")
                   .from(CorteCaja, "corte_caja")
                   .where("corte_caja.caja.id = :id", {id})
                   .getQuery()
-                  return "corte_caja.fecha = " + subQuery})
+                  return "corte_caja.fechas = " + subQuery})
     .getOne() 
   }  
 
@@ -86,6 +91,8 @@ export class CorteCajaService {
     balance += Number(egreso);
     const {ingreso} = await this.totalIngresos(id);
     balance -= Number(ingreso);
+    /* const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(id);
+    balance -= Number(cuentaPorCobrar) */;
     return balance;
   }
 
@@ -96,6 +103,10 @@ export class CorteCajaService {
 
   async totalEgresos(id:number){
     return await this.egresosService.totalEgresos(id)
+  }
+
+  async totalCuentasPorCobrar(id:number){
+    //return await this.cuentasPorCobrarService.totalCuentasPorCobrar(id);
   }
 
   async ultimoMovimiento(id:number){
@@ -145,6 +156,9 @@ export class CorteCajaService {
       if(element.concepto === 'INGRESOS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
         corte.corteCajaDetalle[0].monto -= corte.corteCajaDetalle[i].monto
       }
+      if(element.concepto === 'CUENTAS POR COBRAR' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
+        corte.corteCajaDetalle[0].monto -= corte.corteCajaDetalle[i].monto
+      }
     }
     return corte;
   }
@@ -167,6 +181,10 @@ export class CorteCajaService {
     return await this.egresosService.egresosCorte(idCorte, idCaja);
   }
 
+  async cuentasPorCobrarCorte(idCorte:number, idCaja:number){
+   /*  return await this.cuentasPorCobrarService.cuentasPorCobrarCorte(idCorte, idCaja); */
+  }
+
   /*############################################ FUNCIONES EXTRAS############################################ */
 
   async cobros(corte:CorteCaja ){
@@ -183,6 +201,10 @@ export class CorteCajaService {
 
   async egresos(corte:CorteCaja ){
     return await this.egresosService.egresos(corte);
+  }
+
+  async cuentasPorCobrar(corte:CorteCaja){
+   /*  return await this.cuentasPorCobrarService.cuentasPorCobrar(corte); */
   }
 
   /*############################################ FUNCIONES USADAS FUERA DE SU MODULO ############################################*/

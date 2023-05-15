@@ -15,8 +15,8 @@ import { EgresosModule } from '../egresos/egresos.module';
   imports: [
     AuthModule,
     TypeOrmModule.forFeature([Cobro, DetalleCobro]),
-    VentaModule,
-    MovimientoCajaModule,
+    forwardRef(() => VentaModule),    
+    forwardRef(()=> MovimientoCajaModule),
     forwardRef(() => CajaModule),
     forwardRef(() => EgresosModule),
   ],

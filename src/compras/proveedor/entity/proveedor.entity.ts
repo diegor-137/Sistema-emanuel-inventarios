@@ -6,6 +6,8 @@ import { Column,
         OneToMany, 
         PrimaryGeneratedColumn} 
 from 'typeorm';
+import { CuentaPorPagar } from 'src/creditos/cuentas-por-pagar/entities/cuenta-por-pagar-entity';
+import { CreditoProveedor } from 'src/creditos/credito-proveedor/entities/credito-proveedor.entity';
 
 @Entity('proveedor')
 export class Proveedor{
@@ -32,6 +34,9 @@ export class Proveedor{
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date
+    
+    @Column({name: 'dias_credito', type:'integer',default:0, nullable: true})
+    diasCredito:number
 
     @OneToMany(
         type => Compra,
@@ -44,4 +49,12 @@ export class Proveedor{
         pedido => pedido.proveedor,
         )
         pedido: Pedido;
+
+    @OneToMany(()=> CuentaPorPagar, cuentaPorPagar => cuentaPorPagar.proveedor)
+    cuentaPorPagar:CuentaPorPagar[]
+    
+    @OneToMany(() => CreditoProveedor, credito => credito.proveedor, { 
+        cascade: ['update', 'insert']
+    })
+    credito:CreditoProveedor[]
 }

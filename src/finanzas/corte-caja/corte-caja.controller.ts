@@ -81,6 +81,15 @@ export class CorteCajaController {
 
   @Auth()
   @UseGuards(CajaGuard)
+  @Get('cuentaPorCobrar/caja')
+  async totalCuentasPorCobrar(@User()user: UserEntity){
+    /* const caja = await this.cajaService.findOne(user.empleado.id)
+    const {cuentaPorCobrar} = await this.corteCajaService.totalCuentasPorCobrar(caja.id)
+    return cuentaPorCobrar; */
+  }
+
+  @Auth()
+  @UseGuards(CajaGuard)
   @Get('ultimoMovimiento/caja')
   async ultimoMovimiento(@User()user: UserEntity){
     const {id} = await this.cajaService.findOne(user.empleado.id)  
@@ -130,5 +139,12 @@ export class CorteCajaController {
   async egresosCorte(@Param('idCorte') idCorte: string, @Param('idCaja') idCaja: string){
     return await this.corteCajaService.egresosCorte(+idCorte, +idCaja)
   }
+
+  @Auth()
+  @Get('detalle/cuentasPorCobrar/:idCorte/:idCaja')
+  async cuentasPorCobrarCorte(@Param('idCorte') idCorte: string, @Param('idCaja') idCaja: string){
+    return await this.corteCajaService.cuentasPorCobrarCorte(+idCorte, +idCaja)
+  }
+
 
 }

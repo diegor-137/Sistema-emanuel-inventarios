@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Caja } from '../../caja/entities/caja.entity';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { CorteCaja } from '../../corte-caja/entities/corte-caja.entity';
+import { FileAws3 } from '../../../files/entities/file.entity';
 
 @Entity('gastos')
 export class Gasto {
@@ -38,4 +39,10 @@ export class Gasto {
 
     @ManyToOne(()=> CorteCaja, (corteCaja)=> corteCaja.gasto)
     corteCaja:CorteCaja
+
+    @OneToOne(() => FileAws3, fileAws3 => fileAws3.gasto, {
+        nullable: true
+    })
+    @JoinColumn({ name: "id_foto"})
+    foto: FileAws3;
 }

@@ -4,6 +4,7 @@ import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.ent
 import { DetalleVenta } from './detalle-venta.entity';
 import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 import { Cobro } from 'src/finanzas/cobro/entities/cobro.entity';
+import { CuentaPorCobrar } from 'src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar.entity';
 
 @Entity('venta')
 export class Venta {
@@ -53,4 +54,7 @@ export class Venta {
 
     @Column({ type: 'varchar', length: 45, default: 'PENDIENTE'})
     status: string
+
+    @OneToOne(()=> CuentaPorCobrar, cuentaPorCobrar =>cuentaPorCobrar.venta)
+    cuentaPorCobrar:CuentaPorCobrar
 }

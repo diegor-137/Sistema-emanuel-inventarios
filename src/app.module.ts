@@ -24,6 +24,9 @@ import { CompraSubscriber } from './compras/compra/subscribers/existencia-compra
 import { ventaSubscriber } from './ventas/venta/subscribers/existencia-venta.subscriber';
 import { SucursalModule } from './sucursal/sucursal/sucursal.module';
 import { SucursalesModule } from './sucursales/sucursales.module';
+import { FilesModule } from './files/files.module';
+import { CreditosModule } from './creditos/creditos.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -65,6 +68,8 @@ import { SucursalesModule } from './sucursales/sucursales.module';
     ConfiguracionesModule,
     FinanzasModule,
     SucursalesModule,
+    FilesModule,
+    CreditosModule
   ],
   controllers: [AppController],
   providers: [AppService],

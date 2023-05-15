@@ -7,6 +7,7 @@ import { Gasto } from '../../gastos/entities/gasto.entity';
 import { Ingreso } from '../../ingresos/entities/ingreso.entity';
 import { Egreso } from '../../egresos/entities/egreso.entity';
 import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
+import { CuentaPorCobrarDetalle } from "src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar-details.entity";
 
 
 @Entity('caja')
@@ -57,5 +58,8 @@ export class Caja {
 
     @OneToMany(() => Egreso, (egreso) => egreso.caja)
     egreso:Egreso[]
+
+    @OneToMany(() => CuentaPorCobrarDetalle, (cuentaPorCobrarDetalle) => cuentaPorCobrarDetalle.caja)
+    cuentaPorCobrarDetalle: CuentaPorCobrarDetalle[]
 
 }
