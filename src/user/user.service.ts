@@ -4,7 +4,6 @@ import { getRepository, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { S3 } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuid } from 'uuid';
 import { AWS_PUBLIC_BUCKET_NAME } from 'src/config/constants';
@@ -76,11 +75,7 @@ export class UserService{
     .leftJoinAndSelect("sucursal.region","region")
     .getOne()
     const user = await this.userRepository
-<<<<<<< HEAD
-      .findOne(id, {relations: ["empleado", "empleado.sucursal","empleado.sucursal.region"]});
-=======
-      .findOne(id, {relations: ["empleado", "empleado.sucursal", "empleado.foto"]});
->>>>>>> 3e93f6973e995cceaf378b6e1d9d368b19f01cee
+      .findOne(id, {relations: ["empleado", "empleado.sucursal","empleado.sucursal.region","empleado.foto"]});
 
     if (!user)
       throw new NotFoundException('User does not exists or unauthorized');

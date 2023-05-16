@@ -1,4 +1,5 @@
-import { Sucursal } from 'src/sucursal/entity/sucursal.entity';
+
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 import { Cliente } from '../../../ventas/cliente/entity/cliente.entity';
 export class CreateCreditoClienteDto {
 

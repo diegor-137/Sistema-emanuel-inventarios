@@ -9,7 +9,7 @@ import { CreateCreditoProveedorDto } from './dto/create-credito-proveedor.dto';
 import { UpdateCreditoProveedorDto } from './dto/update-credito-proveedor.dto';
 import { CreditoProveedor } from './entities/credito-proveedor.entity';
 import { Proveedor } from '../../compras/proveedor/entity/proveedor.entity';
-import { Sucursal } from 'src/sucursal/entity/sucursal.entity';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 
 @Injectable()
 export class CreditoProveedorService {

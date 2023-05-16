@@ -1,7 +1,7 @@
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
-import { Sucursal } from 'src/sucursal/entity/sucursal.entity';
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Gasto } from '../../finanzas/gastos/entities/gasto.entity';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
  
 @Entity()
 export class FileAws3 {
@@ -22,5 +22,6 @@ export class FileAws3 {
 
   @OneToOne(() => Sucursal, sucursal => sucursal.foto)
   sucursal: Sucursal;
+
     
 }

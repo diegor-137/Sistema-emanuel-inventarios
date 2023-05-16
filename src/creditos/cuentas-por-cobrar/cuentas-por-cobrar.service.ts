@@ -12,9 +12,9 @@ import { MovimientoCajaService } from 'src/finanzas/movimiento-caja/movimiento-c
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { Caja } from 'src/finanzas/caja/entities/caja.entity';
 import { CorteCaja } from 'src/finanzas/corte-caja/entities/corte-caja.entity';
-import { Sucursal } from '../../sucursal/entity/sucursal.entity';
 import { Empleado } from '../../recursos-humanos/empleado/entity/empleado.entity';
 import { CreditoClienteService } from '../credito-cliente/credito-cliente.service';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 
 
 @Injectable()

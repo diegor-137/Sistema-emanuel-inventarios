@@ -6,7 +6,7 @@ import { Compra } from '../../compras/compra/entity/compra.entity';
 import { CuentaPorPagar } from './entities/cuenta-por-pagar-entity';
 import { CuentaPorPagarDetalle } from './entities/cuenta-por-pagar-details.entity';
 import { CreateCuentaPorPagarDto } from './dto/create-cuenta-por-pagar.dto';
-import { Sucursal } from '../../sucursal/entity/sucursal.entity';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
 import { CreditoProveedorService } from '../credito-proveedor/credito-proveedor.service';
 

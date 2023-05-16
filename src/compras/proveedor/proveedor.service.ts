@@ -3,20 +3,18 @@ import { DataService } from '../../common/service/common.service';
 import { Proveedor } from './entity/proveedor.entity';
 import { EditProveedorDto } from './dto';
 import { CreateProveedorDto } from './dto/create-proveedor.dto';
-<<<<<<< HEAD
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
 import { CreditoProveedorService } from '../../creditos/credito-proveedor/credito-proveedor.service';
-=======
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
->>>>>>> 34de35d63b5379a90ec65886837da6d76c32b55f
 
 @Injectable()
 export class ProveedorService{
 
     constructor(
         @InjectRepository(Proveedor)
-        public readonly repository:Repository<Proveedor>
+        public readonly repository:Repository<Proveedor>,
+        private readonly creditoProveedorService:CreditoProveedorService
     ){}
 
     async findAll(){
@@ -31,12 +29,6 @@ export class ProveedorService{
         const data = await this.repository.findOne(id);
         if(!data) throw new NotFoundException(`El registro no fue encontrado`);
         return data;
-    }
-
-    constructor(
-        private readonly creditoProveedorService:CreditoProveedorService
-    ){
-        super()
     }
 
     async createOne(dto:CreateProveedorDto, empleado:Empleado){
@@ -70,7 +62,6 @@ export class ProveedorService{
         return await this.repository.save(Edited)
     }
 
-<<<<<<< HEAD
     async findTodos(idSucursal:number){
         const proveedor = await this.repository.createQueryBuilder('proveedor')
                 .leftJoinAndSelect('proveedor.credito', 'credito', `credito.sucursal.id = ${idSucursal}`)                                                    
@@ -78,7 +69,6 @@ export class ProveedorService{
         return proveedor
     }
 
-=======
     async deleteById(id:number){
         const data = await this.findById(id)
         data.estado = false
@@ -93,5 +83,4 @@ export class ProveedorService{
           } 
         });
       }
->>>>>>> 34de35d63b5379a90ec65886837da6d76c32b55f
 }

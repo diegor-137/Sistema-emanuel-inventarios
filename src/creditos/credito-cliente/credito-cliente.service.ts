@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException, Inject, forwardRef} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
-import { Sucursal } from 'src/sucursal/entity/sucursal.entity';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 import { Cliente } from 'src/ventas/cliente/entity/cliente.entity';
 import { Venta } from 'src/ventas/venta/entity/venta.entity';
 import { Repository } from 'typeorm';
@@ -10,6 +10,7 @@ import { CuentasPorCobrarService } from '../cuentas-por-cobrar/cuentas-por-cobra
 import { CreateCreditoClienteDto } from './dto/create-credito-cliente.dto';
 import { UpdateCreditoDto } from './dto/update-credito-cliente.dto';
 import { CreditoCliente } from './entities/credito-cliente.entity';
+
 
 @Injectable()
 export class CreditoClienteService {

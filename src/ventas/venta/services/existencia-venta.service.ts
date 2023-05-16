@@ -9,7 +9,7 @@ export class ExistenciaVentaService {
     constructor(){}
 
     @Transactional({propagation:Propagation.MANDATORY})
-    async ingresoVenta(dto:CreateVentaDto){
+    async ingresoVenta(dto:any){
         const inventarioRepository = getRepository(Inventario)
         
         for (let i = 0; i < dto.detalle.length; i++) {

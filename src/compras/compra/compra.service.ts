@@ -4,7 +4,6 @@ import { Compra } from './entity/compra.entity';
 import { CreateCompraDto } from './dto/create-compra.dto';
 import { getConnection,getRepository } from 'typeorm';
 import { InventarioService } from '../../almacen/producto/services/inventario.service';
-import { PrecioService } from '../../almacen/producto/services/precio.service';
 import { CuentaPorPagarService } from 'src/creditos/cuentas-por-pagar/cuenta-por-pagar.service';
 import { CreditoProveedorService } from 'src/creditos/credito-proveedor/credito-proveedor.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';

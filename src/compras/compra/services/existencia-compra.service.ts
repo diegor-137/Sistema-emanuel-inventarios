@@ -11,7 +11,7 @@ export class ExistenciaCompraService {
     constructor(){}
 
     @Transactional({propagation:Propagation.MANDATORY})
-    async ingresoCompra(dto:CreateCompraDto){
+    async ingresoCompra(dto:any){
         const productoRepository = getRepository(Producto)
         const inventarioRepository = getRepository(Inventario)
         //console.log(event.entity.detalle)

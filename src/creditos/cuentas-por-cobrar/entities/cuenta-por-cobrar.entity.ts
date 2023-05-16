@@ -1,8 +1,9 @@
-import { Sucursal } from "src/sucursal/entity/sucursal.entity";
+
 import { Cliente } from "src/ventas/cliente/entity/cliente.entity"
 import { Venta } from "src/ventas/venta/entity/venta.entity"
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { CuentaPorCobrarDetalle } from './cuenta-por-cobrar-details.entity';
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 
 @Entity('cuentas_por_cobrar')
 export class CuentaPorCobrar {

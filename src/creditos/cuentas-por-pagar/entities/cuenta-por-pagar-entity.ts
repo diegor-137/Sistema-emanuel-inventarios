@@ -1,8 +1,8 @@
 import { Compra } from "src/compras/compra/entity/compra.entity";
-import { Sucursal } from "src/sucursal/entity/sucursal.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Proveedor } from '../../../compras/proveedor/entity/proveedor.entity';
 import { CuentaPorPagarDetalle } from "./cuenta-por-pagar-details.entity";
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 
 @Entity('cuentas_por_pagar')
 export class CuentaPorPagar {
@@ -33,6 +33,7 @@ export class CuentaPorPagar {
 
     @ManyToOne(() => Sucursal, sucursal => sucursal.cuentaPorPagar)
     sucursal?: Sucursal;
+
 
 }
 

@@ -25,7 +25,7 @@ export class CreateVentaDto{
     sucursal:Sucursal
 
     @IsOptional()
-    pago:Pago
+    pago?:Pago
 
     status?:string
 }

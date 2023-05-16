@@ -1,6 +1,6 @@
-import { Sucursal } from "src/sucursal/entity/sucursal.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Proveedor } from '../../../compras/proveedor/entity/proveedor.entity';
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 
 @Entity('credito-proveedor')
 export class CreditoProveedor {

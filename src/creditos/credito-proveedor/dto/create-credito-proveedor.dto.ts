@@ -1,5 +1,5 @@
 import { Proveedor } from "src/compras/proveedor/entity/proveedor.entity";
-import { Sucursal } from "src/sucursal/entity/sucursal.entity";
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 
 export class CreateCreditoProveedorDto {
 

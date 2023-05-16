@@ -1,4 +1,5 @@
-import { Sucursal } from "src/sucursal/entity/sucursal.entity";
+
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 import { Cliente } from "src/ventas/cliente/entity/cliente.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
