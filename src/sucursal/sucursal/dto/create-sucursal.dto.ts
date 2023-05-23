@@ -5,6 +5,7 @@ export class CreateSucursalDto {
     nombre:string
 
     @IsBoolean()
+    @IsOptional()
     estado:boolean
 
     foto:FileAws3

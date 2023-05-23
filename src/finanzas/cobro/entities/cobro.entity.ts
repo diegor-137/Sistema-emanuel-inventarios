@@ -13,7 +13,7 @@ export class Cobro {
     @PrimaryGeneratedColumn()
     id:number
 
-    @CreateDateColumn({ name: 'fecha', type: 'timestamp' })
+    @CreateDateColumn({ name: 'fecha', type: 'timestamp with time zone' })
     fecha:Date
 
     @Column({ name: 'deleted_at', nullable: true, type: 'timestamp with time zone' })
