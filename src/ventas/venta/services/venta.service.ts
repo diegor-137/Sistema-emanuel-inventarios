@@ -5,13 +5,17 @@ import { Venta } from '../entity/venta.entity';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { ExistenciaVentaService } from './existencia-venta.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CuentasPorCobrarService } from 'src/creditos/cuentas-por-cobrar/cuentas-por-cobrar.service';
+import { CreditoClienteService } from 'src/creditos/credito-cliente/credito-cliente.service';
 
 @Injectable()
 export class VentaService{
     constructor(
         @InjectRepository(Venta)
         public readonly repository:Repository<Venta>,
-        private readonly existencia:ExistenciaVentaService){}
+        private readonly existencia:ExistenciaVentaService,
+        private readonly cuentasPorCobrarService: CuentasPorCobrarService,    
+        private readonly creditoClienteService: CreditoClienteService){}
 
 
     async FindAll(start: Date, end:Date){
@@ -51,9 +55,15 @@ export class VentaService{
 
     @Transactional()
     async CreateOne(dto:CreateVentaDto){
+        dto.pago.code? dto.status = 'CREDITO':null;
         const venta = this.repository.create(dto)
         const ventaRealizada = await this.repository.save(venta)
         await this.existencia.ingresoVenta(ventaRealizada)
+        if(dto.pago.code){
+            await this.creditoClienteService.findOneAndAllowCredit(ventaRealizada, dto.empleado)
+            await this.cuentasPorCobrarService.create(ventaRealizada, dto.empleado);
+            console.log('Se ha guardo el credito!');                
+        }
         return ventaRealizada
     }
     

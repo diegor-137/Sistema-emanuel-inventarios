@@ -119,7 +119,7 @@ export class CuentaPorPagarService {
         })
         .getOne();
       const saldo =  Number(cuentaPorPagar.balance) - cuentaPorPagarDetalleDto.monto;
-      if( cuentaPorPagarDetalleDto.monto >= cuentaPorPagar.balance) throw new BadRequestException('El monto debe ser diferente') 
+      if( cuentaPorPagarDetalleDto.monto >= cuentaPorPagar.balance) throw new BadRequestException('El monto debe ser parcial') 
       cuentaPorPagarDetalleDto.balance =  saldo; 
       return await this.cuentaPorPagarDetalleRepository.save(cuentaPorPagarDetalleDto);         
   }

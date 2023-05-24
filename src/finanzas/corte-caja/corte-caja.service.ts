@@ -23,7 +23,7 @@ export class CorteCajaService {
     private readonly gastosService:GastosService,
     private readonly ingresosService:IngresosService,
     private readonly egresosService:EgresosService,
-    //private readonly cuentasPorCobrarService:CuentasPorCobrarService
+    private readonly cuentasPorCobrarService:CuentasPorCobrarService
   ) {}
 
   /* ############################################ FUNCIONES USADAS EN CONTROLADORES ############################################*/
@@ -36,7 +36,7 @@ export class CorteCajaService {
     const {gasto} = await this.totalGasto(caja.id);
     const {ingreso} = await this.totalIngresos(caja.id);
     const {egreso} = await this.totalEgresos(caja.id);
-   /*  const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(caja.id); */
+    const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(caja.id);
     if(monto>balance) throw new BadRequestException('El monto no puede ser mayor al que se quiere retirar!')
     let detalle: CreateCorteCajaDetalle[] = [
       {monto: balance, concepto: 'SALADO CAJA', type :true},
@@ -91,8 +91,8 @@ export class CorteCajaService {
     balance += Number(egreso);
     const {ingreso} = await this.totalIngresos(id);
     balance -= Number(ingreso);
-    /* const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(id);
-    balance -= Number(cuentaPorCobrar) */;
+    const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(id);
+    balance -= Number(cuentaPorCobrar);
     return balance;
   }
 
@@ -106,7 +106,7 @@ export class CorteCajaService {
   }
 
   async totalCuentasPorCobrar(id:number){
-    //return await this.cuentasPorCobrarService.totalCuentasPorCobrar(id);
+    return await this.cuentasPorCobrarService.totalCuentasPorCobrar(id);
   }
 
   async ultimoMovimiento(id:number){
@@ -182,7 +182,7 @@ export class CorteCajaService {
   }
 
   async cuentasPorCobrarCorte(idCorte:number, idCaja:number){
-   /*  return await this.cuentasPorCobrarService.cuentasPorCobrarCorte(idCorte, idCaja); */
+    return await this.cuentasPorCobrarService.cuentasPorCobrarCorte(idCorte, idCaja);
   }
 
   /*############################################ FUNCIONES EXTRAS############################################ */
@@ -204,7 +204,7 @@ export class CorteCajaService {
   }
 
   async cuentasPorCobrar(corte:CorteCaja){
-   /*  return await this.cuentasPorCobrarService.cuentasPorCobrar(corte); */
+    return await this.cuentasPorCobrarService.cuentasPorCobrar(corte);
   }
 
   /*############################################ FUNCIONES USADAS FUERA DE SU MODULO ############################################*/

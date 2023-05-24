@@ -123,7 +123,7 @@ export class CuentasPorCobrarService {
         })
         .getOne();
       const saldo =  Number(lastCuentaPorCobrarDet.balance) - cuentaPorCobrarDetalle.monto; 
-      if( cuentaPorCobrarDetalle.monto >= lastCuentaPorCobrarDet.balance) throw new BadRequestException('El monto debe ser diferente')
+      if( cuentaPorCobrarDetalle.monto >= lastCuentaPorCobrarDet.balance) throw new BadRequestException('El monto debe ser parcial')
       cuentaPorCobrarDetalle.balance =  saldo; 
       const cuentaPorCobrarDet = await this.cuentaPorCobrarDetalleRepository.save(cuentaPorCobrarDetalle) 
       return await this.movimientoCajaService.create(cuentaPorCobrarDet.monto, `INGRESO POR CREDITO ${cuentaPorCobrarDet.descripcion} NO. ${cuentaPorCobrarDet.id}, CREDITO NO.${cuentaPorCobrarDetalle.cuentaPorCobrar.id}`, 1, cuentaPorCobrarDetalle.caja, true) ;         
