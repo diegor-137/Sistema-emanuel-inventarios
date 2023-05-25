@@ -26,7 +26,7 @@ export class GastosService {
   @Transactional()
   async create(createGastoDto: CreateGastoDto, foto:Express.Multer.File) {
     const {balance} = await this.movimientoCajaService.ultimoMovimiento(createGastoDto.caja.id);
-    if(createGastoDto.monto>balance) throw new BadRequestException('El gasto no puede ser mayor al monto que se tiene en caja!')
+    if(Number(createGastoDto.monto)>Number(balance)) throw new BadRequestException('El gasto no puede ser mayor al monto que se tiene en caja!')
     const uploadResult = await this.filesService.uploadPublicFile(foto.buffer, foto.originalname, `${createGastoDto.documento}-${createGastoDto.empleado.sucursal.nombre}-${createGastoDto.monto}`); 
     createGastoDto.foto = uploadResult
     const gasto = await this.gastoRepository.save(createGastoDto)

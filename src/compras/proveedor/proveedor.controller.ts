@@ -15,11 +15,11 @@ export class ProveedorController{
     constructor(private readonly proveedorService:ProveedorService){
     }
 
-    @Auth()
+    /* @Auth()
     @Get()
     async findAll(){
         return await this.proveedorService.findAll()
-    }
+    } */
 
     @Auth()
     @Get('uno/:id')

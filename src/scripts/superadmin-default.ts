@@ -3,9 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { DEFAULT_EMPLEADO_NAME, DEFAULT_USER_SUPER_ADMIN, DEFAULT_SUPER_ADMIN_PASSWORD, DEFAULT_EMPLEADO_LASTNAME, DEFAULT_EMPLEADO_EMAIL } from '../config/constants';
 import { User } from 'src/user/entities/user.entity';
 import { Role } from 'src/app.roles';
+import { TipoCobro } from 'src/finanzas/tipo-cobro/entities/tipo-cobro.entity';
 
 const setDefaultSuperAdmin = async (config: ConfigService) => {
   const userRepository = getRepository<User>(User);
+  const tipoCobroRepository = getRepository<TipoCobro>(TipoCobro)
 
   const defaultUser = await userRepository
     .createQueryBuilder("user")
@@ -13,6 +15,23 @@ const setDefaultSuperAdmin = async (config: ConfigService) => {
         user: config.get<string>(DEFAULT_USER_SUPER_ADMIN),
     })
     .getOne();
+
+  const defaultTipoCobro = await tipoCobroRepository
+    .createQueryBuilder("tipo_cobro")
+    .where('tipo_cobro.id_tipo_cobro = :id', {
+        id: 1
+    })  
+    .getOne();
+  
+  if(!defaultTipoCobro){
+    const tiposCobro = tipoCobroRepository.create([
+      {id:1, nombre: 'Efectivo'},
+      {id:2, nombre: 'Tarjeta'},
+      {id:3, nombre: 'Cheque'},
+      {id:4, nombre: 'Transferencia'}
+    ])
+    return await tipoCobroRepository.save(tiposCobro);
+  }
 
   if (!defaultUser) {
     console.log('Usuario super admin creado');    

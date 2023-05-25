@@ -10,5 +10,6 @@ export class TipoPrecioDto{
     nombre:string
 
     @IsBoolean()
+    @IsOptional()
     estado:boolean
 }

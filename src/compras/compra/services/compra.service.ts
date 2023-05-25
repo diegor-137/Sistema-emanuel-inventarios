@@ -7,6 +7,8 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { CreateCompraDto } from '../dto/create-compra.dto';
 import { Compra } from '../entity/compra.entity';
 import { ExistenciaCompraService } from './existencia-compra.service';
+import { CuentaPorPagarService } from 'src/creditos/cuentas-por-pagar/cuenta-por-pagar.service';
+import { CreditoProveedorService } from 'src/creditos/credito-proveedor/credito-proveedor.service';
 
 
 
@@ -15,7 +17,9 @@ export class CompraService{
     constructor(
         @InjectRepository(Compra)
         public readonly repository:Repository<Compra>,
-        private readonly existencia: ExistenciaCompraService) {}
+        private readonly existencia: ExistenciaCompraService,
+        private readonly cuentaPorPagarService: CuentaPorPagarService,
+        private readonly creditoProveedorService: CreditoProveedorService) {}
 
     async findAll(start: Date, end:Date){
         const st = new Date(start)
@@ -55,6 +59,11 @@ export class CompraService{
         const compra = this.repository.create(dto)
         const compraRealizada = await this.repository.save(compra)
         await this.existencia.ingresoCompra(compraRealizada)
+        if(dto.pago.code){
+            await this.creditoProveedorService.findOneAndAllowCredit(compraRealizada, dto.empleado)
+            await this.cuentaPorPagarService.create(compraRealizada, dto.empleado);
+        }
+
         return compraRealizada
     }
 

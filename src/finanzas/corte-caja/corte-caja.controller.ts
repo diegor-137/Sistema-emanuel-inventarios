@@ -83,9 +83,9 @@ export class CorteCajaController {
   @UseGuards(CajaGuard)
   @Get('cuentaPorCobrar/caja')
   async totalCuentasPorCobrar(@User()user: UserEntity){
-    /* const caja = await this.cajaService.findOne(user.empleado.id)
+    const caja = await this.cajaService.findOne(user.empleado.id)
     const {cuentaPorCobrar} = await this.corteCajaService.totalCuentasPorCobrar(caja.id)
-    return cuentaPorCobrar; */
+    return cuentaPorCobrar;
   }
 
   @Auth()

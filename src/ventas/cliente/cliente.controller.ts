@@ -13,11 +13,11 @@ import { EditClienteDto } from './dto/edit-cliente.dto';
 export class ClienteController{
     constructor(private readonly clienteService:ClienteService){}
 
-    @Auth()
+    /* @Auth()
     @Get()
     async findAll(){
         return await this.clienteService.findAll()
-    }
+    } */
 
     @Auth()
     @Get('uno/:id')

@@ -10,7 +10,7 @@ export class CuentaPorCobrar {
     @PrimaryGeneratedColumn({name: 'id_cuentas_por_cobrar'})
     id?: number
 
-    @CreateDateColumn({ name: 'fecha_inicio', type: 'timestamp' })
+    @CreateDateColumn({ name: 'fecha_inicio', type: 'timestamp with time zone' })
     fechaInicio?:Date
 
     @Column({ name: 'fecha_final', type: 'date' })

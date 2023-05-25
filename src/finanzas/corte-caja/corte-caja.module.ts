@@ -22,7 +22,7 @@ import { CuentasPorCobrarModule } from '../../creditos/cuentas-por-cobrar/cuenta
     forwardRef(()=>GastosModule),
     forwardRef(()=>IngresosModule),
     forwardRef(()=>EgresosModule),
-    //forwardRef(()=>CuentasPorCobrarModule),
+    forwardRef(()=>CuentasPorCobrarModule),
     TypeOrmModule.forFeature([CorteCaja, CorteCajaDetalle])
   ],
   controllers: [CorteCajaController],
