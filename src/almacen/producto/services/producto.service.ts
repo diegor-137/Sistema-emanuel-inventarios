@@ -5,7 +5,7 @@ import { DataService } from '../../../common/service/common.service';
 import { Producto } from '../entities/producto.entity';
 import { join } from 'path';
 import { FotoDto } from '../dto/foto.dto';
-import { Repository, getConnection, getRepository } from 'typeorm';
+import { Brackets, Repository, getConnection, getManager, getRepository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { InventarioService } from './inventario.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
@@ -80,19 +80,18 @@ export class ProductoService{
 
   //Se usa para llamaer los productos disponibles en los modulos de ventas y compras
   async prodPorSucursal(user:User){
-    return await getRepository(Producto)
+    var suc = user.empleado.sucursal.id
+    var reg = user.empleado.sucursal.region.id
+    var resultado = await getRepository(Producto)
     .createQueryBuilder("producto")
+    .innerJoinAndSelect("producto.precio","precio","precio.region=:regionId",{regionId:reg})
+    .leftJoinAndSelect("producto.costo","costo",'costo.region.id = :regionId',{regionId:reg})
+    .innerJoinAndSelect("producto.inventario","inventario","inventario.sucursal=:sucursalId",{sucursalId:suc})
     .leftJoinAndSelect("producto.categoria","categoria")
     .leftJoinAndSelect("producto.marca","marca")
-    .leftJoinAndSelect("producto.precio","precio")
-    .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
-    .leftJoinAndSelect("precio.region","region")
-    .leftJoinAndSelect("producto.inventario","inventario")
-    .leftJoinAndSelect("inventario.sucursal","sucursal")
-    .leftJoinAndSelect("producto.costo","costo")
-    .andWhere("sucursal.id =:id",{id:user.empleado.sucursal.id})
-    .andWhere("region.id =:id",{id:user.empleado.sucursal.region.id})
     .getMany()
+    return resultado
+
   }
   async findProductImages(id:number){
     return await this.repository.findOne(id, {relations: ['fotos']});      
