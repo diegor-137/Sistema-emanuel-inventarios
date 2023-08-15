@@ -99,6 +99,15 @@ export class ProductoController{
      return this.inventarioService.editOne(id,dto)
    }
 
+   @Get('nombre-producto/')
+   async find(){
+     return await this.productoService.find()
+   }
+
+    @Get('nombre-producto/:nombre?')
+    async findNameAutoProducto(@Param('nombre') nombre:string){
+      return await this.productoService.findNameAutoProducto(nombre)
+    }
 
    //temporal
 //    @Get('costosprevios')

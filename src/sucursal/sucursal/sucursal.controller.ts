@@ -7,6 +7,8 @@ import { CommonController } from 'src/common/controller/common.controller';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { EditSucursalDto } from './dto/edit-sucursal.dto';
 import { SucursalService } from './sucursal.service';
+import { User } from 'src/auth/decorators/user.decorator';
+import { User as UserEntity} from 'src/user/entities/user.entity';
 
 
 @ApiTags('Sucursal endPoints')
@@ -45,5 +47,11 @@ export class SucursalController extends CommonController(SucursalService){
     @Get("name/:nombre")
     async sucursalName(@Param("nombre") nombre: string) {
         return await this.sucursalService.sucursalName(nombre);
+    }
+
+    @Auth()
+    @Get("por-region")
+    async sucursalesPorRegion( @User() user: UserEntity) {
+        return await this.sucursalService.sucursalesPorRegion(user);
     }
 }

@@ -28,6 +28,12 @@ export class EmpleadoController{
     }
 
     @Auth()
+    @Get('por/sucursal')
+    async findAllPorSucursal(@User()user: UserEntity){
+        return await this.empleadoService.findAllPorSucursal(user)
+    }
+
+    @Auth()
     @Get(':id')
     async findById(@Param('id',ParseIntPipe) id:number){
         return await this.empleadoService.findById(id)

@@ -5,6 +5,8 @@ import { DataService } from 'src/common/service/common.service';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { EditSucursalDto } from './dto/edit-sucursal.dto';
 import { Sucursal } from './entity/sucursal.entity';
+import { User } from 'src/user/entities/user.entity';
+import { Not } from 'typeorm';
 
 
 @Injectable()
@@ -53,4 +55,14 @@ export class SucursalService extends DataService(Sucursal){
         });
         return sucursalResutl;    
       }
+
+    async sucursalesPorRegion(user: User) {
+        const sucursales = await this.repository.createQueryBuilder("sucursal")
+                .leftJoinAndSelect("sucursal.region", "region")
+                .select(["sucursal.id", "sucursal.nombre"])
+                .where("region.id = :id", {id: user.empleado.sucursal.region.id})
+                .andWhere("sucursal.id != :id2", {id2:user.empleado.sucursal.id})
+                .getMany()
+        return sucursales;
+    }  
 }

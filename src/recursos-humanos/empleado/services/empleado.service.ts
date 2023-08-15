@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateHistorialEmpDto } from '../dto/create-historial.dto';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { HistorialEmpService } from './historial-emp.service';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class EmpleadoService{
@@ -20,6 +21,16 @@ export class EmpleadoService{
     async findAll(){
         return await this.repository.find({
                         relations:["puesto","sucursal"]
+        })
+    }
+    async findAllPorSucursal(user:User){
+        return await this.repository.find({
+            where:[{
+                estado:true,
+                sucursal: {
+                    id:user.empleado.sucursal.id
+                }
+            }]
         })
     }
 

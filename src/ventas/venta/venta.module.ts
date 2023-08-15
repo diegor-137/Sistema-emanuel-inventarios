@@ -20,6 +20,6 @@ import { KardexModule } from 'src/almacen/kardex/kardex.module';
   ],
   controllers: [VentaController],
   providers: [VentaService, ExistenciaVentaService], 
-  exports: [VentaService]
+  exports: [VentaService, ExistenciaVentaService]
 })
 export class VentaModule {}

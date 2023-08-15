@@ -4,7 +4,7 @@ import { UpdateProductoDto } from '../dto/update-producto.dto';
 import { Producto } from '../entities/producto.entity';
 import { join } from 'path';
 import { FotoDto } from '../dto/foto.dto';
-import { Repository, getConnection, getRepository} from 'typeorm';
+import { Brackets, ILike, Repository, getConnection, getManager, getRepository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { InventarioService } from './inventario.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
@@ -122,5 +122,24 @@ export class ProductoService{
         var index:number = productos.fotos.indexOf(productos.fotos.find(a =>a.id === id && a.nombre == nombre));
         if(index === -1) throw new NotFoundException(`La foto no existe/pertenece al producto`);          
         return (res.sendFile(join(process.cwd(), 'uploads/productImages/' + nombre)));        
-    } 
+    }
+    
+    async findNameAutoProducto(nombre:string){
+      console.log(nombre);
+      
+      return await this.repository.find({
+         where: {
+          nombre: ILike(`%${nombre}%`),
+          estado: true
+        } 
+      });
+    }
+    
+    async find(){
+        const data = await this.repository
+        .createQueryBuilder("producto")
+        .andWhere("producto.estado = true")
+        .getMany()
+        return data
+    }
 }

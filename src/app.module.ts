@@ -26,6 +26,7 @@ import { SucursalModule } from './sucursal/sucursal/sucursal.module';
 import { SucursalesModule } from './sucursales/sucursales.module';
 import { FilesModule } from './files/files.module';
 import { CreditosModule } from './creditos/creditos.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -69,7 +70,8 @@ import { CreditosModule } from './creditos/creditos.module';
     FinanzasModule,
     SucursalesModule,
     FilesModule,
-    CreditosModule
+    CreditosModule,
+    ReportsModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,6 +12,8 @@ import { CorteCaja } from '../../../finanzas/corte-caja/entities/corte-caja.enti
 import { Gasto } from '../../../finanzas/gastos/entities/gasto.entity';
 import { FileAws3 } from 'src/files/entities/file.entity';
 import { historialEmp } from './historial-emp.entity';
+import { Traslado } from 'src/almacen/traslado/entities/traslado.entity';
+import { Envio } from 'src/almacen/envio/entities/envio.entity';
 
 @Entity('empleado')
 export class Empleado{
@@ -119,4 +121,19 @@ export class Empleado{
         historialemp => historialemp.empleado,
         )
         historialemp: historialEmp;
+    /*********Traslados*********/
+    @OneToMany(() => Traslado, (traslado) => traslado.responsable, {
+        nullable: true
+    })
+    trasladoRes:Traslado[]
+
+    @OneToMany(() => Traslado, (traslado) => traslado.solicitador)
+    trasladoSol:Traslado[]
+
+    /*********Envios*********/
+    @OneToMany(() => Envio, (envio) => envio.despachador)
+    envioDespachador:Envio[]
+
+    @OneToMany(() => Envio, (envio) => envio.recepcionador)
+    envioRecepcionador:Envio[]
 }
