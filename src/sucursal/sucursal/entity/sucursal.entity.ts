@@ -12,6 +12,7 @@ import { FileAws3 } from "src/files/entities/file.entity";
 import { CreditoCliente } from "src/creditos/credito-cliente/entities/credito-cliente.entity";
 import { CuentaPorPagar } from "src/creditos/cuentas-por-pagar/entities/cuenta-por-pagar-entity";
 import { CuentaPorCobrar } from "src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar.entity";
+import { Kardex } from "src/almacen/kardex/entity/kardex.entity";
 
 @Entity('sucursal')
 export class Sucursal{
@@ -95,4 +96,7 @@ export class Sucursal{
 
     @OneToMany(() => CreditoCliente, credito => credito.sucursal)
     credito:CreditoCliente[]
+
+    @OneToMany(()=>Kardex, kardex => kardex.sucursal)
+    kardex:Kardex[]
 }

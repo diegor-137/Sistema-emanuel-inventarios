@@ -7,13 +7,13 @@ export class Costo {
     @PrimaryGeneratedColumn()
     id:number
 
-    @Column({type: 'decimal', precision:6,scale:2})
+    @Column({type: 'decimal',  default: 0, precision:6,scale:2})
     costo_prom:number
    
-    @Column({type: 'decimal', precision:6,scale:2})
+    @Column({type: 'decimal',  default: 0, precision:6,scale:2})
     costo_prom_old:number
    
-    @Column({type: 'decimal', precision:6,scale:2})
+    @Column({type: 'decimal',  default: 0, precision:6,scale:2})
     ultimo_precio:number
 
     @ManyToOne(()=>Region, region => region.costo,{

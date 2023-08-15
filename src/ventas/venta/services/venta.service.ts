@@ -5,8 +5,8 @@ import { Venta } from '../entity/venta.entity';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { ExistenciaVentaService } from './existencia-venta.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CuentasPorCobrarService } from 'src/creditos/cuentas-por-cobrar/cuentas-por-cobrar.service';
-import { CreditoClienteService } from 'src/creditos/credito-cliente/credito-cliente.service';
+import { User } from 'src/user/entities/user.entity';
+import { KardexService } from 'src/almacen/kardex/services/kardex.service';
 
 @Injectable()
 export class VentaService{
@@ -14,11 +14,11 @@ export class VentaService{
         @InjectRepository(Venta)
         public readonly repository:Repository<Venta>,
         private readonly existencia:ExistenciaVentaService,
-        private readonly cuentasPorCobrarService: CuentasPorCobrarService,    
-        private readonly creditoClienteService: CreditoClienteService){}
+        private readonly kardexService:KardexService){}
 
 
-    async FindAll(start: Date, end:Date){
+    async FindAll(start: Date, end:Date,user:User){
+        const sucId = user.empleado.sucursal.id
         const st = new Date(start)
         const en = new Date(end)
         const es = true
@@ -36,6 +36,7 @@ export class VentaService{
         .andWhere("venta.created_at>=:st",{st})
         .andWhere("venta.created_at<:en",{en})
         .andWhere("venta.estado",{es})
+        .andWhere("venta.sucursal=:SucursalId",{SucursalId:sucId})
         .groupBy("venta.id,cliente.nombre,sucursal.nombre,venta.created_At")
         .getRawMany()
     }
@@ -55,15 +56,10 @@ export class VentaService{
 
     @Transactional()
     async CreateOne(dto:CreateVentaDto){
-        dto.pago.code? dto.status = 'CREDITO':null;
         const venta = this.repository.create(dto)
         const ventaRealizada = await this.repository.save(venta)
         await this.existencia.ingresoVenta(ventaRealizada)
-        if(dto.pago.code){
-            await this.creditoClienteService.findOneAndAllowCredit(ventaRealizada, dto.empleado)
-            await this.cuentasPorCobrarService.create(ventaRealizada, dto.empleado);
-            console.log('Se ha guardo el credito!');                
-        }
+        await this.kardexService.create(2,"Salida Venta",ventaRealizada.sucursal,ventaRealizada.id,ventaRealizada.detalle)
         return ventaRealizada
     }
     

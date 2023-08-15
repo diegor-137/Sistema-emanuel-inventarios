@@ -11,6 +11,7 @@ import { PrecioService } from './services/precio.service';
     TypeOrmModule.forFeature([Costo,Precio])
   ],
   controllers: [PrecioController],
-  providers: [PrecioService, CostoService]
+  providers: [PrecioService, CostoService],
+  exports:[PrecioService,CostoService]
 })
 export class PrecioModule {}

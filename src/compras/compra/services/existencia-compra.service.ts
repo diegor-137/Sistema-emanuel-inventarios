@@ -3,37 +3,52 @@ import { Inventario } from 'src/almacen/producto/entities/inventario.entity';
 import { Producto } from 'src/almacen/producto/entities/producto.entity';
 import { getRepository } from 'typeorm';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
-import { CreateCompraDto } from '../dto/create-compra.dto';
+import { Costo } from 'src/almacen/precio/entities/costo.entity';
+import { CostoService } from 'src/almacen/precio/services/costo.service';
 
 @Injectable()
 export class ExistenciaCompraService {
-
-    constructor(){}
+    constructor(
+        private readonly costoService:CostoService,
+    ){}
 
     @Transactional({propagation:Propagation.MANDATORY})
     async ingresoCompra(dto:any){
-        const productoRepository = getRepository(Producto)
+        const costoRepository = getRepository(Costo)
         const inventarioRepository = getRepository(Inventario)
-        //console.log(event.entity.detalle)
         for (let i = 0; i < dto.detalle.length; i++) {
             
             const inventario = await inventarioRepository.find({
                 where:{sucursal: dto.sucursal.id,producto:dto.detalle[i].producto}})
            
-            const producto:any = await productoRepository.find({
-                where:{id:dto.detalle[i].producto}})
+            //const producto:any = await productoRepository.find({
+            //    where:{id:dto.detalle[i].producto}})
+
+            //verificamos si el producto tiene registo de costo creado o no
+            //en caso que no tenga, crea el registro y luego pobla la constante
+            let prueba = await costoRepository.find({
+                where:{region:dto.sucursal.region.id,producto:dto.detalle[i].producto}}) 
+            if (prueba.length === 0) {
+                this.costoService.createNewCosto(dto.detalle[i].producto,dto.sucursal.region.id)    
+                }
+
+            const costo = await costoRepository.find({
+                    where:{region:dto.sucursal.region.id,producto:dto.detalle[i].producto}})
+            //console.log 
+            //('de nuevo consulta:',
+            //costo)
 
 
-            let nuevaInversion = (inventario[0].cantidad * producto[0].costo_prom) + 
+            let nuevaInversion = (inventario[0].cantidad * costo[0].costo_prom) + 
                                  ((+dto.detalle[i].cantidad) * (+dto.detalle[i].precio)) 
-            let nuevaExistencia = (+dto.detalle[0].cantidad) + (+inventario[0].cantidad)
+            let nuevaExistencia = (+dto.detalle[i].cantidad) + (+inventario[0].cantidad)
             
             let nuevoCosto = nuevaInversion / nuevaExistencia
             
-            producto[0].costo_prom_old = +producto[0].costo_prom
-            producto[0].ultimo_precio = dto.detalle[i].precio
-            producto[0].costo_prom = nuevoCosto
-            await productoRepository.save(producto)
+            costo[0].costo_prom_old = +costo[0].costo_prom
+            costo[0].ultimo_precio = dto.detalle[i].precio
+            costo[0].costo_prom = nuevoCosto
+            await costoRepository.save(costo)
 
             inventario[0].cantidad = nuevaExistencia
             await inventarioRepository.save(inventario)

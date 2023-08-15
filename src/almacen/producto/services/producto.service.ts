@@ -1,22 +1,23 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateProductoDto } from '../dto/create-producto.dto';
 import { UpdateProductoDto } from '../dto/update-producto.dto';
-import { DataService } from '../../../common/service/common.service';
 import { Producto } from '../entities/producto.entity';
 import { join } from 'path';
 import { FotoDto } from '../dto/foto.dto';
-import { Brackets, Repository, getConnection, getManager, getRepository } from 'typeorm';
+import { Repository, getConnection, getRepository} from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { InventarioService } from './inventario.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CostoService } from 'src/almacen/precio/services/costo.service';
 
 @Injectable()
 export class ProductoService{
     constructor(
       @InjectRepository(Producto)
       public readonly repository:Repository<Producto>,      
-      private readonly inventario:InventarioService){}
+      private readonly inventario:InventarioService,
+      private readonly costo:CostoService,){}
 
   async findAll(user:User){
     const data = await getRepository(Producto)
@@ -26,7 +27,7 @@ export class ProductoService{
     .leftJoinAndSelect("producto.precio","precio",'precio.region.id = :id',{id:user.empleado.sucursal.region.id})
     .leftJoinAndSelect("precio.tipoPrecio","tipoPrecio")
     .leftJoinAndSelect("precio.region","region")
-    .leftJoinAndSelect("producto.costo","costo",'costo.region.id = :id',{id:user.empleado.sucursal.region.id})
+    .innerJoinAndSelect("producto.costo","costo",'costo.region.id = :id',{id:user.empleado.sucursal.region.id})
     .andWhere("producto.estado = true")
     .getMany()
     return data
@@ -47,6 +48,8 @@ export class ProductoService{
             const creado = this.repository.create(producto)
             const saved =  await this.repository.save(creado)
             await this.inventario.afterCreateNewProd(saved)
+            await this.costo.afterCreateNewProd(saved)
+
             return saved
   }
 
@@ -78,14 +81,29 @@ export class ProductoService{
     return await this.repository.save(data)
   }
 
-  //Se usa para llamaer los productos disponibles en los modulos de ventas y compras
+  //Se usa para llamaer los productos disponibles en los modulos de ventas
   async prodPorSucursal(user:User){
     var suc = user.empleado.sucursal.id
     var reg = user.empleado.sucursal.region.id
     var resultado = await getRepository(Producto)
     .createQueryBuilder("producto")
     .innerJoinAndSelect("producto.precio","precio","precio.region=:regionId",{regionId:reg})
-    .leftJoinAndSelect("producto.costo","costo",'costo.region.id = :regionId',{regionId:reg})
+    .innerJoinAndSelect("producto.costo","costo",'costo.region.id = :regionId',{regionId:reg})
+    .innerJoinAndSelect("producto.inventario","inventario","inventario.sucursal=:sucursalId",{sucursalId:suc})
+    .leftJoinAndSelect("producto.categoria","categoria")
+    .leftJoinAndSelect("producto.marca","marca")
+    .getMany()
+    return resultado
+  }
+
+  //Se usa para llamaer los productos disponibles en los modulos de compras
+  async prodPorSucursalCompra(user:User){
+    var suc = user.empleado.sucursal.id
+    var reg = user.empleado.sucursal.region.id
+    var resultado = await getRepository(Producto)
+    .createQueryBuilder("producto")
+    .innerJoinAndSelect("producto.precio","precio","precio.region=:regionId",{regionId:reg})
+    .innerJoinAndSelect("producto.costo","costo",'costo.region.id = :regionId',{regionId:reg})
     .innerJoinAndSelect("producto.inventario","inventario","inventario.sucursal=:sucursalId",{sucursalId:suc})
     .leftJoinAndSelect("producto.categoria","categoria")
     .leftJoinAndSelect("producto.marca","marca")
@@ -93,6 +111,7 @@ export class ProductoService{
     return resultado
 
   }
+
   async findProductImages(id:number){
     return await this.repository.findOne(id, {relations: ['fotos']});      
   }

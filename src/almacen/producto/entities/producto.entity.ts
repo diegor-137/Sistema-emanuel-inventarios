@@ -11,6 +11,7 @@ import { DetalleCotizacion } from '../../../ventas/cotizacion/entity/detalle-cot
 import { Inventario } from './inventario.entity';
 import { Costo } from "src/almacen/precio/entities/costo.entity";
 import { Precio } from "src/almacen/precio/entities/precio.entity";
+import { Kardex } from "src/almacen/kardex/entity/kardex.entity";
 
 
 @Entity('productos')
@@ -78,6 +79,9 @@ export class Producto {
         {cascade:["insert","update"]
         })
     inventario : Inventario[];
+
+    @OneToMany(()=>Kardex, kardex=>kardex.producto)
+    kardex:Kardex
 
     //---------Compras-------------
     @OneToMany(

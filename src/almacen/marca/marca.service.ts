@@ -49,8 +49,8 @@ export class MarcaService{
         async findByName(nombre:string){
             return await this.repository.find({
                where: {
+                estado:true,
                 nombre: ILike(`%${nombre}%`),
-                estado: true
               } 
             });
           }

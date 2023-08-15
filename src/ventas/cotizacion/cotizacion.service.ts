@@ -6,6 +6,7 @@ import { getConnection, getRepository, Repository } from 'typeorm';
 import { EditCotizacionDto } from './dto/edit-cotizacion.dto';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class CotizacionService{
@@ -14,7 +15,8 @@ export class CotizacionService{
         public readonly repository:Repository<Cotizacion>
     ){}
     
-    async findAll(start: Date, end:Date){
+    async findAll(start: Date, end:Date,user:User){
+        const sucId = user.empleado.sucursal.id
         const st = new Date(start)
         const en = new Date(end)
         const es = true 
@@ -30,6 +32,7 @@ export class CotizacionService{
         .andWhere("cotizacion.created_at>=:st",{st})
         .andWhere("cotizacion.created_at<:en",{en})
         .andWhere("cotizacion.estado",{es})
+        .andWhere("cotizacion.sucursal=:SucursalId",{SucursalId:sucId})
         .groupBy("cotizacion.id,cliente.nombre,sucursal.nombre")
         .getRawMany()}
         

@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JWT_SECRET } from 'src/config/constants';
-import { EmpleadoService } from 'src/recursos-humanos/empleado/empleado.service';
+import { EmpleadoService } from 'src/recursos-humanos/empleado/services/empleado.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()

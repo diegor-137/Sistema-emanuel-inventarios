@@ -7,10 +7,12 @@ import { Foto } from './entities/foto.entity';
 
 import { Inventario } from './entities/inventario.entity';
 import { InventarioService } from './services/inventario.service';
+import { PrecioModule } from '../precio/precio.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Producto, Foto, Inventario])
+    TypeOrmModule.forFeature([Producto, Foto, Inventario]),
+    PrecioModule,
   ],
   controllers: [ProductoController],
   providers: [ProductoService,InventarioService],
