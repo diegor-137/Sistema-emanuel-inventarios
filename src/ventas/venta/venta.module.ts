@@ -18,6 +18,6 @@ import { ExistenciaVentaService } from './services/existencia-venta.service';
   ],
   controllers: [VentaController],
   providers: [VentaService, ExistenciaVentaService], 
-  exports: [VentaService]
+  exports: [VentaService, ExistenciaVentaService]
 })
 export class VentaModule {}

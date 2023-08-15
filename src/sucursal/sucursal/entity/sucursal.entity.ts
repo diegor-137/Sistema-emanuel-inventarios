@@ -12,6 +12,8 @@ import { FileAws3 } from "src/files/entities/file.entity";
 import { CreditoCliente } from "src/creditos/credito-cliente/entities/credito-cliente.entity";
 import { CuentaPorPagar } from "src/creditos/cuentas-por-pagar/entities/cuenta-por-pagar-entity";
 import { CuentaPorCobrar } from "src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar.entity";
+import { Traslado } from "src/almacen/traslado/entities/traslado.entity";
+import { Envio } from "src/almacen/envio/entities/envio.entity";
 
 @Entity('sucursal')
 export class Sucursal{
@@ -95,4 +97,19 @@ export class Sucursal{
 
     @OneToMany(() => CreditoCliente, credito => credito.sucursal)
     credito:CreditoCliente[]
+
+    /*********Traslados*********/
+
+    @OneToMany(() => Traslado, (traslado) => traslado.sucursalResp)
+    trasladoRes:Traslado[]
+
+    @OneToMany(() => Traslado, (traslado) => traslado.solicitador)
+    trasladoSol:Traslado[]
+
+    /*********Envios*********/
+    @OneToMany(() => Envio, (envio) => envio.sucursalDespachador)
+    envioSucursalDespachador:Envio[]
+
+    @OneToMany(() => Envio, (traslado) => traslado.sucursalRecepcionador)
+    envioSucursalRecepcionador:Envio[]
 }

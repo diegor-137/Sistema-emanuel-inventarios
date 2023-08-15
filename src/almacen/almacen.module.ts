@@ -5,6 +5,9 @@ import { ProductoModule } from './producto/producto.module';
 import { TipoPrecioModule } from './tipo-precio/tipo-precio.module';
 import { InventarioModule } from './inventario/inventario.module';
 import { PrecioModule } from './precio/precio.module';
+import { TrasladoModule } from './traslado/traslado.module';
+import { EnvioModule } from './envio/envio.module';
+import { RecepcionModule } from './recepcion/recepcion.module';
 
 @Module({
   imports: [
@@ -12,6 +15,6 @@ import { PrecioModule } from './precio/precio.module';
     MarcaModule, 
     ProductoModule, 
     TipoPrecioModule, 
-    InventarioModule, PrecioModule]
+    InventarioModule, PrecioModule, TrasladoModule, EnvioModule, RecepcionModule]
 })
 export class AlmacenModule {}

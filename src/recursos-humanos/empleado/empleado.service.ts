@@ -4,6 +4,7 @@ import { Empleado } from './entity/empleado.entity';
 import { CreateEmpleadoDto, EditEmpleadoDto } from './dto';
 import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class EmpleadoService{
@@ -17,6 +18,16 @@ export class EmpleadoService{
         return await this.repository.find({
             where:[{estado:true}],
             relations:["puesto","sucursal"]
+        })
+    }
+    async findAllPorSucursal(user:User){
+        return await this.repository.find({
+            where:[{
+                estado:true,
+                sucursal: {
+                    id:user.empleado.sucursal.id
+                }
+            }]
         })
     }
 

@@ -9,6 +9,9 @@ import { Recurso } from 'src/app.roles';
 import { ApiTags } from '@nestjs/swagger';
 import { PermissionsRequired } from 'src/auth/decorators/permissions.decorator';
 import Permission from 'src/auth/enums/permission.type';
+import { User } from 'src/auth/decorators/user.decorator';
+import { User as UserEntity} from 'src/user/entities/user.entity';
+
 
 @ApiTags('Empleados endPoints')
 @Controller('empleado')
@@ -20,6 +23,12 @@ export class EmpleadoController{
     @Get()
     async findAll(){
         return await this.empleadoService.findAll()
+    }
+
+    @Auth()
+    @Get('por/sucursal')
+    async findAllPorSucursal(@User()user: UserEntity){
+        return await this.empleadoService.findAllPorSucursal(user)
     }
 
     @Auth()
