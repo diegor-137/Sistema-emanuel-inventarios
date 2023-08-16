@@ -44,7 +44,7 @@ export class MarcaController{
     }
 
     @Auth()
-    @Get(':nombre?')
+    @Get('autocomplete/:nombre?')
     async findByName(
        @Param('nombre') nombre:string 
     ){

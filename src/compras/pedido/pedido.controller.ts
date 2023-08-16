@@ -15,8 +15,9 @@ export class PedidoController{
 
     @Auth()
     @Get()
-    async findAll(@Query() query: { start: Date, end:Date}){
-        return await this.pedidoService.findAll(query.start,query.end)
+    async findAll(@Query() query: { start: Date, end:Date},
+                    @User() user:UserEntity){
+        return await this.pedidoService.findAll(query.start,query.end,user)
     }
 
     @Auth()

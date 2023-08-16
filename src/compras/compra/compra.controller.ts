@@ -17,8 +17,9 @@ export class CompraController{
     
     @Auth()
     @Get()
-    async findAll(@Query() query: { start: Date, end:Date}){
-        return await this.compraService.findAll(query.start,query.end)
+    async findAll(@Query() query: { start: Date, end:Date},
+                    @User() user:UserEntity){
+        return await this.compraService.findAll(query.start,query.end,user)
     } 
 
     @Auth()
@@ -35,6 +36,7 @@ export class CompraController{
     ){
         dto.empleado = user.empleado
         dto.sucursal = user.empleado.sucursal
+        //return console.log(dto.sucursal)
         return await this.compraService.createOne(dto)
     }
 

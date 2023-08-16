@@ -64,6 +64,11 @@ export class ProductoController{
     async productoVenta(@User() user: UserEntity){
       return this.productoService.prodPorSucursal(user);
     }
+    @Auth()
+    @Get('transaccionesCompras')
+    async productoCompra(@User() user: UserEntity){
+      return this.productoService.prodPorSucursalCompra(user);
+    }
   
     //Para el modulo Inventario
     @Auth()

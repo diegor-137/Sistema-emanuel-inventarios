@@ -10,8 +10,8 @@ import { Cobro } from 'src/finanzas/cobro/entities/cobro.entity';
 import { Caja } from 'src/finanzas/caja/entities/caja.entity';
 import { CorteCaja } from '../../../finanzas/corte-caja/entities/corte-caja.entity';
 import { Gasto } from '../../../finanzas/gastos/entities/gasto.entity';
-import { Ingreso } from 'src/finanzas/ingresos/entities/ingreso.entity';
 import { FileAws3 } from 'src/files/entities/file.entity';
+import { historialEmp } from './historial-emp.entity';
 import { Traslado } from 'src/almacen/traslado/entities/traslado.entity';
 import { Envio } from 'src/almacen/envio/entities/envio.entity';
 import { CuentaBancaria } from 'src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria';
@@ -115,6 +115,13 @@ export class Empleado{
     @JoinColumn({ name: "id_foto"})
     foto: FileAws3;
     
+
+    /*********Historial Empleado*********/
+    @OneToMany(
+        type => historialEmp,
+        historialemp => historialemp.empleado,
+        )
+        historialemp: historialEmp;
     /*********Traslados*********/
     @OneToMany(() => Traslado, (traslado) => traslado.responsable, {
         nullable: true

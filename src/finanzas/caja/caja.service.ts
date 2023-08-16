@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmpleadoService } from 'src/recursos-humanos/empleado/empleado.service';
+import { EmpleadoService } from 'src/recursos-humanos/empleado/services/empleado.service';
 import { User } from 'src/user/entities/user.entity';
 import { Repository, IsNull } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';

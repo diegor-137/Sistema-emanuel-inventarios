@@ -12,6 +12,7 @@ import { FileAws3 } from "src/files/entities/file.entity";
 import { CreditoCliente } from "src/creditos/credito-cliente/entities/credito-cliente.entity";
 import { CuentaPorPagar } from "src/creditos/cuentas-por-pagar/entities/cuenta-por-pagar-entity";
 import { CuentaPorCobrar } from "src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar.entity";
+import { Kardex } from "src/almacen/kardex/entity/kardex.entity";
 import { Traslado } from "src/almacen/traslado/entities/traslado.entity";
 import { Envio } from "src/almacen/envio/entities/envio.entity";
 import { CuentaBancaria } from "src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria";
@@ -99,6 +100,8 @@ export class Sucursal{
     @OneToMany(() => CreditoCliente, credito => credito.sucursal)
     credito:CreditoCliente[]
 
+    @OneToMany(()=>Kardex, kardex => kardex.sucursal)
+    kardex:Kardex[]
     /*********Traslados*********/
 
     @OneToMany(() => Traslado, (traslado) => traslado.sucursalResp)

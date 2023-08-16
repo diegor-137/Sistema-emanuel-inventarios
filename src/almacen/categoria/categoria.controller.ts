@@ -50,7 +50,7 @@ export class CategoriaController{
     }
 
     @Auth()
-    @Get(':nombre?')
+    @Get('autocomplete/:nombre?')
     async findByName(
        @Param('nombre') nombre:string 
     ){

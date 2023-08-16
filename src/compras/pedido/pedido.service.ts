@@ -6,6 +6,7 @@ import { getConnection, getRepository, Repository } from 'typeorm';
 import { EditPedidoDto } from './dto/edit-pedido.dto';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class PedidoService{
@@ -14,7 +15,8 @@ export class PedidoService{
         public readonly repository:Repository<Pedido>
     ){}
 
-    async findAll(start: Date, end:Date){
+    async findAll(start: Date, end:Date,user:User){
+        const sucId = user.empleado.sucursal.id
         const st = new Date(start)
         const en = new Date(end)
         const es = true
@@ -32,6 +34,7 @@ export class PedidoService{
         .andWhere("pedido.created_at>=:st",{st})
         .andWhere("pedido.created_at<:en",{en})
         .andWhere("pedido.estado",{es})
+        .andWhere("pedido.sucursal=:SucursalId",{SucursalId:sucId})
         .groupBy("pedido.id,pedido.documento,proveedor.nombre,sucursal.nombre")
         .getRawMany()}
 

@@ -15,8 +15,9 @@ export class CotizacionController{
 
     @Auth()
     @Get()
-    async findAll(@Query() query: { start: Date, end:Date}){
-        return await this.cotizacionService.findAll(query.start,query.end)
+    async findAll(@Query() query: { start: Date, end:Date},
+    @User() user:UserEntity){
+        return await this.cotizacionService.findAll(query.start,query.end,user)
     }
     
     @Auth()

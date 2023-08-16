@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { EmpleadoService } from 'src/recursos-humanos/empleado/empleado.service';
+import { EmpleadoService } from 'src/recursos-humanos/empleado/services/empleado.service';
 import { compare } from 'bcryptjs';
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
 import { JwtService } from '@nestjs/jwt';
