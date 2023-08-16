@@ -14,6 +14,7 @@ import { CuentaPorPagar } from "src/creditos/cuentas-por-pagar/entities/cuenta-p
 import { CuentaPorCobrar } from "src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar.entity";
 import { Traslado } from "src/almacen/traslado/entities/traslado.entity";
 import { Envio } from "src/almacen/envio/entities/envio.entity";
+import { CuentaBancaria } from "src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria";
 
 @Entity('sucursal')
 export class Sucursal{
@@ -112,4 +113,9 @@ export class Sucursal{
 
     @OneToMany(() => Envio, (traslado) => traslado.sucursalRecepcionador)
     envioSucursalRecepcionador:Envio[]
+
+    /*********Envios*********/
+
+    @OneToMany(()=> CuentaBancaria, cuentaBancaria => cuentaBancaria.sucursal)
+    cuentaBancaria:CuentaBancaria[]
 }

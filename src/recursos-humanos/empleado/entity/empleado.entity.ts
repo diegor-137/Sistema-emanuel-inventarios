@@ -14,6 +14,7 @@ import { Ingreso } from 'src/finanzas/ingresos/entities/ingreso.entity';
 import { FileAws3 } from 'src/files/entities/file.entity';
 import { Traslado } from 'src/almacen/traslado/entities/traslado.entity';
 import { Envio } from 'src/almacen/envio/entities/envio.entity';
+import { CuentaBancaria } from 'src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria';
 
 @Entity('empleado')
 export class Empleado{
@@ -129,4 +130,8 @@ export class Empleado{
 
     @OneToMany(() => Envio, (envio) => envio.recepcionador)
     envioRecepcionador:Envio[]
+
+    /*********Envios*********/
+    @OneToMany(() => CuentaBancaria, (cuentaBancaria) => cuentaBancaria.empleado)
+    cuentaBancaria:CuentaBancaria[]
 }
