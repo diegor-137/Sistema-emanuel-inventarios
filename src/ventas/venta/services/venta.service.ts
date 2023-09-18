@@ -16,8 +16,8 @@ export class VentaService{
         private readonly existencia:ExistenciaVentaService,
         private readonly kardexService:KardexService){}
 
-
-    async FindAll(start: Date, end:Date,user:User){
+    //es tercer parametro que recibe es para definir si queremos compras activas o anulada
+    async FindAll(start: Date, end:Date,user:User,estado:boolean){
         const sucId = user.empleado.sucursal.id
         const st = new Date(start)
         const en = new Date(end)

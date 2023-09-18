@@ -5,10 +5,7 @@ export class CreateRegionDto {
     @IsString()
     nombre:string
 
-    @IsString()
-    direccion:string
-
+    @IsBoolean()
     estado:boolean
 
-    foto:FileAws3
 }

@@ -23,5 +23,6 @@ import { KardexModule } from 'src/almacen/kardex/kardex.module';
   ],
   controllers: [CompraController],
   providers: [CompraService, ExistenciaCompraService],
+  exports:[CompraService]
 })
 export class CompraModule {}

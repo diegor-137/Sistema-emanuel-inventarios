@@ -1,9 +1,3 @@
- 
- 
-
-
-
-
 
  export interface ResultUtility {
     header:Header  
@@ -12,6 +6,7 @@
     compra:number, 
     utilidad:number
  }
+
  interface Header {
     documento:string,
     sucursal:{
@@ -22,5 +17,11 @@
         nombre:string
         apellido:string
     }
-    periodo:string
+    periodo?:string
+}
+
+export interface ResultReportGeneric{
+        header:Header
+        result: any[], 
+        total?:number
 }

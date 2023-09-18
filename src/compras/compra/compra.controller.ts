@@ -19,7 +19,7 @@ export class CompraController{
     @Get()
     async findAll(@Query() query: { start: Date, end:Date},
                     @User() user:UserEntity){
-        return await this.compraService.findAll(query.start,query.end,user)
+        return await this.compraService.findAll(query.start,query.end,user,true)
     } 
 
     @Auth()

@@ -11,6 +11,7 @@ import { CreditoProveedorModule } from 'src/creditos/credito-proveedor/credito-p
     TypeOrmModule.forFeature([Proveedor])
   ],
   providers: [ProveedorService],
-  controllers: [ProveedorController]
+  controllers: [ProveedorController],
+  exports:[ProveedorService]
 })
 export class ProveedorModule {}

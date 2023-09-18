@@ -102,11 +102,12 @@ export class ProductoService{
     var reg = user.empleado.sucursal.region.id
     var resultado = await getRepository(Producto)
     .createQueryBuilder("producto")
-    .innerJoinAndSelect("producto.precio","precio","precio.region=:regionId",{regionId:reg})
+    .leftJoinAndSelect("producto.precio","precio","precio.region=:regionId",{regionId:reg})
     .innerJoinAndSelect("producto.costo","costo",'costo.region.id = :regionId',{regionId:reg})
     .innerJoinAndSelect("producto.inventario","inventario","inventario.sucursal=:sucursalId",{sucursalId:suc})
     .leftJoinAndSelect("producto.categoria","categoria")
     .leftJoinAndSelect("producto.marca","marca")
+    .where("producto.estado=true")
     .getMany()
     return resultado
 
@@ -125,8 +126,6 @@ export class ProductoService{
     }
     
     async findNameAutoProducto(nombre:string){
-      console.log(nombre);
-      
       return await this.repository.find({
          where: {
           nombre: ILike(`%${nombre}%`),

@@ -32,6 +32,8 @@ export class ProveedorController{
     async CreateOne(
         @Body() dto:CreateProveedorDto, @User() user: UserEntity
     ){
+
+        console.log(user.empleado.sucursal)
         return await this.proveedorService.createOne(dto, user.empleado)
     }
 

@@ -27,7 +27,8 @@ export class ClienteController{
 
     @Auth()
     @Post()
-    async create(@Body() dto:CreateClienteDto, @User() user: UserEntity){                   
+    async create(@Body() dto:CreateClienteDto, @User() user: UserEntity){   
+      console.log(user)                
         return await this.clienteService.CreateOne(dto, user.empleado);
     }
 

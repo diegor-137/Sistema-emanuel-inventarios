@@ -3,7 +3,6 @@ import { CategoriaModule } from './categoria/categoria.module';
 import { MarcaModule } from './marca/marca.module';
 import { ProductoModule } from './producto/producto.module';
 import { TipoPrecioModule } from './tipo-precio/tipo-precio.module';
-import { InventarioModule } from './inventario/inventario.module';
 import { PrecioModule } from './precio/precio.module';
 import { KardexModule } from './kardex/kardex.module';
 import { TrasladoModule } from './traslado/traslado.module';
@@ -17,6 +16,6 @@ import { RecepcionModule } from './recepcion/recepcion.module';
     ProductoModule, 
     TipoPrecioModule, 
     KardexModule,
-    InventarioModule, PrecioModule, TrasladoModule, EnvioModule, RecepcionModule]
+    PrecioModule, TrasladoModule, EnvioModule, RecepcionModule]
 })
 export class AlmacenModule {}
