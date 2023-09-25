@@ -18,7 +18,7 @@ export class VentaController{
     @Get()
     async FindAll(@Query() query: { start: Date, end:Date},
                   @User() user:UserEntity){
-        return await this.ventaService.FindAll(query.start,query.end,user)
+        return await this.ventaService.FindAll(query.start,query.end,user,true)
     }
 
     @Get(":id")

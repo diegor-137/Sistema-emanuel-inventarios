@@ -32,15 +32,6 @@ export class Producto {
     @Column({ type: 'bool', default: true })
     estado: boolean
 
-    @Column({type: 'decimal', default: 0, precision:6,scale:2,nullable: true })
-    costo_prom:number
-
-    @Column({type: 'decimal', default: 0, precision:6,scale:2,nullable: true})
-    costo_prom_old:number
-
-    @Column({type: 'decimal', default: 0, precision:6,scale:2, nullable: true})
-    ultimo_precio:number
-
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
 

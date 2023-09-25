@@ -16,6 +16,6 @@ import { PrecioModule } from '../precio/precio.module';
   ],
   controllers: [ProductoController],
   providers: [ProductoService,InventarioService],
-  exports:[InventarioService]
+  exports:[InventarioService,ProductoService]
 })
 export class ProductoModule {}

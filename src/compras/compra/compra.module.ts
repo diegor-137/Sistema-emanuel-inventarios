@@ -25,5 +25,6 @@ import { PagoModule } from 'src/finanzas/pago/pago.module';
   ],
   controllers: [CompraController],
   providers: [CompraService, ExistenciaCompraService],
+  exports:[CompraService]
 })
 export class CompraModule {}

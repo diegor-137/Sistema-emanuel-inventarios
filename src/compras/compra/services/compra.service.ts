@@ -31,11 +31,13 @@ export class CompraService{
         private readonly pagoService:PagoService, 
         ) {}
 
-    async findAll(start: Date, end:Date,user:User){
+
+    //es tercer parametro que recibe es para definir si queremos compras activas o anuladas
+    async findAll(start: Date, end:Date,user:User,estado:boolean){
         const sucId = user.empleado.sucursal.id
         const st = new Date(start)
         const en = new Date(end)
-        const es = true
+        const es = estado
         return await getRepository(Compra)
         .createQueryBuilder("compra")
         .leftJoinAndSelect("compra.empleado","empleado")
@@ -47,7 +49,7 @@ export class CompraService{
         "compra.created_At","SUM(detalle.cantidad*detalle.precio)as total"])
         .andWhere("compra.created_at>=:st",{st})
         .andWhere("compra.created_at<:en",{en})
-        .andWhere("compra.estado",{es})
+        .andWhere("compra.estado= :est",{est:es})
         .andWhere("compra.sucursal=:SucursalId",{SucursalId:sucId})
         .groupBy("compra.id,compra.documento,proveedor.nombre,sucursal.nombre")
         .getRawMany()

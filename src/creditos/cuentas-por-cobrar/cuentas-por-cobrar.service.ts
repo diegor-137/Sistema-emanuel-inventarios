@@ -2,12 +2,9 @@ import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/com
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { CreateCuentasPorCobrarDto } from './dto/create-cuentas-por-cobrar.dto';
-import { UpdateCuentasPorCobrarDto } from './dto/update-cuentas-por-cobrar.dto';
 import { CuentaPorCobrarDetalle } from './entities/cuenta-por-cobrar-details.entity';
 import { CuentaPorCobrar } from './entities/cuenta-por-cobrar.entity';
-import { Cliente } from '../../ventas/cliente/entity/cliente.entity';
 import { Venta } from '../../ventas/venta/entity/venta.entity';
-import { IngresosService } from 'src/finanzas/ingresos/ingresos.service';
 import { MovimientoCajaService } from 'src/finanzas/movimiento-caja/movimiento-caja.service';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { Caja } from 'src/finanzas/caja/entities/caja.entity';

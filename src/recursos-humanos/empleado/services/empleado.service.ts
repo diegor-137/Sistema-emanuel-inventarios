@@ -20,7 +20,10 @@ export class EmpleadoService{
 
     async findAll(){
         return await this.repository.find({
-                        relations:["puesto","sucursal"]
+            relations:["puesto","sucursal"],
+            where:[{
+                //email:"superadmin@gmail.com"
+            }]
         })
     }
     async findAllPorSucursal(user:User){
@@ -29,7 +32,7 @@ export class EmpleadoService{
                 estado:true,
                 sucursal: {
                     id:user.empleado.sucursal.id
-                }
+                },
             }]
         })
     }
