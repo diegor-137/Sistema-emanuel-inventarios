@@ -23,7 +23,7 @@ export class CobroController {
     const caja = await this.cajaService.findOne(user.empleado.id)
     createCobroDto.empleado= decodedJwtAccessToken.empleado
     createCobroDto.caja= caja
-    return await this.cobroService.create(createCobroDto);
+    return await this.cobroService.create(createCobroDto, user);
   }
 
   @Auth()

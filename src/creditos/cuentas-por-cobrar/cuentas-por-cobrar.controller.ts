@@ -5,37 +5,23 @@ import { CreateCuentasPorCobrarDto } from './dto/create-cuentas-por-cobrar.dto';
 import { User as UserEntity} from 'src/user/entities/user.entity';
 import { User } from 'src/auth/decorators/user.decorator';
 import { CajaService } from 'src/finanzas/caja/caja.service';
+import { ConsultCuentasPorCobrarDto } from './dto/consult-cuentas-por-cobrar.dto';
 
 @Controller('cuentas-por-cobrar')
 export class CuentasPorCobrarController {
   constructor(private readonly cuentasPorCobrarService: CuentasPorCobrarService, private readonly cajaService:CajaService) {}
 
   @Auth()
-  @Get('getCuentasPorCobrarbyCliente/:id/:checked')
-  async getCuentasPorCobrarbyCliente(@Param('id',ParseIntPipe) id:number, @Param('checked', ParseBoolPipe) checked:boolean, @Query('start')start: Date,@Query('end')end: Date, @User() user: UserEntity){
-    return await this.cuentasPorCobrarService.getCuentasPorCobrarbyCliente(id, user.empleado.sucursal, checked, start, end);
-  }
-
-  @Auth()
-  @Get('getTodostCuentasPorCobrar')
-  async getTodostCuentasPorCobrar(@User() user: UserEntity){
-    return await this.cuentasPorCobrarService.getTodostCuentasPorCobrar(user.empleado.sucursal);
-  }
-
-  @Auth()
-  @Post('pagarCreditos')
-  async pagarCreditos(@Body() cuentasPorCobrarDetalle:CreateCuentasPorCobrarDto[], @User() user: UserEntity){
-    const caja = await this.cajaService.findOne(user.empleado.id)
-    cuentasPorCobrarDetalle.forEach(r=> r.caja = caja);        
-    return await this.cuentasPorCobrarService.pagarCreditos(cuentasPorCobrarDetalle, caja)
+  @Post('getCuentasPorCobrarParams')
+  async getCuentasPorCobrarParams(@User() user: UserEntity,@Body() dto:ConsultCuentasPorCobrarDto){
+    return await this.cuentasPorCobrarService.getCuentasPorCobrarParams(user.empleado.sucursal, dto.checked, dto.dates, dto.id);
   }
 
   @Auth()
   @Post('pagarCredito')
-  async pagarCredito(@Body() cuentaPorCobrarDetalle:CreateCuentasPorCobrarDto, @User() user: UserEntity){
-    const caja = await this.cajaService.findOne(user.empleado.id)
-    cuentaPorCobrarDetalle.caja = caja;
-    return await this.cuentasPorCobrarService.pagarCredito(cuentaPorCobrarDetalle)
+  async pagarCredito(@Body() cuentaPorCobrar:CreateCuentasPorCobrarDto, @User() user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)  
+    return await this.cuentasPorCobrarService.pago(cuentaPorCobrar, user, caja);
   }
 
   @Get('pagosDetail/:id')

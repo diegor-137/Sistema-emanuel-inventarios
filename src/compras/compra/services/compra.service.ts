@@ -11,6 +11,11 @@ import { CuentaPorPagarService } from 'src/creditos/cuentas-por-pagar/cuenta-por
 import { CreditoProveedorService } from 'src/creditos/credito-proveedor/credito-proveedor.service';
 import { User } from 'src/user/entities/user.entity';
 import { KardexService } from 'src/almacen/kardex/services/kardex.service';
+import { EfectivoService } from 'src/finanzas/fondos/efectivo/efectivo.service';
+import { CuentaBancariaService } from 'src/finanzas/fondos/cuenta-bancaria/cuenta-bancaria.service';
+import { CreateDetalleEfectivoDto } from 'src/finanzas/fondos/efectivo/dto/create-detalle-efectivo.dto';
+import { CreateDetalleCuentaBancariaDto } from 'src/finanzas/fondos/cuenta-bancaria/dto/create-detalle-cuenta-bancaria.dto';
+import { PagoService } from 'src/finanzas/pago/pago.service';
 
 
 
@@ -22,7 +27,9 @@ export class CompraService{
         private readonly existencia: ExistenciaCompraService,
         private readonly cuentaPorPagarService: CuentaPorPagarService,
         private readonly creditoProveedorService: CreditoProveedorService,
-        private readonly kardexService:KardexService) {}
+        private readonly kardexService:KardexService, 
+        private readonly pagoService:PagoService, 
+        ) {}
 
     async findAll(start: Date, end:Date,user:User){
         const sucId = user.empleado.sucursal.id
@@ -60,18 +67,19 @@ export class CompraService{
     }
 
     @Transactional()
-    async createOne(dto:CreateCompraDto){
-        
+    async createOne(dto:CreateCompraDto, user:User){
         const compra = this.repository.create(dto)
         const compraRealizada = await this.repository.save(compra)
         await this.existencia.ingresoCompra(compraRealizada)
         //console.log(compraRealizada)
         await this.kardexService.create(1,"ingreso compra",compraRealizada.sucursal,compraRealizada.id,compraRealizada.detalle)
-        if(dto.pago.code){
+        if(dto.pagoType.code){
             await this.creditoProveedorService.findOneAndAllowCredit(compraRealizada, dto.empleado)
             await this.cuentaPorPagarService.create(compraRealizada, dto.empleado);
+        }else{
+            dto.pago.compra = compraRealizada
+            await this.pagoService.create(dto.pago, user);
         }
-
         return compraRealizada
     }
 

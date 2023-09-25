@@ -5,10 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CuentaPorPagar } from './entities/cuenta-por-pagar-entity';
 import { CuentaPorPagarDetalle } from './entities/cuenta-por-pagar-details.entity';
 import { CreditoProveedorModule } from '../credito-proveedor/credito-proveedor.module';
+import { EfectivoModule } from 'src/finanzas/fondos/efectivo/efectivo.module';
+import { CuentaBancariaModule } from 'src/finanzas/fondos/cuenta-bancaria/cuenta-bancaria.module';
 
 @Module({
   imports: [
     forwardRef(()=>CreditoProveedorModule),
+    forwardRef(()=>EfectivoModule),
+    forwardRef(()=>CuentaBancariaModule),
     TypeOrmModule.forFeature([CuentaPorPagar, CuentaPorPagarDetalle]),
   ],
   controllers: [CuentaPorPagarController],

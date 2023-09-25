@@ -5,6 +5,7 @@ import { Column, CreateDateColumn, Entity, EntityRepository, JoinColumn, ManyToO
 
 import { DetalleCuentaBancaria } from "./detalle-cuenta-bancaria";
 import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
+import { Banco } from "../../bancos/entities/banco.entity";
 
 
 @Entity('cuenta_bancaria')
@@ -14,23 +15,23 @@ export class CuentaBancaria {
     id:number
 
     @CreateDateColumn({ name: 'fecha', type: 'timestamp with time zone' })
-    fecha:Date
+    fecha?:Date
 
     @Column({type: 'varchar', length: 45, nullable: false, unique:true})
-    numero: string
+    numero?: string
 
     @Column({type: 'varchar', length: 45, nullable: false})
-    nombre:string
+    nombre?:string
 
     //-----Tablas Padre--------
 
     @ManyToOne(() => Empleado, (empleado) => empleado.cuentaBancaria)
     @JoinColumn({ name: "id_empleado"})
-    empleado:Empleado
+    empleado?:Empleado
 
     @ManyToOne(() => Sucursal, (sucursal) => sucursal.cuentaBancaria)
     @JoinColumn({ name: "id_sucursal"})
-    sucursal:Sucursal
+    sucursal?:Sucursal
 
     //-------Tablas Hijas--------
 
@@ -38,9 +39,13 @@ export class CuentaBancaria {
     {
         cascade: ["insert", "update", "remove"]
     })
-    detalleCuentaBancaria: DetalleCuentaBancaria[];
+    detalleCuentaBancaria?: DetalleCuentaBancaria[];
 
     @Column({ type: 'boolean', default: true})
     estado?: string
+
+    @ManyToOne(() => Banco, banco => banco.cuentaBancaria)
+    @JoinColumn({ name: "id_banco"})
+    banco?:Banco;
 
 }

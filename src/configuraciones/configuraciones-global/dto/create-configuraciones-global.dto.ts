@@ -1,10 +1,15 @@
-import { IsBoolean, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { CuentaBancaria } from "src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria";
+import { Efectivo } from "src/finanzas/fondos/efectivo/entities/efectivo.entity";
 
 export class CreateConfiguracionesGlobalDto {
 
-    @IsString()
-    name:string
+    @IsNotEmpty()
+    id:number
 
-    @IsBoolean()
-    checked:boolean
+    @IsNotEmpty()
+    efectivo:Efectivo
+
+    @IsOptional()
+    cuentaBancaria:CuentaBancaria
 }

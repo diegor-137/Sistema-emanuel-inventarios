@@ -31,7 +31,7 @@ export class CreditoProveedorService {
     const credit = await this.creditoRepository.findOne({where: {proveedor: compra.proveedor.id, sucursal: empleado.sucursal}});
     if(!credit) throw new NotFoundException('El proveedor no tiene creditos autorizados');
     const totalVent = compra.detalle.reduce((sum, a)=> sum +  Number(a.cantidad * a.precio), 0.00);
-    const {totalCuenta, totalCompraCredito} = await this.cuentasPorPagarService.totalCuentasPorPagarProveedor(compra.proveedor.id);
+    const {totalCuenta, totalCompraCredito} = await this.cuentasPorPagarService.totalCuentasPorPagarProveedor(compra.proveedor.id, empleado.sucursal);
     console.log('Credito Limite',Number(credit.limite));
     console.log('Total venta',totalVent);
     console.log('Total Credito',Number(totalCompraCredito));

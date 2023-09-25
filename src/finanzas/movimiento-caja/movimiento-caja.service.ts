@@ -14,7 +14,7 @@ export class MovimientoCajaService {
     private readonly movimientoCajaRepository: Repository<MovimientoCaja>,
   ) {}
 
-  @Transactional({propagation: Propagation.MANDATORY})
+  @Transactional({propagation: Propagation.REQUIRED})
   async create(monto:number, descripcion:string, num: number, caja?:Caja, type?:boolean) {
     const movimiento : CreateMovimientoCajaDto = {
       monto, descripcion, caja, type

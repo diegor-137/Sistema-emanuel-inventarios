@@ -3,6 +3,8 @@ import { DetalleCompra } from '../entity/detalle-compra.entity';
 import { Proveedor } from '../../proveedor/entity/proveedor.entity';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
+import { CuentaBancaria } from 'src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria';
+import { CreatePagoDto } from 'src/finanzas/pago/dto/create-pago.dto';
 
 
 export class CreateCompraDto {
@@ -29,11 +31,20 @@ export class CreateCompraDto {
     sucursal:Sucursal
 
     @IsOptional()
-    pago:Pago
+    pagoType:PagoType
+
+    @IsOptional()
+    cuenta?:CuentaBancaria
+
+    @IsOptional()
+    doc?:string
+
+    @IsOptional()
+    pago?:CreatePagoDto
 
 }
 
-interface Pago {
+interface PagoType {
     name:string,
     code:boolean
 }

@@ -8,6 +8,7 @@ import { Ingreso } from '../../ingresos/entities/ingreso.entity';
 import { Egreso } from '../../egresos/entities/egreso.entity';
 import { Sucursal } from '../../../sucursal/sucursal/entity/sucursal.entity';
 import { CuentaPorCobrarDetalle } from "src/creditos/cuentas-por-cobrar/entities/cuenta-por-cobrar-details.entity";
+import { Efectivo } from "src/finanzas/fondos/efectivo/entities/efectivo.entity";
 
 
 @Entity('caja')
@@ -17,7 +18,7 @@ export class Caja {
     id: number
 
     @Column({ type: 'varchar', length: 255, nullable: false})
-    lugar: string;
+    nombre: string;
 
     @Column({ type: 'varchar', length: 45, nullable: false, default: 'ACTIVO'})
     estado: string
@@ -61,5 +62,9 @@ export class Caja {
 
     @OneToMany(() => CuentaPorCobrarDetalle, (cuentaPorCobrarDetalle) => cuentaPorCobrarDetalle.caja)
     cuentaPorCobrarDetalle: CuentaPorCobrarDetalle[]
+
+    @OneToOne(()=> Efectivo)
+    @JoinColumn({name:'id_efectivo'})
+    efectivo:Efectivo
 
 }

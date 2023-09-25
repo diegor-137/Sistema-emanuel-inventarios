@@ -24,7 +24,7 @@ export class CorteCajaController {
     const caja = await this.cajaService.findOne(user.empleado.id)
     createCorteCajaDto.caja = caja
     createCorteCajaDto.empleado = decodedJwtAccessToken.empleado;
-    return this.corteCajaService.create(createCorteCajaDto, +monto);
+    return this.corteCajaService.create(createCorteCajaDto, +monto, user);
   }
 
   @Auth()
@@ -35,16 +35,8 @@ export class CorteCajaController {
     return this.corteCajaService.lastCorte(+id);
   }
 
-  @Auth()
-  @UseGuards(CajaGuard)
-  @Get('totalGasto/caja')
-  async totalGasto(@User()user: UserEntity){
-    const caja = await this.cajaService.findOne(user.empleado.id)
-    const {gasto} = await this.corteCajaService.totalGasto(caja.id)
-    return gasto;
-  }
 
-  @Auth()
+/*   @Auth()
   @UseGuards(CajaGuard)
   @Get('totalCobro/caja')
   async totalCobro(@User()user: UserEntity){
@@ -54,6 +46,24 @@ export class CorteCajaController {
   }
 
   @Auth()
+  @UseGuards(CajaGuard)
+  @Get('totalCobroEfectivo/caja')
+  async totalCobroEfectivo(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {total} = await this.corteCajaService.totalCobroEfectivo(caja.id)
+    return total;
+  }
+
+  @Auth()
+  @UseGuards(CajaGuard)
+  @Get('totalCobroBanco/caja')
+  async totalCobroBanco(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {totalBanco} = await this.corteCajaService.totalCobroBanco(caja.id)
+    return totalBanco;
+  } */
+
+/*   @Auth()
   @UseGuards(CajaGuard)
   @Get('saldo/caja')
   async saldo(@User()user: UserEntity){
@@ -77,9 +87,9 @@ export class CorteCajaController {
     const caja = await this.cajaService.findOne(user.empleado.id)
     const {egreso} = await this.corteCajaService.totalEgresos(caja.id)
     return egreso;
-  }
+  } */
 
-  @Auth()
+/*   @Auth()
   @UseGuards(CajaGuard)
   @Get('cuentaPorCobrar/caja')
   async totalCuentasPorCobrar(@User()user: UserEntity){
@@ -90,12 +100,38 @@ export class CorteCajaController {
 
   @Auth()
   @UseGuards(CajaGuard)
+  @Get('cuentaPorCobrarEfectivo/caja')
+  async totalCuentasPorEfectivo(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {cuentaPorCobrarEfectivo} = await this.corteCajaService.totalCuentasPorCobrarEfectivo(caja.id)
+    return cuentaPorCobrarEfectivo;
+  }
+
+  @Auth()
+  @UseGuards(CajaGuard)
+  @Get('cuentaPorCobrarBanco/caja')
+  async totalCuentasPorCobrarBanco(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    const {cuentaPorCobrarBanco} = await this.corteCajaService.totalCuentasPorCobrarBanco(caja.id)
+    return cuentaPorCobrarBanco;
+  } */
+
+/*   @Auth()
+  @UseGuards(CajaGuard)
   @Get('ultimoMovimiento/caja')
   async ultimoMovimiento(@User()user: UserEntity){
     const {id} = await this.cajaService.findOne(user.empleado.id)  
     const movimiento = await this.corteCajaService.ultimoMovimiento(id);
     return movimiento.balance
-  }
+  } */
+
+  @Auth()
+  @UseGuards(CajaGuard)
+  @Get('transaccionesSinCorte')
+  async transaccionesSinCorte(@User()user: UserEntity){
+    const caja = await this.cajaService.findOne(user.empleado.id)
+    return await this.corteCajaService.transaccionesSinCorte(caja);
+  } 
 
   /* BUSQUEDA POR PARTE DEL ADMINISTRADOR!!!!*/
   
@@ -111,9 +147,11 @@ export class CorteCajaController {
     return this.corteCajaService.findOne(+id);
   }
 
+
+
+
+
   /* DETALLES DE CORTE */
-
-
 
   @Auth()
   @Get('detalle/ventas-cobros/:idCorte/:idCaja')
@@ -122,11 +160,6 @@ export class CorteCajaController {
 
   }
 
-  @Auth()
-  @Get('detalle/gastos/:idCorte/:idCaja')
-  async gastosCorte(@Param('idCorte') idCorte: string, @Param('idCaja') idCaja: string){
-    return await this.corteCajaService.gastosCorte(+idCorte, +idCaja)
-  }
 
   @Auth()
   @Get('detalle/ingresos/:idCorte/:idCaja')

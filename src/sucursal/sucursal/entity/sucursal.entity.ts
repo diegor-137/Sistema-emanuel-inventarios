@@ -16,6 +16,8 @@ import { Kardex } from "src/almacen/kardex/entity/kardex.entity";
 import { Traslado } from "src/almacen/traslado/entities/traslado.entity";
 import { Envio } from "src/almacen/envio/entities/envio.entity";
 import { CuentaBancaria } from "src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria";
+import { Efectivo } from "src/finanzas/fondos/efectivo/entities/efectivo.entity";
+import { ConfiguracionesGlobal } from "src/configuraciones/configuraciones-global/entities/configuraciones-global.entity";
 
 @Entity('sucursal')
 export class Sucursal{
@@ -121,4 +123,10 @@ export class Sucursal{
 
     @OneToMany(()=> CuentaBancaria, cuentaBancaria => cuentaBancaria.sucursal)
     cuentaBancaria:CuentaBancaria[]
+
+    @OneToMany(()=> Efectivo, efectivo => efectivo.sucursal)
+    efectivo:Efectivo[]
+
+    @OneToMany(()=> ConfiguracionesGlobal, configuracionesGlobal => configuracionesGlobal.sucursal)
+    configuracionesGlobal:ConfiguracionesGlobal[]
 }

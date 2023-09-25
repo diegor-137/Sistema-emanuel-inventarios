@@ -25,8 +25,10 @@ export class CobroGateway implements OnGatewayConnection {
 
 
   @SubscribeMessage('getFacturas')
-  async handleMessage(socket:Socket, @MessageBody() usertoken: any) {    
-    const {token} = usertoken  
+  async handleMessage(socket:Socket, @MessageBody() usertoken: any) {  
+    console.log(usertoken);
+    const {token, idVenta, status} = usertoken  
+    idVenta?await this.cobroService.updateVenta(idVenta, status):null; 
     const user = await this.authService.decodeToken(token);           
     const ventas = await this.cobroService.findVentaToday(user);
     this.server.emit(user.empleado.sucursal.nombre, ventas);

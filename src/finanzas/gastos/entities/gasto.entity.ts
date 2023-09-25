@@ -3,6 +3,7 @@ import { Caja } from '../../caja/entities/caja.entity';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { CorteCaja } from '../../corte-caja/entities/corte-caja.entity';
 import { FileAws3 } from '../../../files/entities/file.entity';
+import { TipoGasto } from "src/finanzas/tipo-gasto/entities/tipo-gasto.entity";
 
 @Entity('gastos')
 export class Gasto {
@@ -37,12 +38,17 @@ export class Gasto {
     @ManyToOne(()=> Empleado, empleado=> empleado.gastosDelete)
     deleteResponsible:Empleado
 
-    @ManyToOne(()=> CorteCaja, (corteCaja)=> corteCaja.gasto)
-    corteCaja:CorteCaja
-
     @OneToOne(() => FileAws3, fileAws3 => fileAws3.gasto, {
         nullable: true
     })
     @JoinColumn({ name: "id_foto"})
     foto: FileAws3;
+
+    @ManyToOne(()=> TipoGasto, (tipoGasto)=> tipoGasto.gasto,  {
+        nullable: true
+    })
+    tipoGasto:TipoGasto
+
+    @Column({type: 'varchar', length: 90, nullable: true})
+    solicitante:string
 }

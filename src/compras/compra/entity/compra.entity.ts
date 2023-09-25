@@ -4,6 +4,7 @@ import { Proveedor } from '../../proveedor/entity/proveedor.entity';
 import { DetalleCompra } from './detalle-compra.entity';
 import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 import { CuentaPorPagar } from 'src/creditos/cuentas-por-pagar/entities/cuenta-por-pagar-entity';
+import { Pago } from 'src/finanzas/pago/entities/pago.entity';
 
 
 @Entity('compra')
@@ -52,5 +53,8 @@ export class Compra{
         detalle: DetalleCompra[];
 
     @OneToOne(()=> CuentaPorPagar, cuentaPorPagar =>cuentaPorPagar.compra)
-    cuentaPorPagar:CuentaPorPagar    
+    cuentaPorPagar:CuentaPorPagar
+    
+    @OneToOne(() => Pago, (Pago) => Pago.compra) // specify inverse side as a second parameter
+    pago?: Pago
 }

@@ -8,10 +8,12 @@ import { CajaModule } from '../caja/caja.module';
 import { MovimientoCajaModule } from '../movimiento-caja/movimiento-caja.module';
 import { IngresosModule } from '../ingresos/ingresos.module';
 import { FilesModule } from 'src/files/files.module';
+import { EfectivoModule } from '../fondos/efectivo/efectivo.module';
 
 @Module({
   imports:[
     AuthModule,
+    forwardRef(()=>EfectivoModule),
     forwardRef(()=>IngresosModule),
     forwardRef(() => FilesModule),
     forwardRef(()=>CajaModule),

@@ -11,6 +11,8 @@ import { Gasto } from './entities/gasto.entity';
 import { CorteCaja } from '../corte-caja/entities/corte-caja.entity';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { FilesService } from 'src/files/file.service';
+import { EfectivoService } from '../fondos/efectivo/efectivo.service';
+import { CreateDetalleEfectivoDto } from '../fondos/efectivo/dto/create-detalle-efectivo.dto';
 
 @Injectable()
 export class GastosService {
@@ -18,26 +20,32 @@ export class GastosService {
   constructor( 
   @InjectRepository(Gasto)
   public readonly gastoRepository: Repository<Gasto>,
-  private readonly movimientoCajaService: MovimientoCajaService,
+  //private readonly movimientoCajaService: MovimientoCajaService,
+  private readonly EfectivoService: EfectivoService,
   private readonly ingresosService: IngresosService,
   private readonly filesService:FilesService
   ){}
 
   @Transactional()
-  async create(createGastoDto: CreateGastoDto, foto:Express.Multer.File) {
-    const {balance} = await this.movimientoCajaService.ultimoMovimiento(createGastoDto.caja.id);
-    if(Number(createGastoDto.monto)>Number(balance)) throw new BadRequestException('El gasto no puede ser mayor al monto que se tiene en caja!')
+  async create(createGastoDto: CreateGastoDto, foto:Express.Multer.File, user:User) {
+    const {balance} = await this.EfectivoService.ultimoMovimiento(createGastoDto.caja.efectivo.id);
+    if(Number(createGastoDto.monto)>Number(balance)) throw new BadRequestException('El gasto no puede ser mayor al monto que se tiene en caja chica!')
     const uploadResult = await this.filesService.uploadPublicFile(foto.buffer, foto.originalname, `${createGastoDto.documento}-${createGastoDto.empleado.sucursal.nombre}-${createGastoDto.monto}`); 
     createGastoDto.foto = uploadResult
     const gasto = await this.gastoRepository.save(createGastoDto)
-    const {monto, caja} = createGastoDto;
-    await this.movimientoCajaService.create(monto, `EGRESO GASTO NO.${gasto.id}`, 2, caja, false)
+    const CreateDetalleEfectivoDto:CreateDetalleEfectivoDto={
+      documento: `${gasto.documento}`,
+      descripcion: `GASTO ${gasto.descripcion}`,
+      monto: gasto.monto,
+      type: false
+    }
+    await this.EfectivoService.transaccion(CreateDetalleEfectivoDto, user, createGastoDto.caja.efectivo.id);
     return true; 
   }
 
   @Transactional()
   async deleteGasto(id:number, user:User, caja:Caja){
-    const gasto = await this.gastoRepository.findOne(id, {relations: ['corteCaja', 'foto']})
+/*     const gasto = await this.gastoRepository.findOne(id, {relations: ['corteCaja', 'foto']})
     if(!gasto || gasto.deletedAt != null )throw new BadRequestException('El gasto no existe o ya ha sido eliminado')
     const idArchivo= gasto.foto.id
     gasto.foto = null
@@ -48,7 +56,7 @@ export class GastosService {
     await this.filesService.deletePublicFile(idArchivo);
     delete gastoDeleted.deleteResponsible
     await this.movimientoCajaService.create(gastoDeleted.monto, `INGRESO ANULACION GASTO NO.${gasto.id}`, 1, caja, true) 
-    return gasto;
+    return gasto; */
 }
 
   async findAll(start: Date, end:Date, id:number) {
@@ -59,14 +67,17 @@ export class GastosService {
     .leftJoin("gastos.foto", "foto")
     .leftJoin("gastos.empleado", "empleado")
     .leftJoin("gastos.caja", "caja")
+    .leftJoin("gastos.tipoGasto", "tipoGasto")
     .leftJoin("caja.empleado", "cajaEmpleado")
-    .select(["gastos", "empleado.nombre", "empleado.apellido", "caja.lugar", "cajaEmpleado.nombre", "cajaEmpleado.apellido", "foto"])
+    .select(["gastos", "empleado.nombre", "empleado.apellido", "caja.nombre", "cajaEmpleado.nombre", "cajaEmpleado.apellido", "foto", 
+    "tipoGasto.id", "tipoGasto.nombre"
+    ])
     .where("caja.id = :id", {id})
     .andWhere("gastos.fecha >= :st", {st})
     .andWhere("gastos.fecha < :en", {en})
     .andWhere("gastos.deleted_at IS NUll")
     .orderBy("gastos.fecha", "ASC")
-    .groupBy("gastos.id, empleado.id, caja.id_caja, cajaEmpleado.id, foto.id")
+    .groupBy("gastos.id, empleado.id, caja.id_caja, cajaEmpleado.id, foto.id, tipoGasto.id")
     .getMany()
   }  
 
@@ -79,7 +90,7 @@ export class GastosService {
     .leftJoin("gastos.deleteResponsible", "deleteResponsible")
     .leftJoin("gastos.caja", "caja")
     .leftJoin("caja.empleado", "cajaEmpleado")
-    .select(["gastos", "empleado.nombre", "empleado.apellido", "caja.lugar", "cajaEmpleado.nombre", "cajaEmpleado.apellido", "deleteResponsible.nombre", "deleteResponsible.apellido"])
+    .select(["gastos", "empleado.nombre", "empleado.apellido", "caja.nombre", "cajaEmpleado.nombre", "cajaEmpleado.apellido", "deleteResponsible.nombre", "deleteResponsible.apellido"])
     .where("caja.id = :id", {id})
     .andWhere("gastos.fecha >= :st", {st})
     .andWhere("gastos.fecha < :en", {en})
@@ -93,7 +104,7 @@ export class GastosService {
 
 
   /* FUNCIONES USADAS FUERA DE SU MODULO*/
-
+/* 
   async totalGasto(id:number){
     return await this.gastoRepository.createQueryBuilder("gastos")                                
     .leftJoinAndSelect("gastos.caja", "caja")
@@ -103,15 +114,15 @@ export class GastosService {
     .andWhere('corte.id is null')
     .andWhere('gastos.deletedAt is null')
     .getRawOne() 
-  }
+  } */
 
-  async gastosCorte(idCorte:number, idCaja:number){
+/*   async gastosCorte(idCorte:number, idCaja:number){
     return await this.gastoRepository.find({
       where: { caja: {id: idCaja}, corteCaja: {id: idCorte}}
     });
-  }
+  } */
 
-  async gastos(corte:CorteCaja){
+/*   async gastos(corte:CorteCaja){
     const gastos = await this.gastoRepository.find({
       relations: ["corteCaja"], 
       where: { caja: {id: corte.caja.id}, corteCaja: {id: IsNull()}, deletedAt:IsNull()}
@@ -120,6 +131,6 @@ export class GastosService {
       gastos.map(gasto=> gasto.corteCaja = corte)
       await this.gastoRepository.save(gastos);
     };
-  }
+  } */
 
 }

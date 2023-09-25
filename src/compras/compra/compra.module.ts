@@ -10,6 +10,7 @@ import { ExistenciaCompraService } from './services/existencia-compra.service';
 import { CompraService } from './services/compra.service';
 import { PrecioModule } from 'src/almacen/precio/precio.module';
 import { KardexModule } from 'src/almacen/kardex/kardex.module';
+import { PagoModule } from 'src/finanzas/pago/pago.module';
 
 @Module({
   imports:[
@@ -17,6 +18,7 @@ import { KardexModule } from 'src/almacen/kardex/kardex.module';
     TypeOrmModule.forFeature([Compra,DetalleCompra]),
     forwardRef(()=>ProductoModule),
     forwardRef(()=>CreditoProveedorModule),
+    forwardRef(()=>PagoModule),
     PrecioModule,
     KardexModule,
     

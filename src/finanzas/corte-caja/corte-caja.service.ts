@@ -10,6 +10,12 @@ import { CorteCaja } from './entities/corte-caja.entity';
 import { EgresosService } from '../egresos/egresos.service';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { CuentasPorCobrarService } from 'src/creditos/cuentas-por-cobrar/cuentas-por-cobrar.service';
+import { ConfiguracionesGlobalService } from 'src/configuraciones/configuraciones-global/configuraciones-global.service';
+import { User } from 'src/user/entities/user.entity';
+import { EfectivoService } from '../fondos/efectivo/efectivo.service';
+import { CreateEfectivoDto } from '../fondos/efectivo/dto/create-efectivo.dto';
+import { CreateDetalleEfectivoDto } from '../fondos/efectivo/dto/create-detalle-efectivo.dto';
+import { Caja } from '../caja/entities/caja.entity';
 
 
 @Injectable()
@@ -20,49 +26,60 @@ export class CorteCajaService {
     public readonly corteCajaRepository: Repository<CorteCaja>,
     private readonly movimientoCajaService: MovimientoCajaService,
     private readonly cobroService:CobroService,
-    private readonly gastosService:GastosService,
     private readonly ingresosService:IngresosService,
     private readonly egresosService:EgresosService,
-    private readonly cuentasPorCobrarService:CuentasPorCobrarService
+    private readonly cuentasPorCobrarService:CuentasPorCobrarService,
+    private readonly configuracionesGlobalService:ConfiguracionesGlobalService,
+    private readonly efectivoService:EfectivoService,
+
   ) {}
 
   /* ############################################ FUNCIONES USADAS EN CONTROLADORES ############################################*/
 
   @Transactional()
-  async create(createCorteCajaDto: CreateCorteCajaDto, monto:number){
-    let {caja} = createCorteCajaDto    
-    const {balance} = await this.movimientoCajaService.ultimoMovimiento(caja.id);
-    const {total} = await this.totalCobro(caja.id);
-    const {gasto} = await this.totalGasto(caja.id);
-    const {ingreso} = await this.totalIngresos(caja.id);
-    const {egreso} = await this.totalEgresos(caja.id);
-    const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(caja.id);
-    if(monto>balance) throw new BadRequestException('El monto no puede ser mayor al que se quiere retirar!')
+  async create(createCorteCajaDto: CreateCorteCajaDto, monto:number, user:User){
+    let {caja} = createCorteCajaDto 
+    const saldo = await this.lastCorte(caja.id).then(a=>a.corteCajaDetalle.find((b)=>b.concepto ==='SALDO'));  
+    const {cobroBanco, cuentaPorCobrarBanco, cobro, ingreso, egreso, cuentaPorCobrar, cobroEfectivo, cuentaPorCobrarEfectivo} = await this.transaccionesSinCorte(caja);
+    const dinero = Number(cobroEfectivo) + Number(ingreso) + Number(cuentaPorCobrarEfectivo) + Number(saldo.monto);
+    if(monto>dinero) throw new BadRequestException('El monto no puede ser mayor al que se quiere retirar!')
+    const banco = Number(cobroBanco) + Number(cuentaPorCobrarBanco)
     let detalle: CreateCorteCajaDetalle[] = [
-      {monto: balance, concepto: 'SALADO CAJA', type :true},
-      {monto: Number(total), concepto: 'VENTAS', type :true},      
+      {monto: saldo.monto, concepto: 'SALDO INICIAL', type :true},
+      {monto: Number(cobro), concepto: 'VENTAS', type :true},      
+      {monto: Number(cuentaPorCobrar), concepto: 'CUENTAS POR COBRAR', type :true},
       {monto: Number(ingreso), concepto: 'INGRESOS', type :true},      
-      {monto: Number(gasto), concepto: 'GASTOS', type :false},
       {monto: Number(egreso), concepto: 'EGRESOS', type :false},
-      /* {monto: Number(cuentaPorCobrar), concepto: 'CUENTAS POR COBRAR', type :true}, */
+      {monto: Number(banco), concepto: 'BANCOS', type :false},
       {monto: Number(monto), concepto: 'MONTO A RETIRAR', type :false},
+      {monto: Number(dinero - monto), concepto: 'SALDO', type :true},
     ]
     const data = detalle.filter((det)=>det.monto !== 0 && det.monto != null)
     createCorteCajaDto.corteCajaDetalle = data;
     const corte = await this.corteCajaRepository.save(createCorteCajaDto);
     await this.cobros(corte);
-    await this.gastos(corte);    
     await this.ingresos(corte);    
     await this.egresos(corte);    
-    await this.cuentasPorCobrar(corte);    
-    await this.movimientoCajaService.create(monto, `EGRESO CORTE NO. ${corte.id}`, 2, createCorteCajaDto.caja, false)
+    await this.cuentasPorCobrar(corte);
+    const {efectivo} = await this.configuracionesGlobalService.getConfiguraciones(user);
+    let createDetalleEfectivoDto:CreateDetalleEfectivoDto = {
+      documento: `${corte.id}`,
+      descripcion: 'INGRESO POR CORTE DE CAJA',
+      monto,
+      type: true
+    }
+    const montoMovimiento = Number(monto) + Number(banco)
+    await this.efectivoService.transaccion(createDetalleEfectivoDto, user, efectivo.id);
+    await this.movimientoCajaService.create(montoMovimiento, `EGRESO CORTE NO. ${corte.id}`, 2, createCorteCajaDto.caja, false)
   }
 
   //TODO:USANDO
   async lastCorte(id:number){
     return await this.corteCajaRepository.createQueryBuilder("corte_caja")
     .leftJoinAndSelect("corte_caja.empleado", "empleado")
+    .leftJoinAndSelect("corte_caja.corteCajaDetalle", "corteCajaDetalle")
     .select(["corte_caja.fechas", "corte_caja.id", "empleado.nombre", "empleado.apellido"])
+    .addSelect("corteCajaDetalle")
     .where("corte_caja.caja.id = :id", {id})
     .andWhere((qb)=>{const subQuery= qb.subQuery()
                   .select("MAX(corte_caja.fecha)", "fechas")
@@ -73,28 +90,30 @@ export class CorteCajaService {
     .getOne() 
   }  
 
-  async totalGasto(id:number){
-    return await this.gastosService.totalGasto(id);
+  async transaccionesSinCorte(caja:Caja){
+    const {balance} = await this.movimientoCajaService.ultimoMovimiento(caja.id);
+    const {cobro} = await this.totalCobro(caja.id);
+    const {cobroBanco} = await this.totalCobroBanco(caja.id);
+    const {cobroEfectivo} = await this.totalCobroEfectivo(caja.id);
+    const {ingreso} = await this.totalIngresos(caja.id);
+    const {egreso} = await this.totalEgresos(caja.id);
+    const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(caja.id);
+    const {cuentaPorCobrarEfectivo} = await this.totalCuentasPorCobrarEfectivo(caja.id);
+    const {cuentaPorCobrarBanco} = await this.totalCuentasPorCobrarBanco(caja.id);
+    return {balance, cobro, ingreso, egreso, cuentaPorCobrar, cobroBanco, cobroEfectivo, cuentaPorCobrarEfectivo, cuentaPorCobrarBanco}
   }
 
+/* ############# */
   async totalCobro(id:number){
     return await this.cobroService.totalCobro(id)
   }
-
-  async saldo(id:number){
-    const {total} = await this.totalCobro(id);
-    let {balance} = await this.ultimoMovimiento(id);
-    balance = Number(balance-total)
-    const {gasto} = await this.totalGasto(id);
-    balance += Number(gasto);
-    const {egreso} = await this.totalEgresos(id);
-    balance += Number(egreso);
-    const {ingreso} = await this.totalIngresos(id);
-    balance -= Number(ingreso);
-    const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(id);
-    balance -= Number(cuentaPorCobrar);
-    return balance;
+  async totalCobroEfectivo(id:number){
+    return await this.cobroService.totalCobroEfectivo(id)
   }
+  async totalCobroBanco(id:number){
+    return await this.cobroService.totalCobroBanco(id)
+  }
+/* ############# */
 
 
   async totalIngresos(id:number){
@@ -105,13 +124,42 @@ export class CorteCajaService {
     return await this.egresosService.totalEgresos(id)
   }
 
+/* ############# */
   async totalCuentasPorCobrar(id:number){
     return await this.cuentasPorCobrarService.totalCuentasPorCobrar(id);
   }
 
+  async totalCuentasPorCobrarEfectivo(id:number){
+    return await this.cuentasPorCobrarService.totalCuentasPorCobrarEfectivo(id);
+  }
+
+  async totalCuentasPorCobrarBanco(id:number){
+    return await this.cuentasPorCobrarService.totalCuentasPorCobrarBanco(id);
+  }
+/* ############# */
   async ultimoMovimiento(id:number){
     return this.movimientoCajaService.ultimoMovimiento(id);
   }
+
+  /*############################################ MARCAR LOS QUE NO TIENEN CORTE############################################ */
+
+  async cobros(corte:CorteCaja ){
+    return await this.cobroService.cobros(corte)
+  }
+
+  async ingresos(corte:CorteCaja ){
+    return await this.ingresosService.ingresos(corte);
+  }
+
+  async egresos(corte:CorteCaja ){
+    return await this.egresosService.egresos(corte);
+  }
+
+  async cuentasPorCobrar(corte:CorteCaja){
+    return await this.cuentasPorCobrarService.cuentasPorCobrar(corte);
+  }  
+
+  /* ####################################CONSULTA########################################################## */
 
   async findAll(start: Date, end:Date, id:number) {
     const st = new Date(start)
@@ -137,7 +185,7 @@ export class CorteCajaService {
     .leftJoin("corte_caja.caja", "caja")
     .leftJoin("caja.empleado", "cajaEmpleado")
     .leftJoin("corte_caja.corteCajaDetalle", "corteCajaDetalle")
-    .select(["corte_caja", "corteCajaDetalle","empleado.nombre", "empleado.apellido", "caja.id", "caja.lugar", "cajaEmpleado.nombre", "cajaEmpleado.apellido"])
+    .select(["corte_caja", "corteCajaDetalle","empleado.nombre", "empleado.apellido", "caja.id", "caja.nombre", "cajaEmpleado.nombre", "cajaEmpleado.apellido"])
     .where({id})
     .orderBy('corteCajaDetalle.id', 'ASC')
     .getOne()
@@ -163,15 +211,12 @@ export class CorteCajaService {
     return corte;
   }
 
+  /*############################################ DETALLE CORTE ############################################ */
+  
   async ventasCobrosCorte(idCaja:number, idCorte:number){
     return await this.cobroService.ventasCobrosCorte(idCaja, idCorte);
 
   }
-
-  async gastosCorte(idCorte:number, idCaja:number){
-    return await this.gastosService.gastosCorte(idCorte, idCaja);
-  }
-
   
   async ingresosCorte(idCorte:number, idCaja:number){
     return await this.ingresosService.ingresosCorte(idCorte, idCaja);
@@ -183,28 +228,6 @@ export class CorteCajaService {
 
   async cuentasPorCobrarCorte(idCorte:number, idCaja:number){
     return await this.cuentasPorCobrarService.cuentasPorCobrarCorte(idCorte, idCaja);
-  }
-
-  /*############################################ FUNCIONES EXTRAS############################################ */
-
-  async cobros(corte:CorteCaja ){
-    return await this.cobroService.cobros(corte)
-  }
-
-  async gastos(corte:CorteCaja ){
-    return await this.gastosService.gastos(corte);
-  }
-
-  async ingresos(corte:CorteCaja ){
-    return await this.ingresosService.ingresos(corte);
-  }
-
-  async egresos(corte:CorteCaja ){
-    return await this.egresosService.egresos(corte);
-  }
-
-  async cuentasPorCobrar(corte:CorteCaja){
-    return await this.cuentasPorCobrarService.cuentasPorCobrar(corte);
   }
 
   /*############################################ FUNCIONES USADAS FUERA DE SU MODULO ############################################*/

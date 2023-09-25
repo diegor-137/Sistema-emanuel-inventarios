@@ -1,8 +1,14 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Empleado } from 'src/recursos-humanos/empleado/entity/empleado.entity';
 import { DetalleCuentaBancaria } from '../entities/detalle-cuenta-bancaria';
+import { CreateDetalleCuentaBancariaDto } from './create-detalle-cuenta-bancaria.dto';
+import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
+import { Banco } from '../../bancos/entities/banco.entity';
 
 export class CreateCuentaBancariaDto {
+
+    @IsOptional()
+    id:number
 
     @IsNotEmpty()
     numero:string
@@ -11,6 +17,13 @@ export class CreateCuentaBancariaDto {
     nombre:string
 
     @IsNotEmpty()
-    detalleCuentaBancaria:DetalleCuentaBancaria[]
+    banco:Banco
+
+    empleado:Empleado
+
+    sucursal:Sucursal
+
+    @IsNotEmpty()
+    detalleCuentaBancaria:CreateDetalleCuentaBancariaDto[]
 
 }
