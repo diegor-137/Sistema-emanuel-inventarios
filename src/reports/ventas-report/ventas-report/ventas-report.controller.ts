@@ -9,7 +9,7 @@ export class VentasReportController {
   constructor(private readonly ventasReportService: VentasReportService) {}
   
   @Auth()
-  @Get()
+  @Post()
   async findAll(@Query() query: { start: Date, end:Date},
                     @User() user:UserEntity,
                     @Body() dto:any) {

@@ -21,7 +21,7 @@ export class VentaService{
         const sucId = user.empleado.sucursal.id
         const st = new Date(start)
         const en = new Date(end)
-        const es = true
+        const es = estado
         return await getRepository(Venta)
         .createQueryBuilder("venta")
         .leftJoinAndSelect("venta.empleado","empleado")
@@ -35,7 +35,7 @@ export class VentaService{
         "SUM(detalle.cantidad*detalle.precio_venta)as total"])
         .andWhere("venta.created_at>=:st",{st})
         .andWhere("venta.created_at<:en",{en})
-        .andWhere("venta.estado",{es})
+        .andWhere("venta.estado=:estado",{estado:es})
         .andWhere("venta.sucursal=:SucursalId",{SucursalId:sucId})
         .groupBy("venta.id,cliente.nombre,sucursal.nombre,venta.created_At")
         .getRawMany()
