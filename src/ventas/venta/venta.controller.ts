@@ -7,6 +7,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { User as UserEntity} from 'src/user/entities/user.entity';
+import { facturaThermal } from '../thermal/venta-thermal/printer-thermal-venta';
 
 @ApiTags('Venta endPoints')
 @Controller('venta')
@@ -52,5 +53,13 @@ export class VentaController{
     @Delete(':id')
     async deleteById(@Param('id',ParseIntPipe) id:number){
         return await this.ventaService.deleteById(id)
+    }
+
+      @Get('thermal/:id')
+    async thermal(@Param('id') id: number) { 
+        const factura = await this.findById(id)
+
+        facturaThermal(factura);        
+        return {msg: 'HOLA'}    
     }
 }
