@@ -37,7 +37,7 @@ export class CompraController{
         dto.empleado = user.empleado
         dto.sucursal = user.empleado.sucursal
         //return console.log(dto.sucursal)
-        return await this.compraService.createOne(dto)
+        return await this.compraService.createOne(dto, user)
     }
 
     @Auth()

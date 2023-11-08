@@ -49,7 +49,7 @@ export class CorteCaja {
     @PrimaryGeneratedColumn()
     id:number
 
-    @CreateDateColumn({ name: 'fecha', type: 'timestamp' })
+    @CreateDateColumn({ name: 'fecha', type: 'timestamp with time zone' })
     fechas:Date
 
     @Column({ type: 'varchar', length: 350, default: '', nullable: true })
@@ -70,11 +70,6 @@ export class CorteCaja {
         nullable: true
     })
     cobro: Cobro[];
-
-    @OneToMany(() => Gasto, gasto => gasto.corteCaja, {
-        nullable: true
-    })
-    gasto: Gasto[];
 
     @OneToMany(() => Ingreso, ingreso => ingreso.corteCaja, {
         nullable: true

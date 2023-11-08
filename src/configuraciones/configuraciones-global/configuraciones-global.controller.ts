@@ -2,38 +2,23 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ConfiguracionesGlobalService } from './configuraciones-global.service';
 import { CreateConfiguracionesGlobalDto } from './dto/create-configuraciones-global.dto';
 import { UpdateConfiguracionesGlobalDto } from './dto/update-configuraciones-global.dto';
+import { User } from 'src/auth/decorators/user.decorator';
+import { User as UserEntity} from 'src/user/entities/user.entity';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 @Controller('configuraciones-global')
 export class ConfiguracionesGlobalController {
   constructor(private readonly configuracionesGlobalService: ConfiguracionesGlobalService) {}
 
   @Post()
-  create(@Body() createConfiguracionesGlobalDto: CreateConfiguracionesGlobalDto[]) {
+  create(@Body() createConfiguracionesGlobalDto: CreateConfiguracionesGlobalDto) {
     return this.configuracionesGlobalService.create(createConfiguracionesGlobalDto);
   }
 
+  @Auth()
   @Get()
-  async findAll() {
-    return await this.configuracionesGlobalService.findAll();
+  async getConfiguraciones(@User() user: UserEntity) {
+    return await this.configuracionesGlobalService.getConfiguraciones(user);
   }
 
-  @Get('permisions')
-  async findPermissions(){
-    return await this.configuracionesGlobalService.findPermissions();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.configuracionesGlobalService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateConfiguracionesGlobalDto: UpdateConfiguracionesGlobalDto) {
-    return this.configuracionesGlobalService.update(+id, updateConfiguracionesGlobalDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.configuracionesGlobalService.remove(+id);
-  }
 }

@@ -7,6 +7,8 @@ import { ExistenciaVentaService } from './existencia-venta.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { KardexService } from 'src/almacen/kardex/services/kardex.service';
+import { CreditoClienteService } from 'src/creditos/credito-cliente/credito-cliente.service';
+import { CuentasPorCobrarService } from 'src/creditos/cuentas-por-cobrar/cuentas-por-cobrar.service';
 
 @Injectable()
 export class VentaService{
@@ -14,7 +16,9 @@ export class VentaService{
         @InjectRepository(Venta)
         public readonly repository:Repository<Venta>,
         private readonly existencia:ExistenciaVentaService,
-        private readonly kardexService:KardexService){}
+        private readonly kardexService:KardexService,
+        private readonly creditoClienteService: CreditoClienteService,
+        private readonly cuentasPorCobrarService: CuentasPorCobrarService){}
 
     //es tercer parametro que recibe es para definir si queremos compras activas o anulada
     async FindAll(start: Date, end:Date,user:User,estado:boolean){
@@ -56,8 +60,14 @@ export class VentaService{
 
     @Transactional()
     async CreateOne(dto:CreateVentaDto){
+        dto.pago.code? dto.status = 'CREDITO':null;
         const venta = this.repository.create(dto)
         const ventaRealizada = await this.repository.save(venta)
+        if(dto.pago.code){
+            await this.creditoClienteService.findOneAndAllowCredit(ventaRealizada, dto.empleado)
+            await this.cuentasPorCobrarService.create(ventaRealizada, dto.empleado);
+            console.log('Se ha guardo el credito!');                
+        }
         await this.existencia.ingresoVenta(ventaRealizada)
         await this.kardexService.create(2,"Salida Venta",ventaRealizada.sucursal,ventaRealizada.id,ventaRealizada.detalle)
         return ventaRealizada

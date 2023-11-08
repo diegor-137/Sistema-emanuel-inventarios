@@ -4,6 +4,7 @@ import { User } from 'src/auth/decorators/user.decorator';
 import { CuentaPorPagarService } from './cuenta-por-pagar.service';
 import { CreateCuentaPorPagarDto } from './dto/create-cuenta-por-pagar.dto';
 import { User as UserEntity} from 'src/user/entities/user.entity';
+import { ConsultCuentasPorPagarDto } from './dto/consult-cuentas-por-pagar.dto';
 
 
 @Controller('cuentas-por-pagar')
@@ -11,25 +12,20 @@ export class CuentaPorPagarController {
   constructor(private readonly cuentaPorPagarService: CuentaPorPagarService) {}
   
   @Auth()
-  @Get('getCuentasPorPagarByProveedor/:id/:checked')
-  async getCuentasPorPagarByProveedor(@Param('id',ParseIntPipe) id:number, @Param('checked', ParseBoolPipe) checked:boolean, @Query('start')start: Date,@Query('end')end: Date, @User() user: UserEntity){
-    return await this.cuentaPorPagarService.getCuentasPorPagarByProveedor(id, user.empleado.sucursal, checked, start, end);
+  @Post('getCuentasPorPagarParams')
+  async getCuentasPorPagarParams(@Body()dto:ConsultCuentasPorPagarDto, @User() user: UserEntity){
+     return this.cuentaPorPagarService.getCuentasPorPagarParams(user.empleado.sucursal, dto.checked, dto.dates, dto.id);
   }
 
-  @Auth()
-  @Get('getTodosCuentasPorPagar')
-  async getTodosCuentasPorPagar(@User() user: UserEntity){
-    return await this.cuentaPorPagarService.getTodosCuentasPorPagar(user.empleado.sucursal);
-  }
-
-  @Post('pagarCreditos')
+/*   @Post('pagarCreditos')
   async pagarCreditos(@Body() creditoCompras:CreateCuentaPorPagarDto[]){        
     return await this.cuentaPorPagarService.pagarCreditos(creditoCompras)
-  }
+  } */
 
+  @Auth()
   @Post('pagarCredito')
-  async pagarCredito(@Body() creditoCompra:CreateCuentaPorPagarDto){
-    return await this.cuentaPorPagarService.pagarCredito(creditoCompra)
+  async pagarCredito(@Body() creditoCompra:CreateCuentaPorPagarDto, @User() user: UserEntity){
+    return await this.cuentaPorPagarService.pago(creditoCompra, user)
   }
 
   @Get('pagosDetail/:id')

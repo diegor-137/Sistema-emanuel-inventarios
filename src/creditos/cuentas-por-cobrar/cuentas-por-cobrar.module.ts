@@ -8,6 +8,7 @@ import { IngresosModule } from 'src/finanzas/ingresos/ingresos.module';
 import { CajaModule } from 'src/finanzas/caja/caja.module';
 import { MovimientoCajaModule } from 'src/finanzas/movimiento-caja/movimiento-caja.module';
 import { CreditoClienteModule } from '../credito-cliente/credito-cliente.module';
+import { CuentaBancariaModule } from 'src/finanzas/fondos/cuenta-bancaria/cuenta-bancaria.module';
 
 
 
@@ -16,7 +17,8 @@ import { CreditoClienteModule } from '../credito-cliente/credito-cliente.module'
     TypeOrmModule.forFeature([CuentaPorCobrar, CuentaPorCobrarDetalle]),
     forwardRef(()=>MovimientoCajaModule),
     forwardRef(()=>CajaModule),
-    forwardRef(()=>CreditoClienteModule)
+    forwardRef(()=>CreditoClienteModule),
+    forwardRef(()=>CuentaBancariaModule)
   ],
   controllers: [CuentasPorCobrarController],
   providers: [CuentasPorCobrarService],

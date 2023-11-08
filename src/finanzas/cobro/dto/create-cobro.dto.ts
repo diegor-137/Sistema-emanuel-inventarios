@@ -24,6 +24,6 @@ export class CreateCobroDto {
     @Type(()=> CreateDetalleCobroDto)
     @ValidateNested({each: true})
     @ArrayNotEmpty()
-    detalleCobro: DetalleCobro[];
+    detalleCobro: CreateDetalleCobroDto[];
 
 }

@@ -8,7 +8,7 @@ export class MovimientoCaja {
     @PrimaryGeneratedColumn()
     id:number
 
-    @CreateDateColumn({ name: 'fecha', type: 'timestamp' })
+    @CreateDateColumn({ name: 'fecha', type: 'timestamp with time zone' })
     fecha:Date
 
     @Column({type: 'varchar', length: 100, nullable: true})

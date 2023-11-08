@@ -10,11 +10,13 @@ import { MovimientoCajaModule } from '../movimiento-caja/movimiento-caja.module'
 import { CajaModule } from '../caja/caja.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { EgresosModule } from '../egresos/egresos.module';
+import { CuentaBancariaModule } from '../fondos/cuenta-bancaria/cuenta-bancaria.module';
 
 @Module({
   imports: [
     AuthModule,
     TypeOrmModule.forFeature([Cobro, DetalleCobro]),
+    forwardRef(() => CuentaBancariaModule),    
     forwardRef(() => VentaModule),    
     forwardRef(()=> MovimientoCajaModule),
     forwardRef(() => CajaModule),

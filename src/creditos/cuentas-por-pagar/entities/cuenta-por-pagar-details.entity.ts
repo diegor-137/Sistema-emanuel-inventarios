@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { CuentaPorPagar } from "./cuenta-por-pagar-entity";
+import { TipoTransaccion } from "src/finanzas/tipo-transaccion/entities/tipo-transaccion.entity";
 
 
 
@@ -9,10 +10,10 @@ export class CuentaPorPagarDetalle {
     @PrimaryGeneratedColumn({name: 'id_estado_cuenta'})
     id?: number
 
-    @CreateDateColumn({ name: 'fecha', type: 'timestamp' })
+    @CreateDateColumn({ name: 'fecha', type: 'timestamp with time zone' })
     fecha?:Date
 
-    @Column({type: 'varchar', length: 45, nullable: false})
+    @Column({type: 'varchar', length: 200, nullable: true})
     descripcion?:string
 
     @Column({type:"decimal",precision:10,scale:2})
@@ -23,5 +24,9 @@ export class CuentaPorPagarDetalle {
 
     @ManyToOne(()=> CuentaPorPagar, credito=> credito.cuentaPorPagarDetalle)
     cuentaPorPagar?:CuentaPorPagar
+
+    @ManyToOne(() => TipoTransaccion, tipoTransaccion => tipoTransaccion.cuentaPorCobrarDetalle)
+    @JoinColumn({ name: "id_tipo_transaccion"})
+    tipoTransaccion?:TipoTransaccion;
     
 }

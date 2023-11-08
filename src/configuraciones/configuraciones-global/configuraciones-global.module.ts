@@ -9,6 +9,7 @@ import { ConfiguracionesGlobal } from './entities/configuraciones-global.entity'
     TypeOrmModule.forFeature([ConfiguracionesGlobal])
   ],
   controllers: [ConfiguracionesGlobalController],
-  providers: [ConfiguracionesGlobalService]
+  providers: [ConfiguracionesGlobalService],
+  exports: [ConfiguracionesGlobalService]
 })
 export class ConfiguracionesGlobalModule {}

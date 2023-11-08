@@ -15,6 +15,10 @@ import { historialEmp } from './historial-emp.entity';
 import { Traslado } from 'src/almacen/traslado/entities/traslado.entity';
 import { Envio } from 'src/almacen/envio/entities/envio.entity';
 import { CuentaBancaria } from 'src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria';
+import { DetalleCuentaBancaria } from 'src/finanzas/fondos/cuenta-bancaria/entities/detalle-cuenta-bancaria';
+import { Efectivo } from 'src/finanzas/fondos/efectivo/entities/efectivo.entity';
+import { DetalleEfectivo } from 'src/finanzas/fondos/efectivo/entities/detalle-efectivo';
+import { Pago } from 'src/finanzas/pago/entities/pago.entity';
 
 @Entity('empleado')
 export class Empleado{
@@ -92,6 +96,10 @@ export class Empleado{
     @OneToMany(() => Cobro, (cobro) => cobro.empleado)
     cobro:Cobro[]
 
+    /*********Pago*********/ 
+    @OneToMany(() => Pago, (pago) => pago.empleado)
+    pago:Pago[]
+
     /*********Caja*********/ 
     @OneToOne(() => Caja, (caja) => caja.empleado)
     caja:Caja
@@ -138,7 +146,19 @@ export class Empleado{
     @OneToMany(() => Envio, (envio) => envio.recepcionador)
     envioRecepcionador:Envio[]
 
-    /*********Envios*********/
+    /*********Cuenta Bancaria*********/
     @OneToMany(() => CuentaBancaria, (cuentaBancaria) => cuentaBancaria.empleado)
     cuentaBancaria:CuentaBancaria[]
+
+    /*********Detalle cuenta Bancaria*********/
+    @OneToMany(() => DetalleCuentaBancaria, (detalleCuentaBancaria) => detalleCuentaBancaria.empleado)
+    detalleCuentaBancaria:DetalleCuentaBancaria[]
+
+    /*********Efectivo*********/
+    @OneToMany(() => Efectivo, (efectivo) => efectivo.empleado)
+    efectivo:Efectivo[]
+
+    /*********Detalle Efectivo*********/
+    @OneToMany(() => DetalleEfectivo, (detalleEfectivo) => detalleEfectivo.empleado)
+    detalleEfectivo:DetalleEfectivo[]
 }

@@ -25,7 +25,13 @@ export class GastosController {
     const caja = await this.cajaService.findOne(user.empleado.id)
     createGastoDto.empleado= decodedJwtAccessToken.empleado
     createGastoDto.caja= caja
-    return this.gastosService.create(createGastoDto, fotoSend);
+    return this.gastosService.create(createGastoDto, fotoSend, user);
+  }
+
+  @Auth()
+  @Get('findCuentaGasto')
+  async findCuentaGasto(@User() user: UserEntity){
+    return await this.cajaService.findOne(user.empleado.id)
   }
 
   @Auth()

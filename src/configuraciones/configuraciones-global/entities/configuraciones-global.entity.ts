@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { CuentaBancaria } from "src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria";
+import { Efectivo } from "src/finanzas/fondos/efectivo/entities/efectivo.entity";
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity('configuracion-global')
@@ -6,11 +9,18 @@ export class ConfiguracionesGlobal {
 
     @PrimaryGeneratedColumn({name: 'id'})
     id: number
+    
+    @ManyToOne(()=> Sucursal, sucursal => sucursal.configuracionesGlobal)
+    sucursal:Sucursal
 
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    name: string;
+    @OneToOne(() => Efectivo)
+    @JoinColumn({name: 'id_efectivo'})
+    efectivo: Efectivo
 
-    @Column({type:'bool'})
-    checked:boolean
+    @OneToOne(() => CuentaBancaria, {
+        nullable:true
+    })
+    @JoinColumn({name: 'id_cuenta_bancaria'})
+    cuentaBancaria: CuentaBancaria
 
 }

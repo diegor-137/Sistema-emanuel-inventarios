@@ -10,6 +10,8 @@ import { MovimientoCajaService } from '../movimiento-caja/movimiento-caja.servic
 import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { Caja } from './entities/caja.entity';
+import { CreateEfectivoDto } from '../fondos/efectivo/dto/create-efectivo.dto';
+import { EfectivoService } from '../fondos/efectivo/efectivo.service';
 
 @Injectable()
 export class CajaService {
@@ -19,22 +21,35 @@ export class CajaService {
     private readonly cajaRepository: Repository<Caja>,
     private readonly empleadoService: EmpleadoService,
     private readonly movimientoCajaService: MovimientoCajaService,
-    private readonly corteCajaService: CorteCajaService
+    private readonly corteCajaService: CorteCajaService,
+    private readonly efectivoService: EfectivoService
   ) {}
 
   @Transactional()
   async create(createCajaDto: CreateCajaDto, user:User) {
     const limitCaja = await this.cajaRepository.find({where: {sucursal: {id: user.empleado.sucursal.id}, deletedAt: IsNull(), status: true}})
-    if(limitCaja.length>2)throw new UnauthorizedException('Ya no puede habilitar mas cajas')
+    if(limitCaja.length>3)throw new UnauthorizedException('Ya no puede habilitar mas cajas')
     const cajaEmpleado = await this.cajaRepository.findOne({relations: ['empleado'] ,where: {empleado: {id: createCajaDto.empleado.id}}});
     if(cajaEmpleado)throw new UnauthorizedException(`El empleado ${cajaEmpleado.empleado.nombre} ya tiene asignado una caja!`)                                        
-    const created = await this.cajaRepository.findOne({where: { lugar: createCajaDto.lugar, sucursal: {id: user.empleado.sucursal.id}}})
+    const created = await this.cajaRepository.findOne({where: { nombre: createCajaDto.nombre, sucursal: {id: user.empleado.sucursal.id}}})
     if(created) throw new BadRequestException('Ya existe la caja registrada.')
     createCajaDto.sucursal = user.empleado.sucursal;
+    const createEfectivoDto :CreateEfectivoDto={
+      detalleEfectivo: [{documento:'', descripcion:'Fondo inical Caja Chica', monto: createCajaDto.montoCajaChica, type:true}],
+      nombre: `Caja Chica ${createCajaDto.nombre}`,
+      cajaUse:true,
+    }
+    const efectivo = await this.efectivoService.create(createEfectivoDto, user)
+    createCajaDto.efectivo = efectivo
     const caja = await this.cajaRepository.save(createCajaDto);
-    await this.movimientoCajaService.create(createCajaDto.monto, 'FONDO DE APERTURA', 3, caja, true);
+    await this.movimientoCajaService.create(createCajaDto.monto, 'Fondo de apertura', 3, caja, true);
     let corte : CreateCorteCajaDto = {
-      caja:caja, corteCajaDetalle : [{monto: createCajaDto.monto, concepto: 'APERTURA', type: true }], empleado:user.empleado
+      caja:caja, 
+      corteCajaDetalle : [
+        {monto: createCajaDto.monto, concepto: 'Apertura', type: true },
+        {monto: createCajaDto.monto, concepto: 'SALDO', type: true }
+      ], 
+      empleado:user.empleado
     }
     await this.corteCajaService.save(corte)
     return {message: 'successful', ok: true}
@@ -43,7 +58,7 @@ export class CajaService {
   async findAll(user:User) {
     return await this.cajaRepository.createQueryBuilder("caja")
       .leftJoinAndSelect("caja.empleado", "empleado")
-      .select(["caja.id","caja.lugar", "caja.estado","empleado.id", "empleado.nombre", "empleado.apellido", "caja.status"])
+      .select(["caja.id","caja.nombre", "caja.estado","empleado.id", "empleado.nombre", "empleado.apellido", "caja.status"])
       .where("caja.sucursal.id = :id", {id: user.empleado.sucursal.id})
       .orderBy("caja.id", "ASC")
       .getMany();
@@ -62,7 +77,7 @@ export class CajaService {
   async update(id: number, user:User) {
     const caja = await this.cajaRepository.findOne({ where: {id, sucursal: {id: user.empleado.sucursal.id}}});
     const {balance} = await this.movimientoCajaService.ultimoMovimiento(caja.id);
-    if(balance != 0) throw new BadRequestException(`El saldo de la caja '${caja.lugar}' debe estar a Q.0.00`)
+    if(balance != 0) throw new BadRequestException(`El saldo de la caja '${caja.nombre}' debe estar a Q.0.00`)
     if(caja.status === true && caja.deletedAt === null){
       caja.estado = 'INACTIVO';
       caja.status = false;
@@ -83,7 +98,9 @@ export class CajaService {
 
   /* FUNCIONES USADAS FUERA DE SU MODULO*/
   async findOne(id:number){
-    return await this.cajaRepository.findOne({where: {
+    return await this.cajaRepository.findOne({
+    relations: ['efectivo'],
+    where: {
       empleado: {id}
     }})
   }
