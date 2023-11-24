@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataService } from '../../../common/service/common.service';
 import { Empleado } from '../entity/empleado.entity';
 import { CreateEmpleadoDto, EditEmpleadoDto } from '../dto';
-import { ILike, Repository } from 'typeorm';
+import { ILike, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateHistorialEmpDto } from '../dto/create-historial.dto';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
@@ -22,7 +22,9 @@ export class EmpleadoService{
         return await this.repository.find({
             relations:["puesto","sucursal"],
             where:[{
-                //email:"superadmin@gmail.com"
+                nombre:Not("Super"),
+                apellido:Not("admin"),
+
             }]
         })
     }
