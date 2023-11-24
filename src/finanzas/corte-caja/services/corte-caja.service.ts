@@ -1,21 +1,22 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
-import { CobroService } from '../cobro/cobro.service';
-import { GastosService } from '../gastos/gastos.service';
-import { IngresosService } from '../ingresos/ingresos.service';
-import { MovimientoCajaService } from '../movimiento-caja/movimiento-caja.service';
-import { CreateCorteCajaDetalle, CreateCorteCajaDto } from './dto/create-corte-caja.dto';
-import { CorteCaja } from './entities/corte-caja.entity';
-import { EgresosService } from '../egresos/egresos.service';
+import { CobroService } from '../../cobro/services/cobro.service';
+import { GastosService } from '../../gastos/gastos.service';
+import { IngresosService } from '../../ingresos/ingresos.service';
+import { MovimientoCajaService } from '../../movimiento-caja/movimiento-caja.service';
+import { CreateCorteCajaDetalle, CreateCorteCajaDto } from '../dto/create-corte-caja.dto';
+import { CorteCaja } from '../entities/corte-caja.entity';
+import { EgresosService } from '../../egresos/egresos.service';
 import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { CuentasPorCobrarService } from 'src/creditos/cuentas-por-cobrar/cuentas-por-cobrar.service';
 import { ConfiguracionesGlobalService } from 'src/configuraciones/configuraciones-global/configuraciones-global.service';
 import { User } from 'src/user/entities/user.entity';
-import { EfectivoService } from '../fondos/efectivo/efectivo.service';
-import { CreateEfectivoDto } from '../fondos/efectivo/dto/create-efectivo.dto';
-import { CreateDetalleEfectivoDto } from '../fondos/efectivo/dto/create-detalle-efectivo.dto';
-import { Caja } from '../caja/entities/caja.entity';
+import { EfectivoService } from '../../fondos/efectivo/efectivo.service';
+import { CreateEfectivoDto } from '../../fondos/efectivo/dto/create-efectivo.dto';
+import { CreateDetalleEfectivoDto } from '../../fondos/efectivo/dto/create-detalle-efectivo.dto';
+import { Caja } from '../../caja/entities/caja.entity';
+import { CobroConsultService } from '../../cobro/services/cobro-consult.service';
 
 
 @Injectable()
@@ -25,7 +26,9 @@ export class CorteCajaService {
     @InjectRepository(CorteCaja)
     public readonly corteCajaRepository: Repository<CorteCaja>,
     private readonly movimientoCajaService: MovimientoCajaService,
+    @Inject(forwardRef(() => CobroService))
     private readonly cobroService:CobroService,
+    private readonly cobroConsultService:CobroConsultService,
     private readonly ingresosService:IngresosService,
     private readonly egresosService:EgresosService,
     private readonly cuentasPorCobrarService:CuentasPorCobrarService,
@@ -73,7 +76,19 @@ export class CorteCajaService {
     await this.movimientoCajaService.create(montoMovimiento, `EGRESO CORTE NO. ${corte.id}`, 2, createCorteCajaDto.caja, false)
   }
 
-  //TODO:USANDO
+  async transaccionesSinCorte(caja:Caja){
+    const {balance} = await this.movimientoCajaService.ultimoMovimiento(caja.id);
+    const {cobro} = await this.totalCobro(caja.id);
+    const {cobroBanco} = await this.totalCobroBanco(caja.id);
+    const {cobroEfectivo} = await this.totalCobroEfectivo(caja.id);
+    const {ingreso} = await this.totalIngresos(caja.id);
+    const {egreso} = await this.totalEgresos(caja.id);
+    const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(caja.id);
+    const {cuentaPorCobrarEfectivo} = await this.totalCuentasPorCobrarEfectivo(caja.id);
+    const {cuentaPorCobrarBanco} = await this.totalCuentasPorCobrarBanco(caja.id);
+    return {balance, cobro, ingreso, egreso, cuentaPorCobrar, cobroBanco, cobroEfectivo, cuentaPorCobrarEfectivo, cuentaPorCobrarBanco}
+  }
+
   async lastCorte(id:number){
     return await this.corteCajaRepository.createQueryBuilder("corte_caja")
     .leftJoinAndSelect("corte_caja.empleado", "empleado")
@@ -88,30 +103,17 @@ export class CorteCajaService {
                   .getQuery()
                   return "corte_caja.fechas = " + subQuery})
     .getOne() 
-  }  
-
-  async transaccionesSinCorte(caja:Caja){
-    const {balance} = await this.movimientoCajaService.ultimoMovimiento(caja.id);
-    const {cobro} = await this.totalCobro(caja.id);
-    const {cobroBanco} = await this.totalCobroBanco(caja.id);
-    const {cobroEfectivo} = await this.totalCobroEfectivo(caja.id);
-    const {ingreso} = await this.totalIngresos(caja.id);
-    const {egreso} = await this.totalEgresos(caja.id);
-    const {cuentaPorCobrar} = await this.totalCuentasPorCobrar(caja.id);
-    const {cuentaPorCobrarEfectivo} = await this.totalCuentasPorCobrarEfectivo(caja.id);
-    const {cuentaPorCobrarBanco} = await this.totalCuentasPorCobrarBanco(caja.id);
-    return {balance, cobro, ingreso, egreso, cuentaPorCobrar, cobroBanco, cobroEfectivo, cuentaPorCobrarEfectivo, cuentaPorCobrarBanco}
-  }
+}
 
 /* ############# */
   async totalCobro(id:number){
-    return await this.cobroService.totalCobro(id)
+    return await this.cobroConsultService.totalCobro(id)
   }
   async totalCobroEfectivo(id:number){
-    return await this.cobroService.totalCobroEfectivo(id)
+    return await this.cobroConsultService.totalCobroEfectivo(id)
   }
   async totalCobroBanco(id:number){
-    return await this.cobroService.totalCobroBanco(id)
+    return await this.cobroConsultService.totalCobroBanco(id)
   }
 /* ############# */
 
@@ -159,62 +161,10 @@ export class CorteCajaService {
     return await this.cuentasPorCobrarService.cuentasPorCobrar(corte);
   }  
 
-  /* ####################################CONSULTA########################################################## */
-
-  async findAll(start: Date, end:Date, id:number) {
-    const st = new Date(start)
-    const en = new Date(end)
-    en.setDate(en.getDate() + 1);
-    return await this.corteCajaRepository.createQueryBuilder("corte_caja")
-    .leftJoin("corte_caja.empleado", "empleado")
-    .leftJoin("corte_caja.caja", "caja")
-    .leftJoin("corte_caja.corteCajaDetalle", "corteCajaDetalle")
-    .select(["corte_caja", "empleado.nombre", "empleado.apellido", "corteCajaDetalle"])
-    .where("caja.id = :id", {id})
-    .andWhere("corte_caja.fechas >= :st", {st})
-    .andWhere("corte_caja.fechas < :en", {en})
-    .having("corteCajaDetalle.concepto = :string", {string: "MONTO A RETIRAR"})
-    .orderBy("corte_caja.fechas", "ASC")
-    .groupBy("corte_caja.id, empleado.id, corteCajaDetalle.id")
-    .getMany()
-  }
-
-  async findOne(id:number){
-    const corte = await this.corteCajaRepository.createQueryBuilder("corte_caja")
-    .leftJoin("corte_caja.empleado", "empleado")
-    .leftJoin("corte_caja.caja", "caja")
-    .leftJoin("caja.empleado", "cajaEmpleado")
-    .leftJoin("corte_caja.corteCajaDetalle", "corteCajaDetalle")
-    .select(["corte_caja", "corteCajaDetalle","empleado.nombre", "empleado.apellido", "caja.id", "caja.nombre", "cajaEmpleado.nombre", "cajaEmpleado.apellido"])
-    .where({id})
-    .orderBy('corteCajaDetalle.id', 'ASC')
-    .getOne()
-    for (let i = 0; i < corte.corteCajaDetalle.length; i++) {
-      corte.corteCajaDetalle[i].monto = Number(corte.corteCajaDetalle[i].monto)
-      const element = corte.corteCajaDetalle[i];
-      if(element.concepto === 'VENTAS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){                
-        corte.corteCajaDetalle[0].monto -= corte.corteCajaDetalle[i].monto 
-      }
-      if(element.concepto === 'GASTOS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
-        corte.corteCajaDetalle[0].monto += corte.corteCajaDetalle[i].monto
-      }
-      if(element.concepto === 'EGRESOS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
-        corte.corteCajaDetalle[0].monto += corte.corteCajaDetalle[i].monto
-      }
-      if(element.concepto === 'INGRESOS' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
-        corte.corteCajaDetalle[0].monto -= corte.corteCajaDetalle[i].monto
-      }
-      if(element.concepto === 'CUENTAS POR COBRAR' && corte.corteCajaDetalle[0].concepto ==='SALADO CAJA'){
-        corte.corteCajaDetalle[0].monto -= corte.corteCajaDetalle[i].monto
-      }
-    }
-    return corte;
-  }
-
   /*############################################ DETALLE CORTE ############################################ */
   
   async ventasCobrosCorte(idCaja:number, idCorte:number){
-    return await this.cobroService.ventasCobrosCorte(idCaja, idCorte);
+    return await this.cobroConsultService.ventasCobrosCorte(idCaja, idCorte);
 
   }
   
@@ -230,7 +180,7 @@ export class CorteCajaService {
     return await this.cuentasPorCobrarService.cuentasPorCobrarCorte(idCorte, idCaja);
   }
 
-  /*############################################ FUNCIONES USADAS FUERA DE SU MODULO ############################################*/
+  /*############################################ FUNCIONES USADAS FUERA DE SU MODULO (CAJA) ############################################*/
   
   @Transactional({propagation: Propagation.MANDATORY})
   async save(corte:CreateCorteCajaDto){

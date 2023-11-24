@@ -10,9 +10,10 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 export class ConfiguracionesGlobalController {
   constructor(private readonly configuracionesGlobalService: ConfiguracionesGlobalService) {}
 
+  @Auth()
   @Post()
-  create(@Body() createConfiguracionesGlobalDto: CreateConfiguracionesGlobalDto) {
-    return this.configuracionesGlobalService.create(createConfiguracionesGlobalDto);
+  create(@Body() createConfiguracionesGlobalDto: CreateConfiguracionesGlobalDto, @User() user: UserEntity) {
+    return this.configuracionesGlobalService.create(createConfiguracionesGlobalDto, user);
   }
 
   @Auth()

@@ -14,9 +14,9 @@ export class ClientesReportController {
     return this.clientesReportService.findAllClientes(user)
   }
 
-  @Auth()
+/*   @Auth()
   @Get('creditosClientes')
   CreditoClientes(@User()user:UserEntity){
     return this.clientesReportService.creditosClientes(user)
-  }
+  } */
 }

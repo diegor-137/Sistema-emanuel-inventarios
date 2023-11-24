@@ -32,7 +32,7 @@ export class ClientesReportService {
         return listClientes
     }
 
-    async creditosClientes(user:User){
+/*     async creditosClientes(user:User){
         const data = await this.cuentasPorCobrarService
         .getTodostCuentasPorCobrar(user.empleado.sucursal)
 
@@ -58,6 +58,6 @@ export class ClientesReportService {
       }
 
       return resultadoCreditosActivos
-    }
+    } */
     
 }

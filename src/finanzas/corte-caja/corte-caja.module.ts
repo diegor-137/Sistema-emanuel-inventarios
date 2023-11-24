@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { CorteCajaService } from './corte-caja.service';
+import { CorteCajaService } from './services/corte-caja.service';
 import { CorteCajaController } from './corte-caja.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CorteCaja } from './entities/corte-caja.entity';
@@ -14,6 +14,7 @@ import { EgresosModule } from '../egresos/egresos.module';
 import { CuentasPorCobrarModule } from '../../creditos/cuentas-por-cobrar/cuentas-por-cobrar.module';
 import { ConfiguracionesGlobalModule } from 'src/configuraciones/configuraciones-global/configuraciones-global.module';
 import { EfectivoModule } from '../fondos/efectivo/efectivo.module';
+import { CorteCajaConsultService } from './services/corte-caja-consult.service';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { EfectivoModule } from '../fondos/efectivo/efectivo.module';
     TypeOrmModule.forFeature([CorteCaja, CorteCajaDetalle])
   ],
   controllers: [CorteCajaController],
-  providers: [CorteCajaService],
-  exports: [CorteCajaService]
+  providers: [CorteCajaService, CorteCajaConsultService],
+  exports: [CorteCajaService, CorteCajaConsultService]
 })
 export class CorteCajaModule {}

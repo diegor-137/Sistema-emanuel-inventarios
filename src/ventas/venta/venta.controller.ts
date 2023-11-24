@@ -36,7 +36,7 @@ export class VentaController{
     ){
         dto.empleado = user.empleado
         dto.sucursal = user.empleado.sucursal
-        return await this.ventaService.CreateOne(dto)
+        return await this.ventaService.CreateOne(dto, user)
     }
 
     @Auth()

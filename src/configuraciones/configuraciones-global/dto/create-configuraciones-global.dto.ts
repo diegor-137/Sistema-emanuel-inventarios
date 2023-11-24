@@ -12,4 +12,7 @@ export class CreateConfiguracionesGlobalDto {
 
     @IsOptional()
     cuentaBancaria:CuentaBancaria
+
+    @IsOptional()
+    ventaCobro:boolean
 }

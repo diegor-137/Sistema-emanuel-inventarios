@@ -5,7 +5,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { User as UserEntity} from 'src/user/entities/user.entity';
-import { CobroService } from './cobro.service';
+import { CobroService } from './services/cobro.service';
 
 
 @WebSocketGateway(91, {
@@ -30,7 +30,7 @@ export class CobroGateway implements OnGatewayConnection {
     const {token, idVenta, status} = usertoken  
     idVenta?await this.cobroService.updateVenta(idVenta, status):null; 
     const user = await this.authService.decodeToken(token);           
-    const ventas = await this.cobroService.findVentaToday(user);
+    const ventas = await this.cobroService.findVentaNoCobro(user);
     this.server.emit(user.empleado.sucursal.nombre, ventas);
   }
 }

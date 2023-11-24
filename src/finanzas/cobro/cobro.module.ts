@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { CobroService } from './cobro.service';
+import { CobroService } from './services/cobro.service';
 import { CobroController } from './cobro.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cobro } from './entities/cobro.entity';
@@ -11,6 +11,7 @@ import { CajaModule } from '../caja/caja.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { EgresosModule } from '../egresos/egresos.module';
 import { CuentaBancariaModule } from '../fondos/cuenta-bancaria/cuenta-bancaria.module';
+import { CobroConsultService } from './services/cobro-consult.service';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { CuentaBancariaModule } from '../fondos/cuenta-bancaria/cuenta-bancaria.
     forwardRef(() => EgresosModule),
   ],
   controllers: [CobroController],
-  providers: [CobroService, CobroGateway],
-  exports: [CobroService]
+  providers: [CobroService, CobroGateway, CobroConsultService],
+  exports: [CobroService, CobroConsultService]
 })
 export class CobroModule {}

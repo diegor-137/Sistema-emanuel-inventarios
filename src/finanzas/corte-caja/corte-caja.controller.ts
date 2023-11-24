@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, Inject, forwardRef, UseGuards } from '@nestjs/common';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
-import { CorteCajaService } from './corte-caja.service';
+import { CorteCajaService } from './services/corte-caja.service';
 import { CreateCorteCajaDto } from './dto/create-corte-caja.dto';
 import { User as UserEntity} from 'src/user/entities/user.entity';
 import { UpdateCorteCajaDto } from './dto/update-corte-caja.dto';
@@ -9,10 +9,12 @@ import { CajaService } from '../caja/caja.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../../auth/auth.service';
 import { CajaGuard } from '../caja/guards/caja-verification.guard';
+import { CorteCajaConsultService } from './services/corte-caja-consult.service';
 
 @Controller('corte-caja')
 export class CorteCajaController {
   constructor(private readonly corteCajaService: CorteCajaService,
+              private readonly CorteCajaConsultService: CorteCajaConsultService,
               private readonly cajaService:CajaService, 
               private readonly authService:AuthService) {}
 
@@ -138,13 +140,13 @@ export class CorteCajaController {
   @Auth()
   @Get()
   findAll(@Query() query: { start: Date, end:Date, id:number }) {
-    return this.corteCajaService.findAll(query.start, query.end, query.id);
+    return this.CorteCajaConsultService.findAll(query.start, query.end, query.id);
   }
 
   @Auth()
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.corteCajaService.findOne(+id);
+    return this.CorteCajaConsultService.findOne(+id);
   }
 
 

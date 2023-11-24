@@ -23,4 +23,7 @@ export class ConfiguracionesGlobal {
     @JoinColumn({name: 'id_cuenta_bancaria'})
     cuentaBancaria: CuentaBancaria
 
+    @Column({ name:'venta_cobro',type: 'bool', default: false })
+    ventaCobro: boolean
+
 }

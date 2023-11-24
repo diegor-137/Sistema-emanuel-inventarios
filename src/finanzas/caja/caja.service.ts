@@ -4,7 +4,7 @@ import { EmpleadoService } from 'src/recursos-humanos/empleado/services/empleado
 import { User } from 'src/user/entities/user.entity';
 import { Repository, IsNull } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { CorteCajaService } from '../corte-caja/corte-caja.service';
+import { CorteCajaService } from '../corte-caja/services/corte-caja.service';
 import { CreateCorteCajaDto } from '../corte-caja/dto/create-corte-caja.dto';
 import { MovimientoCajaService } from '../movimiento-caja/movimiento-caja.service';
 import { CreateCajaDto } from './dto/create-caja.dto';
@@ -28,7 +28,7 @@ export class CajaService {
   @Transactional()
   async create(createCajaDto: CreateCajaDto, user:User) {
     const limitCaja = await this.cajaRepository.find({where: {sucursal: {id: user.empleado.sucursal.id}, deletedAt: IsNull(), status: true}})
-    if(limitCaja.length>3)throw new UnauthorizedException('Ya no puede habilitar mas cajas')
+    //if(limitCaja.length>3)throw new UnauthorizedException('Ya no puede habilitar mas cajas')
     const cajaEmpleado = await this.cajaRepository.findOne({relations: ['empleado'] ,where: {empleado: {id: createCajaDto.empleado.id}}});
     if(cajaEmpleado)throw new UnauthorizedException(`El empleado ${cajaEmpleado.empleado.nombre} ya tiene asignado una caja!`)                                        
     const created = await this.cajaRepository.findOne({where: { nombre: createCajaDto.nombre, sucursal: {id: user.empleado.sucursal.id}}})
@@ -86,7 +86,7 @@ export class CajaService {
       return await this.cajaRepository.save(caja);      
     }else{
       const limitCaja = await this.cajaRepository.find({where: {sucursal: {id: user.empleado.sucursal.id}, deletedAt: IsNull(), status: true}})
-      if(limitCaja.length>2)throw new UnauthorizedException('Ya no puede habilitar mas cajas')      
+      //if(limitCaja.length>2)throw new UnauthorizedException('Ya no puede habilitar mas cajas')      
       caja.estado = 'ACTIVO';
       caja.status = true;
       caja.deletedAt = null;

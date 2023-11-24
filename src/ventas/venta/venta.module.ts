@@ -9,11 +9,13 @@ import { CuentasPorCobrarModule } from 'src/creditos/cuentas-por-cobrar/cuentas-
 import { CreditoClienteModule } from 'src/creditos/credito-cliente/credito-cliente.module';
 import { ExistenciaVentaService } from './services/existencia-venta.service';
 import { KardexModule } from 'src/almacen/kardex/kardex.module';
+import { CobroModule } from 'src/finanzas/cobro/cobro.module';
 
 @Module({
   imports:[
     forwardRef(()=>CuentasPorCobrarModule),
     forwardRef(()=>CreditoClienteModule),
+    forwardRef(()=>CobroModule),
     TypeOrmModule.forFeature([Venta,DetalleVenta]),
     ProductoModule,
     KardexModule,
