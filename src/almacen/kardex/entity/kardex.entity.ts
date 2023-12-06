@@ -10,7 +10,7 @@ export class Kardex{
     @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
     createdAt: Date;
 
-    @Column({type: 'varchar', length: 35, nullable: true})
+    @Column({type: 'varchar', length: 150, nullable: true})
     concepto: string
 
     @Column()

@@ -24,7 +24,6 @@ import { PagoModule } from './pago/pago.module';
     IngresosModule, 
     EgresosModule, 
     TransactionsModule,
-    CuentaBancariaModule,
     BancosModule,
     EfectivoModule,
     TipoGastoModule,

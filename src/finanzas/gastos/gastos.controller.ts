@@ -17,29 +17,19 @@ export class GastosController {
               private readonly authService:AuthService){}
 
   @Auth()
-  @UseGuards(CajaGuard)
   @Post()
   @UseInterceptors(FileInterceptor('fotoSend'))
   async create(@UploadedFile() fotoSend: Express.Multer.File,@Body() createGastoDto: CreateGastoDto, @User() user: UserEntity) {    
     const decodedJwtAccessToken = await this.authService.decodeToken(createGastoDto.token);
-    const caja = await this.cajaService.findOne(user.empleado.id)
     createGastoDto.empleado= decodedJwtAccessToken.empleado
-    createGastoDto.caja= caja
     return this.gastosService.create(createGastoDto, fotoSend, user);
-  }
-
-  @Auth()
-  @Get('findCuentaGasto')
-  async findCuentaGasto(@User() user: UserEntity){
-    return await this.cajaService.findOne(user.empleado.id)
   }
 
   @Auth()
   @UseGuards(CajaGuard)
   @Delete('delete/:id')
-  async deleteGasto(@Param('id') id: number, @User() user: UserEntity){
-    const caja = await this.cajaService.findOne(user.empleado.id)    
-    return this.gastosService.deleteGasto(id, user, caja);
+  async deleteGasto(@Param('id') id: number, @User() user: UserEntity){ 
+    return this.gastosService.deleteGasto(id, user);
   }
 
   @Auth()
@@ -48,12 +38,8 @@ export class GastosController {
     @Query('id', ParseIntPipe)id: number, 
     @Query('start')start: Date, 
     @Query('end')end: Date, 
-    @User() user: UserEntity){    
-    if(id===0){    
-      const caja = await this.cajaService.findOne(user.empleado.id)
-      id = caja.id
-    }    
-    return this.gastosService.findAll(start, end, id);
+    @User() user: UserEntity){       
+    return this.gastosService.findAll(start, end, user);
   }
 
   @Auth()

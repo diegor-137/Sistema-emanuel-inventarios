@@ -5,6 +5,7 @@ import { Column, CreateDateColumn, Entity, EntityRepository, JoinColumn, ManyToO
 
 import { DetalleCuentaBancaria } from "./detalle-cuenta-bancaria";
 import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
+import { Region } from "src/sucursales/region/entity/region.entity";
 import { Banco } from "../../bancos/entities/banco.entity";
 
 
@@ -29,9 +30,9 @@ export class CuentaBancaria {
     @JoinColumn({ name: "id_empleado"})
     empleado?:Empleado
 
-    @ManyToOne(() => Sucursal, (sucursal) => sucursal.cuentaBancaria)
-    @JoinColumn({ name: "id_sucursal"})
-    sucursal?:Sucursal
+    @ManyToOne(() => Region, (region) => region.cuentaBancaria)
+    @JoinColumn({ name: "id_region"})
+    region?:Region
 
     //-------Tablas Hijas--------
 

@@ -28,10 +28,11 @@ export class GastosService {
 
   @Transactional()
   async create(createGastoDto: CreateGastoDto, foto:Express.Multer.File, user:User) {
-    const {balance} = await this.EfectivoService.ultimoMovimiento(createGastoDto.caja.efectivo.id);
-    if(Number(createGastoDto.monto)>Number(balance)) throw new BadRequestException('El gasto no puede ser mayor al monto que se tiene en caja chica!')
+    const {balance} = await this.EfectivoService.ultimoMovimiento(createGastoDto.efectivo.id);
+    if(Number(createGastoDto.monto)>Number(balance)) throw new BadRequestException('El gasto no puede ser mayor al monto que se tiene disponible!')
     const uploadResult = await this.filesService.uploadPublicFile(foto.buffer, foto.originalname, `${createGastoDto.documento}-${createGastoDto.empleado.sucursal.nombre}-${createGastoDto.monto}`); 
     createGastoDto.foto = uploadResult
+    createGastoDto.sucursal = user.empleado.sucursal;
     const gasto = await this.gastoRepository.save(createGastoDto)
     const CreateDetalleEfectivoDto:CreateDetalleEfectivoDto={
       documento: `${gasto.documento}`,
@@ -39,12 +40,12 @@ export class GastosService {
       monto: gasto.monto,
       type: false
     }
-    await this.EfectivoService.transaccion(CreateDetalleEfectivoDto, user, createGastoDto.caja.efectivo.id);
+    await this.EfectivoService.transaccion(CreateDetalleEfectivoDto, user, createGastoDto.efectivo.id);
     return true; 
   }
 
   @Transactional()
-  async deleteGasto(id:number, user:User, caja:Caja){
+  async deleteGasto(id:number, user:User){
 /*     const gasto = await this.gastoRepository.findOne(id, {relations: ['corteCaja', 'foto']})
     if(!gasto || gasto.deletedAt != null )throw new BadRequestException('El gasto no existe o ya ha sido eliminado')
     const idArchivo= gasto.foto.id
@@ -59,25 +60,39 @@ export class GastosService {
     return gasto; */
 }
 
-  async findAll(start: Date, end:Date, id:number) {
+  async findAll(start: Date, end:Date, user:User) {
     const st = new Date(start)
     const en = new Date(end)
     en.setDate(en.getDate() + 1);
-    return await this.gastoRepository.createQueryBuilder("gastos")
+    /* return await this.gastoRepository.createQueryBuilder("gastos")
     .leftJoin("gastos.foto", "foto")
     .leftJoin("gastos.empleado", "empleado")
-    .leftJoin("gastos.caja", "caja")
     .leftJoin("gastos.tipoGasto", "tipoGasto")
-    .leftJoin("caja.empleado", "cajaEmpleado")
-    .select(["gastos", "empleado.nombre", "empleado.apellido", "caja.nombre", "cajaEmpleado.nombre", "cajaEmpleado.apellido", "foto", 
+    .leftJoin("gastos.sucursal", "sucursal")
+    .select(["gastos", "empleado.nombre", "empleado.apellido", "foto", 
     "tipoGasto.id", "tipoGasto.nombre"
     ])
-    .where("caja.id = :id", {id})
+    .where("gastos.sucursal.id = :id", {id:user.empleado.sucursal.id})
     .andWhere("gastos.fecha >= :st", {st})
     .andWhere("gastos.fecha < :en", {en})
     .andWhere("gastos.deleted_at IS NUll")
     .orderBy("gastos.fecha", "ASC")
-    .groupBy("gastos.id, empleado.id, caja.id_caja, cajaEmpleado.id, foto.id, tipoGasto.id")
+    .groupBy("gastos.id, empleado.id, foto.id, tipoGasto.id, sucursal.id")
+    .getMany() */
+    return await this.gastoRepository.createQueryBuilder("gastos")
+    .leftJoin("gastos.foto", "foto")
+    .leftJoin("gastos.empleado", "empleado")
+    .leftJoin("gastos.tipoGasto", "tipoGasto")
+    .leftJoin("gastos.sucursal", "sucursal")
+    .select(["gastos", "empleado.nombre", "empleado.apellido", "foto", 
+    "tipoGasto.id", "tipoGasto.nombre"
+    ])
+    .where("gastos.sucursal.id = :id", {id:user.empleado.sucursal.id})
+    .andWhere("gastos.fecha >= :st", {st})
+    .andWhere("gastos.fecha < :en", {en})
+    .andWhere("gastos.deleted_at IS NUll")
+    .orderBy("gastos.fecha", "ASC")
+    .groupBy("gastos.id, empleado.id, foto.id, tipoGasto.id, sucursal.id")
     .getMany()
   }  
 

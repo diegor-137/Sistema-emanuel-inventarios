@@ -4,6 +4,7 @@ import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.ent
 import { CorteCaja } from '../../corte-caja/entities/corte-caja.entity';
 import { FileAws3 } from '../../../files/entities/file.entity';
 import { TipoGasto } from "src/finanzas/tipo-gasto/entities/tipo-gasto.entity";
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 
 @Entity('gastos')
 export class Gasto {
@@ -17,8 +18,6 @@ export class Gasto {
     @Column({ name: 'deleted_at', nullable: true, type: 'timestamp with time zone' })
     deletedAt: Date;
 
-
-
     @Column({type: 'varchar', length: 45, nullable: false})
     descripcion:string
 
@@ -27,11 +26,11 @@ export class Gasto {
 
     @Column({type: 'varchar', length: 45, nullable: false})
     documento:number
-    
-    /* TABLAS PADRES */
-    @ManyToOne(() => Caja, (caja) => caja.gastos)
-    caja:Caja
 
+    @ManyToOne(() => Sucursal, (sucursal) => sucursal.gasto)
+    @JoinColumn({ name: "id_sucursal"})
+    sucursal?:Sucursal
+    
     @ManyToOne(()=> Empleado, empleado=> empleado.gastos)
     empleado:Empleado
 

@@ -15,14 +15,10 @@ export class CreateCajaDto {
 
     @IsNumber()
     monto:number
-    
-    @IsNumber()
-    montoCajaChica:number
 
     @IsOptional()
     estado:string
 
     sucursal:Sucursal
 
-    efectivo:Efectivo
 }

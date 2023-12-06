@@ -3,6 +3,8 @@ import { Caja } from '../../caja/entities/caja.entity';
 import { Empleado } from '../../../recursos-humanos/empleado/entity/empleado.entity';
 import { FileAws3 } from '../../../files/entities/file.entity';
 import { TipoGasto } from "src/finanzas/tipo-gasto/entities/tipo-gasto.entity";
+import { Efectivo } from "src/finanzas/fondos/efectivo/entities/efectivo.entity";
+import { Sucursal } from "src/sucursal/sucursal/entity/sucursal.entity";
 
 export class CreateGastoDto {
 
@@ -25,7 +27,10 @@ export class CreateGastoDto {
     @IsObject()
     tipoGasto:TipoGasto
 
-    caja?:Caja
+    @IsObject()
+    efectivo:Efectivo
+
+    sucursal:Sucursal
 
     empleado?:Empleado
 

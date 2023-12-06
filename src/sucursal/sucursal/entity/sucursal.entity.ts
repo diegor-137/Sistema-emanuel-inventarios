@@ -18,6 +18,7 @@ import { Envio } from "src/almacen/envio/entities/envio.entity";
 import { CuentaBancaria } from "src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria";
 import { Efectivo } from "src/finanzas/fondos/efectivo/entities/efectivo.entity";
 import { ConfiguracionesGlobal } from "src/configuraciones/configuraciones-global/entities/configuraciones-global.entity";
+import { Gasto } from "src/finanzas/gastos/entities/gasto.entity";
 
 @Entity('sucursal')
 export class Sucursal{
@@ -121,11 +122,11 @@ export class Sucursal{
 
     /*********Envios*********/
 
-    @OneToMany(()=> CuentaBancaria, cuentaBancaria => cuentaBancaria.sucursal)
-    cuentaBancaria:CuentaBancaria[]
-
     @OneToMany(()=> Efectivo, efectivo => efectivo.sucursal)
     efectivo:Efectivo[]
+
+    @OneToMany(()=> Gasto, gasto => gasto.sucursal)
+    gasto:Gasto[]
 
     @OneToMany(()=> ConfiguracionesGlobal, configuracionesGlobal => configuracionesGlobal.sucursal)
     configuracionesGlobal:ConfiguracionesGlobal[]

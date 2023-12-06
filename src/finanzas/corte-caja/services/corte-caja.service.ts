@@ -71,6 +71,8 @@ export class CorteCajaService {
       monto,
       type: true
     }
+    if(!efectivo) throw new BadRequestException('Debe registrar una cuenta en efectivo por defecto')
+    
     const montoMovimiento = Number(monto) + Number(banco)
     await this.efectivoService.transaccion(createDetalleEfectivoDto, user, efectivo.id);
     await this.movimientoCajaService.create(montoMovimiento, `EGRESO CORTE NO. ${corte.id}`, 2, createCorteCajaDto.caja, false)

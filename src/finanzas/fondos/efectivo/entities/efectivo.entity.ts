@@ -36,11 +36,4 @@ export class Efectivo {
 
     @Column({ type: 'boolean', default: true})
     estado?: boolean    
-    @Column({ type: 'boolean', default: false})
-    cajaUse?: boolean  
-    
-    @OneToOne(()=>Caja, caja =>caja.efectivo, {
-        cascade:true
-    })
-    caja?:Caja
 }

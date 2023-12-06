@@ -22,7 +22,6 @@ export class CajaService {
     private readonly empleadoService: EmpleadoService,
     private readonly movimientoCajaService: MovimientoCajaService,
     private readonly corteCajaService: CorteCajaService,
-    private readonly efectivoService: EfectivoService
   ) {}
 
   @Transactional()
@@ -34,13 +33,6 @@ export class CajaService {
     const created = await this.cajaRepository.findOne({where: { nombre: createCajaDto.nombre, sucursal: {id: user.empleado.sucursal.id}}})
     if(created) throw new BadRequestException('Ya existe la caja registrada.')
     createCajaDto.sucursal = user.empleado.sucursal;
-    const createEfectivoDto :CreateEfectivoDto={
-      detalleEfectivo: [{documento:'', descripcion:'Fondo inical Caja Chica', monto: createCajaDto.montoCajaChica, type:true}],
-      nombre: `Caja Chica ${createCajaDto.nombre}`,
-      cajaUse:true,
-    }
-    const efectivo = await this.efectivoService.create(createEfectivoDto, user)
-    createCajaDto.efectivo = efectivo
     const caja = await this.cajaRepository.save(createCajaDto);
     await this.movimientoCajaService.create(createCajaDto.monto, 'Fondo de apertura', 3, caja, true);
     let corte : CreateCorteCajaDto = {
@@ -99,7 +91,6 @@ export class CajaService {
   /* FUNCIONES USADAS FUERA DE SU MODULO*/
   async findOne(id:number){
     return await this.cajaRepository.findOne({
-    relations: ['efectivo'],
     where: {
       empleado: {id}
     }})

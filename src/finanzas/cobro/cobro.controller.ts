@@ -20,7 +20,7 @@ export class CobroController {
   @UseGuards(CajaGuard)
   @Post()
   async create(@Body() createCobroDto: CreateCobroDto, @User() user: UserEntity) {
-    return await this.cobroService.create(createCobroDto, user);
+    return await this.cobroService.create(createCobroDto, user, true);
   }
 
   @Auth()

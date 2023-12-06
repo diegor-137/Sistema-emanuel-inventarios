@@ -5,7 +5,10 @@ export enum Role {
   EMPLEADO = 'EMPLEADO',
   BODEGUERO = 'BODEGUERO',
   CAJERO = 'CAJERO',
-  SUPERADMIN = 'SUPERADMIN'
+  SUPERADMIN = 'SUPERADMIN',
+  RRHH = 'RRHH',
+  COMPRAS = 'COMPRAS',
+  VENTAS = 'VENTAS'
 }
 
 export enum Recurso {

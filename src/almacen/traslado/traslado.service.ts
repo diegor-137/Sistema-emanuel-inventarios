@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ExistenciaVentaService } from 'src/ventas/venta/services/existencia-venta.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { KardexService } from '../kardex/services/kardex.service';
 
 @Injectable()
 export class TrasladoService {
@@ -14,24 +15,35 @@ export class TrasladoService {
   constructor(
     @InjectRepository(Traslado)
     public readonly repository:Repository<Traslado>,
-    private readonly existencia:ExistenciaVentaService,)
+    private readonly existencia:ExistenciaVentaService,
+    private readonly kardexService:KardexService
+    )
     {}
 
   /* Solicitar una traslado, sucursal local */  
   async createOne(createTrasladoDto: CreateTrasladoDto){
     const traslado = this.repository.create(createTrasladoDto)
-    return this.repository.save(traslado);
+    return await this.repository.save(traslado);
   }
 
   /* Autorizar traslado, sucursal remota */
   @Transactional()
-  async autorizarTraslado(id:number, user:User){
-    const traslado = await this.repository.findOne(id, {relations: ['sucursalSol', 'detalle', 'detalle.producto']});
+  async autorizarTraslado(idtraslado:number, user:User){
+    const traslado = await this.repository.createQueryBuilder("traslado")
+    .leftJoinAndSelect("traslado.sucursalSol", "sucursalSol")
+    .leftJoinAndSelect("traslado.sucursalResp", "sucursalResp")
+    .leftJoinAndSelect("traslado.detalle", "detalle")
+    .loadRelationIdAndMap('detalle.producto', "detalle.producto")
+    .where("traslado.id = :idtraslado", {idtraslado})
+    .andWhere("sucursalResp.id = :id", {id:user.empleado.sucursal.id})
+    .getOne();
     traslado.status = 'AUTORIZADO';
     traslado.responsable = user.empleado;
     traslado.sucursalResp = user.empleado.sucursal;
     traslado.autorizarDate = new Date();
     await this.existencia.movimientosPorTraslado(traslado)
+    await this.kardexService.create(2,`Salida a ${traslado.sucursalSol.nombre}`,traslado.sucursalResp,traslado.id,traslado.detalle)
+    await this.kardexService.create(1,`Ingreso de ${traslado.sucursalResp.nombre}`,traslado.sucursalSol,traslado.id,traslado.detalle)
     return await this.repository.save(traslado)
   }
 

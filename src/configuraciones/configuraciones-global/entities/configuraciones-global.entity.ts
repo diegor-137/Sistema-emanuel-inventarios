@@ -13,7 +13,9 @@ export class ConfiguracionesGlobal {
     @ManyToOne(()=> Sucursal, sucursal => sucursal.configuracionesGlobal)
     sucursal:Sucursal
 
-    @OneToOne(() => Efectivo)
+    @OneToOne(() => Efectivo, {
+        nullable:true
+    })
     @JoinColumn({name: 'id_efectivo'})
     efectivo: Efectivo
 

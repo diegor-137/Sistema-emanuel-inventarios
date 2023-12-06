@@ -51,9 +51,6 @@ export class Caja {
     @OneToMany(() => MovimientoCaja, (MovimientoCaja) => MovimientoCaja.caja)
     MovimientoCaja:MovimientoCaja[]
 
-    @OneToMany(() => Gasto, (gasto) => gasto.caja)
-    gastos:Gasto[]
-
     @OneToMany(() => Ingreso, (ingreso) => ingreso.caja)
     ingreso:Ingreso[]
 
@@ -62,9 +59,5 @@ export class Caja {
 
     @OneToMany(() => CuentaPorCobrarDetalle, (cuentaPorCobrarDetalle) => cuentaPorCobrarDetalle.caja)
     cuentaPorCobrarDetalle: CuentaPorCobrarDetalle[]
-
-    @OneToOne(()=> Efectivo)
-    @JoinColumn({name:'id_efectivo'})
-    efectivo:Efectivo
 
 }

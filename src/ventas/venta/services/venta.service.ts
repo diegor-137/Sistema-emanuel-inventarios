@@ -64,6 +64,7 @@ export class VentaService{
     @Transactional()
     async CreateOne(dto:CreateVentaDto, user:User){
         dto.pago.code? dto.status = 'CREDITO':null;
+        dto.cobroVenta? dto.status = 'PAGADO':null;
         const venta = this.repository.create(dto)
         const ventaRealizada = await this.repository.save(venta)
         if(dto.pago.code){
@@ -73,7 +74,7 @@ export class VentaService{
         }
         if(dto.cobroVenta){
             dto.cobroVenta.venta = ventaRealizada;
-            await this.cobroService.create(dto.cobroVenta, user);
+            await this.cobroService.create(dto.cobroVenta, user, false);
         }
         await this.existencia.ingresoVenta(ventaRealizada)
         await this.kardexService.create(2,"Salida Venta",ventaRealizada.sucursal,ventaRealizada.id,ventaRealizada.detalle)

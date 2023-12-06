@@ -12,73 +12,73 @@ export class TrasladoController {
 
   @Auth()
   @Post()
-  createOne(@Body() createTrasladoDto: CreateTrasladoDto, @User() user: UserEntity) {
+  async createOne(@Body() createTrasladoDto: CreateTrasladoDto, @User() user: UserEntity) {
     createTrasladoDto.solicitador = user.empleado;
     createTrasladoDto.sucursalSol = user.empleado.sucursal
-    return this.trasladoService.createOne(createTrasladoDto);
+    return await this.trasladoService.createOne(createTrasladoDto);
   }
 
   @Auth()
   @Post('autorizarTraslado/:id')
-  autorizarTraslado(@Param('id',ParseIntPipe) id:number, @User() user: UserEntity) {
-    return this.trasladoService.autorizarTraslado(id, user);
+  async autorizarTraslado(@Param('id',ParseIntPipe) id:number, @User() user: UserEntity) {
+    return await this.trasladoService.autorizarTraslado(id, user);
   }
 
   /* Traslados local */
   @Auth()
   @Get('local')
-  findAllTrasladosPorSucursalLocal(@User() user: UserEntity) {
-    return this.trasladoService.findAllTrasladosPorSucursalLocal(user);
+  async findAllTrasladosPorSucursalLocal(@User() user: UserEntity) {
+    return await this.trasladoService.findAllTrasladosPorSucursalLocal(user);
   }
 
   /* Traslados autorizados sin envio remoto*/
   @Auth()
   @Get('noEnvio')
-  findAllTrasladosNoEnvio(@User() user: UserEntity) {
-    return this.trasladoService.findAllTrasladosNoEnvio(user);
+  async findAllTrasladosNoEnvio(@User() user: UserEntity) {
+    return await this.trasladoService.findAllTrasladosNoEnvio(user);
   }
 
   @Auth()
   @Get()
-  findAllTrasladosPorSucursal(@User() user: UserEntity) {
-    return this.trasladoService.findAllTrasladosPorSucursal(user);
+  async findAllTrasladosPorSucursal(@User() user: UserEntity) {
+    return await this.trasladoService.findAllTrasladosPorSucursal(user);
   }
 
   /* CONSULTAS */
 
   @Auth()
   @Get('porfecha/sucursal')
-  getTrasladosPorfechaSucusal(@User() user: UserEntity, @Query() query: { start: Date, end:Date}) {
-    return this.trasladoService.getTrasladosPorfechaSucusal(query.start, query.end, user);
+  async getTrasladosPorfechaSucusal(@User() user: UserEntity, @Query() query: { start: Date, end:Date}) {
+    return await this.trasladoService.getTrasladosPorfechaSucusal(query.start, query.end, user);
   }
 
   @Auth()
   @Get('ultimos/cincoSucursal')
-  ultimos5Sucursal(@User() user: UserEntity){
-    return this.trasladoService.ultimos5Sucursal(user)
+  async ultimos5Sucursal(@User() user: UserEntity){
+    return await this.trasladoService.ultimos5Sucursal(user)
   }
 
   @Auth()
   @Get('porfecha/local')
-  getTrasladosPorfechaLocal(@User() user: UserEntity, @Query() query: { start: Date, end:Date}) {
-    return this.trasladoService.getTrasladosPorfechaLocal(query.start, query.end, user);
+  async getTrasladosPorfechaLocal(@User() user: UserEntity, @Query() query: { start: Date, end:Date}) {
+    return await this.trasladoService.getTrasladosPorfechaLocal(query.start, query.end, user);
   }
 
   @Auth()
   @Get('ultimos/cinco-local')
-  ultimos5local(@User() user: UserEntity){
-    return this.trasladoService.ultimos5local(user)
+  async ultimos5local(@User() user: UserEntity){
+    return await this.trasladoService.ultimos5local(user)
   }
   
   @Auth()
   @Get('local/:id')
-  buscarTrasladoLocal(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity) {
-    return this.trasladoService.buscarTrasladoLocal(id, user);
+  async buscarTrasladoLocal(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity) {
+    return await this.trasladoService.buscarTrasladoLocal(id, user);
   }
   @Auth()
   @Get(':id')
-  buscarTraslado(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity) {
-    return this.trasladoService.buscarTraslado(id, user);
+  async buscarTraslado(@Param('id', ParseIntPipe) id: number, @User() user: UserEntity) {
+    return await this.trasladoService.buscarTraslado(id, user);
   }
 /* 
 

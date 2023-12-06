@@ -40,18 +40,18 @@ export class CobroService {
   ) { }
   
   @Transactional()
-  async create(createCobroDto: CreateCobroDto, user:User){
-    console.log(createCobroDto.venta);
-    
+  async create(createCobroDto: CreateCobroDto, user:User, cobroVenta:boolean){
     const decodedJwtAccessToken = await this.authService.decodeToken(createCobroDto.token);
     const caja = await this.cajaService.findOne(user.empleado.id)
     createCobroDto.empleado = decodedJwtAccessToken.empleado
-    createCobroDto.caja = caja   
-    const venta = await this.ventasRepository.repository.findOne({where: {
-      id:createCobroDto.venta.id
-    }})
-    venta.status = 'PAGADO'
-    await this.ventasRepository.repository.save(venta);
+    createCobroDto.caja = caja  
+    if(cobroVenta){
+      const venta = await this.ventasRepository.repository.findOne({where: {
+        id:createCobroDto.venta.id
+      }})
+      venta.status = 'PAGADO'
+      await this.ventasRepository.repository.save(venta);
+    } 
     await createCobroDto.detalleCobro.reduce(async(b:any, a)=>{
       await b;
       if(a.tipoTransaccion.id !==1){
@@ -65,9 +65,8 @@ export class CobroService {
   }
 
 /* ####### TRASLADADO AL SERVICIO DE VENTAS ####### */   
-  async updateVenta(id:number, status:string){
+  async updateVenta(id:number){
     const venta = await this.ventasRepository.repository.findOne(id)
-    venta.status = status
     return await this.ventasRepository.repository.save(venta);
   }
 /* ####### TRASLADADO AL SERVICIO DE VENTAS ####### */ 

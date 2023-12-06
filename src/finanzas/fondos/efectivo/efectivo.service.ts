@@ -67,17 +67,14 @@ export class EfectivoService {
   }
 
 
-  async getCuentas(user:User, cajaUse:boolean, caja?:Caja){
+  async getCuentas(user:User){
 
     return await this.efectivoRepository.createQueryBuilder('efectivo')
     .leftJoinAndSelect(
       "efectivo.detalleEfectivo", "detalleEfectivo", 
       "detalleEfectivo.efectivo.id=efectivo.id"
     )
-    .leftJoinAndSelect("efectivo.caja", "caja")
     .where("efectivo.sucursal.id = :idSucursal", {idSucursal:user.empleado.sucursal.id})
-    .andWhere("efectivo.cajaUse = :cajaUse", {cajaUse}) 
-    .andWhere(cajaUse? "efectivo.id = :idEfectivo" : 'TRUE', {idEfectivo:caja?.efectivo.id}) 
     .andWhere(
       (query) =>
       "detalleEfectivo.id=" +
@@ -113,7 +110,6 @@ export class EfectivoService {
   async getEfectivoEncabezado(user:User){
     return await this.efectivoRepository.createQueryBuilder("efectivo")
     .where("efectivo.sucursal.id = :idSucursal", {idSucursal:user.empleado.sucursal.id})
-    .andWhere("efectivo.cajaUse = FALSE", {idSucursal:user.empleado.sucursal.id})
     .getMany();
   }
 }

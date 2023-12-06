@@ -4,6 +4,7 @@ import { DetalleCuentaBancaria } from '../entities/detalle-cuenta-bancaria';
 import { CreateDetalleCuentaBancariaDto } from './create-detalle-cuenta-bancaria.dto';
 import { Sucursal } from 'src/sucursal/sucursal/entity/sucursal.entity';
 import { Banco } from '../../bancos/entities/banco.entity';
+import { Region } from 'src/sucursales/region/entity/region.entity';
 
 export class CreateCuentaBancariaDto {
 
@@ -21,7 +22,7 @@ export class CreateCuentaBancariaDto {
 
     empleado:Empleado
 
-    sucursal:Sucursal
+    region:Region
 
     @IsNotEmpty()
     detalleCuentaBancaria:CreateDetalleCuentaBancariaDto[]

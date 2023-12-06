@@ -27,7 +27,7 @@ export class CuentaBancariaService {
   @Transactional()
   async create(createCuentaBancariaDto:CreateCuentaBancariaDto, user:User){
     createCuentaBancariaDto.empleado = user.empleado
-    createCuentaBancariaDto.sucursal = user.empleado.sucursal
+    createCuentaBancariaDto.region = user.empleado.sucursal.region
     createCuentaBancariaDto.detalleCuentaBancaria.forEach((data)=>{
       data.balance = data.monto,
       data.empleado = user.empleado
@@ -96,11 +96,12 @@ export class CuentaBancariaService {
 
     return await this.cuentaBancariaRepository.createQueryBuilder('cuenta_bancaria')
     .leftJoinAndSelect("cuenta_bancaria.banco", "banco")
+    .leftJoinAndSelect("cuenta_bancaria.region", "region")
     .leftJoinAndSelect(
       "cuenta_bancaria.detalleCuentaBancaria", "detalleCuentaBancaria", 
       "detalleCuentaBancaria.cuentaBancaria.id=cuenta_bancaria.id"
     )
-    .where("cuenta_bancaria.sucursal.id = :idSucursal", {idSucursal:user.empleado.sucursal.id})
+    .where("cuenta_bancaria.region.id = :idRegion", {idRegion:user.empleado.sucursal.region.id})
     .andWhere(
       (query) =>
       "detalleCuentaBancaria.id=" +
@@ -122,7 +123,7 @@ export class CuentaBancariaService {
 
   async getCuentasDetail(id:number, user:User){
     return (await this.common())
-          .where("cuenta_bancaria.sucursal.id = :idSucursal", {idSucursal:user.empleado.sucursal.id})
+          .where("cuenta_bancaria.region.id = :idRegion", {idRegion:user.empleado.sucursal.region.id})
           .andWhere("cuenta_bancaria.id = :idCuenta", {idCuenta:id})
           .getOne()
   }
@@ -138,7 +139,7 @@ export class CuentaBancariaService {
   async getCuentasEncabezado(user:User){
     return await this.cuentaBancariaRepository.createQueryBuilder("cuenta_bancaria")
     .leftJoinAndSelect('cuenta_bancaria.banco', 'banco')
-    .where("cuenta_bancaria.sucursal.id = :idSucursal", {idSucursal:user.empleado.sucursal.id})
+    .where("cuenta_bancaria.region.id = :idRegion", {idRegion:user.empleado.sucursal.region.id})
     .getMany();
   }
 }
