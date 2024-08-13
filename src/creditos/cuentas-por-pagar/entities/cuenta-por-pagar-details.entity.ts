@@ -24,9 +24,5 @@ export class CuentaPorPagarDetalle {
 
     @ManyToOne(()=> CuentaPorPagar, credito=> credito.cuentaPorPagarDetalle)
     cuentaPorPagar?:CuentaPorPagar
-
-    @ManyToOne(() => TipoTransaccion, tipoTransaccion => tipoTransaccion.cuentaPorCobrarDetalle)
-    @JoinColumn({ name: "id_tipo_transaccion"})
-    tipoTransaccion?:TipoTransaccion;
     
 }

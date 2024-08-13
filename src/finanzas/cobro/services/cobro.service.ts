@@ -51,12 +51,14 @@ export class CobroService {
       }})
       venta.status = 'PAGADO'
       await this.ventasRepository.repository.save(venta);
-    } 
+      console.log('PAGADO DESDE CAJA');
+    }
+    console.log('PAGADO DESDE VENTAS'); 
     await createCobroDto.detalleCobro.reduce(async(b:any, a)=>{
       await b;
       if(a.tipoTransaccion.id !==1){
         a.descripcion = `Doc. no ${a.documento} cuenta No. ${a.cuentaBancaria.numero} ${a.cuentaBancaria.banco.nombre}`
-        await this.createMovimientoBanco(a.documento, a.monto, Number(createCobroDto.venta), a.cuentaBancaria, user)
+        await this.createMovimientoBanco(a.documento, a.monto, Number(createCobroDto.venta.id), a.cuentaBancaria, user)
       }
     }, 0.00);
     const total = createCobroDto.detalleCobro.reduce((a:number, b)=>a+b.monto,0);

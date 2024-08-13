@@ -40,7 +40,7 @@ export class CreateCompraDto {
     doc?:string
 
     @IsOptional()
-    pago?:CreatePagoDto
+    pago?:CreatePagoDto[]
 
 }
 

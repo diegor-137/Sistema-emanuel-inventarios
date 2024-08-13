@@ -26,11 +26,6 @@ export class TipoTransaccion {
     })
     cuentaPorCobrarDetalle: CuentaPorCobrarDetalle[];
 
-    @OneToMany(() => CuentaPorPagarDetalle, cuentaPorPagarDetalle => cuentaPorPagarDetalle.tipoTransaccion,{
-        nullable: true
-    })
-    cuentaPorPagarDetalle: CuentaPorPagarDetalle[];
-
     @OneToMany(() => DetallePago, detallePago => detallePago.tipoTransaccion,{
         nullable: true
     })

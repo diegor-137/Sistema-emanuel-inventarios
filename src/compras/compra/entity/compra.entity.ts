@@ -55,6 +55,6 @@ export class Compra{
     @OneToOne(()=> CuentaPorPagar, cuentaPorPagar =>cuentaPorPagar.compra)
     cuentaPorPagar:CuentaPorPagar
     
-    @OneToOne(() => Pago, (Pago) => Pago.compra) // specify inverse side as a second parameter
-    pago?: Pago
+    @OneToMany(() => Pago, (Pago) => Pago.compra) // specify inverse side as a second parameter
+    pago?: Pago []
 }

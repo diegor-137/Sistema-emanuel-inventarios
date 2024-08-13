@@ -16,6 +16,7 @@ import { CreateDetalleCuentaBancariaDto } from 'src/finanzas/fondos/cuenta-banca
 import { CuentaBancaria } from 'src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria';
 import { CreateDetalleEfectivoDto } from 'src/finanzas/fondos/efectivo/dto/create-detalle-efectivo.dto';
 import { EfectivoService } from 'src/finanzas/fondos/efectivo/efectivo.service';
+import { PagoService } from 'src/finanzas/pago/pago.service';
 
 @Injectable()
 export class CuentaPorPagarService {
@@ -28,7 +29,8 @@ export class CuentaPorPagarService {
     @Inject(forwardRef(() => CreditoProveedorService))
     private readonly creditoProveedorService:CreditoProveedorService,
     private readonly CuentaBancariaService:CuentaBancariaService,
-    private readonly efectivoService:EfectivoService
+    private readonly efectivoService:EfectivoService,
+    private readonly pagoService:PagoService,
   ){}
 
   async create(compra:Compra, empleado:Empleado) {
@@ -115,7 +117,7 @@ export class CuentaPorPagarService {
 
   
 
-  async pago(cuentaPorPagar:CreateCuentaPorPagarDto, user:User){
+  /* async pago(cuentaPorPagar:CreateCuentaPorPagarDto, user:User){
     const lastCuentaPorPagarDet =  await this.lastCuentaPorPagarDet(cuentaPorPagar.id);
     let balance = Number(lastCuentaPorPagarDet.balance);
     await cuentaPorPagar.detalleCuentaPorPagar.reduce(async(b:any, a)=>{
@@ -137,6 +139,27 @@ export class CuentaPorPagarService {
     cuenta.comentario=cuenta.comentario
     return await this.cuentaPorPagarRepository.save(cuenta);
 
+  } */
+
+  @Transactional()
+  async pago(cuentaPorPagar:CreateCuentaPorPagarDto, user:User){
+    const lastCuentaPorPagarDet =  await this.lastCuentaPorPagarDet(cuentaPorPagar.id);
+    const cuenta = await this.cuentaPorPagarRepository.findOne(cuentaPorPagar.id,{ relations: ['compra']});
+    cuentaPorPagar.pago.compra = cuenta.compra;
+    cuentaPorPagar.pago.empleado = user.empleado;
+    const pago = await this.pagoService.create(cuentaPorPagar.pago, user, 'EGRESO CREDITO, COMPRA NO.');
+    const detalleCuentaPorPagar : CreateCuentasPorPagarDetalleDto = {
+      monto: lastCuentaPorPagarDet.balance,
+      cuentaPorPagar: lastCuentaPorPagarDet.cuentaPorPagar,
+      descripcion: `PAGO TOTAL CREDITO`,
+      balance: 0,
+      documento: `PAGO NO. ${pago.id}`,
+    }
+    await this.cuentaPorPagarDetalleRepository.save(detalleCuentaPorPagar);
+    cuenta.estado=true
+    cuenta.fechaFinal=new Date();
+    cuenta.comentario=cuentaPorPagar.comentario
+    return await this.cuentaPorPagarRepository.save(cuenta);
   }
 
   async createMovimientoBanco(doc:string, cantidad:number, cuentaPorPagar:CuentaPorPagar, cuenta:CuentaBancaria, user:User){
@@ -151,6 +174,7 @@ export class CuentaPorPagarService {
 
   async lastCuentaPorPagarDet(id:number){
     return  await this.cuentaPorPagarDetalleRepository.createQueryBuilder('cuentas_por_pagar_detalle')
+    .innerJoinAndSelect('cuentas_por_pagar_detalle.cuentaPorPagar', 'cuentaPorPagar')
     .select()
     .where("cuentas_por_pagar_detalle.cuentaPorPagar.id = :id", {id})
     .orderBy('cuentas_por_pagar_detalle.id', 'DESC')

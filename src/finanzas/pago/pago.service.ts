@@ -23,24 +23,59 @@ export class PagoService {
   ) { }
 
   @Transactional()
-  async create(createPagoDto: CreatePagoDto, user:User) {
+  async create(createPagoDto: CreatePagoDto, user:User, descripcion:string) {
       await createPagoDto.detallePago.reduce(async(b:any, a)=>{
         await b;
         if(a.tipoTransaccion.id == 1){
-          await this.createMovimientoEfectivo('', a.monto, createPagoDto.compra, user, createPagoDto.efectivo);         
+          await this.createMovimientoEfectivo('', a.monto, createPagoDto.compra, user, createPagoDto.efectivo, descripcion);         
         }else{
         a.descripcion = `Doc. no ${a.documento} cuenta No. ${a.cuentaBancaria.numero} ${a.cuentaBancaria.banco.nombre}`
-          await this.createMovimientoBanco(a.documento, a.monto, createPagoDto.compra, a.cuentaBancaria, user)
+          await this.createMovimientoBanco(a.documento, a.monto, createPagoDto.compra, a.cuentaBancaria, user, descripcion)
         }
       }, 0.00);
       return await this.pagoRepository.save(createPagoDto);
   }
 
+  async findAll(start: Date, end:Date, idSucursal:number) {
+    const st = new Date(start)
+    const en = new Date(end)
+    en.setDate(en.getDate() + 1);
+    return await this.pagoRepository.createQueryBuilder("pago")            
+            .leftJoin("pago.empleado", "empleado")
+            .leftJoin("pago.compra", "compra")
+            .leftJoin("compra.sucursal", "sucursal")
+            .leftJoin("compra.proveedor", "proveedor")
+            .leftJoin("pago.detallePago", "detallePago")
+            .leftJoin("detallePago.tipoTransaccion", "tipoTransaccion")
+            .select(["pago.id as id", "pago.fecha as fecha", "empleado.nombre as nombre", "empleado.apellido as apellido", 
+            "compra.documento as documento","proveedor.nombre as proveedor","SUM(detallePago.monto) as total"])
+            .where("sucursal.id = :idSucursal", {idSucursal})
+            .andWhere("pago.fecha >= :st", {st})
+            .andWhere("pago.fecha < :en", {en})
+            .andWhere("pago.deletedAt IS NULL")
+            .orderBy("pago.fecha", "ASC")
+            .groupBy("pago.id, empleado.nombre, empleado.apellido, compra.documento, proveedor.nombre")
+            .getRawMany();      
+  }
+/* , empleado.id, compra.id, sucursal.id, proveedor.id, tipoTransaccion.id, detallePago.id */
+  async findPago(id: number) {
+    return await this.pagoRepository.createQueryBuilder("pago")
+            .leftJoinAndSelect("pago.empleado", "empleado")      
+            .leftJoinAndSelect("pago.compra", "compra")      
+            .leftJoinAndSelect("compra.proveedor", "proveedor")      
+            .leftJoinAndSelect("pago.detallePago", "detallePago")      
+            .leftJoinAndSelect("detallePago.tipoTransaccion", "tipoTransaccion")
+            .select(["pago.id", "pago.fecha", "empleado.nombre", "empleado.apellido", "compra.documento", "compra.createdAt",
+            "proveedor.id", "proveedor.nombre", "proveedor.direccion",  "proveedor.nit","detallePago", "tipoTransaccion"])
+            .where("pago.id = :id", {id})
+            .getOne()      
+  }
+
   @Transactional({propagation: Propagation.MANDATORY})
-  async createMovimientoBanco(doc:string, monto:number, compra:Compra, cuenta:CuentaBancaria, user:User){
+  async createMovimientoBanco(doc:string, monto:number, compra:Compra, cuenta:CuentaBancaria, user:User, descripcion:string){
     const detalle:CreateDetalleCuentaBancariaDto={
       documento: doc,
-      descripcion: `EGRESO POR COMPRA NO. ${compra.documento}`,
+      descripcion: `${descripcion} ${compra.documento}`,
       monto,
       type: false,
     }
@@ -48,10 +83,10 @@ export class PagoService {
   }
 
   @Transactional({propagation: Propagation.MANDATORY})
-  async createMovimientoEfectivo(doc:string, cantidad:number, compra:Compra, user:User, id:number){
+  async createMovimientoEfectivo(doc:string, cantidad:number, compra:Compra, user:User, id:number, descripcion:string){
     const detalle:CreateDetalleEfectivoDto={
       documento: doc,
-      descripcion: `EGRESO POR COMPRA NO. ${compra.documento}`,
+      descripcion: `${descripcion} ${compra.documento}`,
       monto: cantidad,
       type: false
     }

@@ -27,7 +27,7 @@ export class CuentaPorPagar {
 
     @OneToOne(()=> Compra, compra => compra.cuentaPorPagar)
     @JoinColumn()
-    compra?:Compra
+    compra:Compra
 
     @OneToMany(()=> CuentaPorPagarDetalle, cuentaPorPagarDetalle=> cuentaPorPagarDetalle.cuentaPorPagar, {
         cascade: true,

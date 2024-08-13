@@ -79,8 +79,8 @@ export class CompraService{
             await this.creditoProveedorService.findOneAndAllowCredit(compraRealizada, dto.empleado)
             await this.cuentaPorPagarService.create(compraRealizada, dto.empleado);
         }else{
-            dto.pago.compra = compraRealizada
-            await this.pagoService.create(dto.pago, user);
+            dto.pago[0].compra = compraRealizada;
+            await this.pagoService.create(dto.pago[0], user, 'EGRESO POR COMPRA NO.');
         }
         return compraRealizada
     }

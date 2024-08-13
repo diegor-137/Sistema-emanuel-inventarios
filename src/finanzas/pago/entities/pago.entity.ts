@@ -21,7 +21,7 @@ export class Pago {
     @JoinColumn({ name: "id_empleado"})
     empleado:Empleado
 
-    @OneToOne(() => Compra, (compra) => compra.pago)
+    @ManyToOne(() => Compra, (compra) => compra.pago)
     @JoinColumn({ name: "id_compra"})
     compra:Compra
 

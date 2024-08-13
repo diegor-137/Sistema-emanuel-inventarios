@@ -2,6 +2,7 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 import { CuentaPorPagar } from '../entities/cuenta-por-pagar-entity';
 import { TipoTransaccion } from 'src/finanzas/tipo-transaccion/entities/tipo-transaccion.entity';
 import { CuentaBancaria } from 'src/finanzas/fondos/cuenta-bancaria/entities/cuenta-bancaria';
+import { CreatePagoDto } from 'src/finanzas/pago/dto/create-pago.dto';
 
 export class CreateCuentaPorPagarDto {
 
@@ -11,11 +12,8 @@ export class CreateCuentaPorPagarDto {
     @IsOptional()
     comentario?:string
 
-    @IsNotEmpty()
-    efectivo:number
-
     @IsOptional()
-    detalleCuentaPorPagar:CreateCuentasPorPagarDetalleDto[]
+    pago:CreatePagoDto
 
 }
 
@@ -34,15 +32,5 @@ export class CreateCuentasPorPagarDetalleDto {
     balance:number
 
     @IsOptional()
-    tipoTransaccion:TipoTransaccion
-
-    @IsOptional()
     documento:string
-
-    @IsOptional()
-    estado:boolean
-
-    @IsOptional()
-    cuentaBancaria:CuentaBancaria
-
 }
